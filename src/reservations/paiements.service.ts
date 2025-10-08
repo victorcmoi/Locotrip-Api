@@ -1,13 +1,24 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { Prisma } from '@prisma/client';
+import { CreatePaiementDto } from './dto/create-paiement.dto';
+import { UpdatePaiementDto } from './dto/update-paiement.dto';
 
 @Injectable()
 export class PaiementsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.paiementCreateInput) {
-    return this.prisma.paiement.create({ data });
+  async create(createPaiementDto: CreatePaiementDto) {
+    return this.prisma.paiement.create({
+      data: {
+        montant: createPaiementDto.montant,
+        methode: createPaiementDto.methode,
+        statut: createPaiementDto.statut,
+        stripe_id: createPaiementDto.stripe_id,
+        reservation: {
+          connect: { id: createPaiementDto.reservation_id },
+        },
+      },
+    });
   }
 
   async findAll() {
@@ -49,8 +60,16 @@ export class PaiementsService {
     });
   }
 
-  async update(id: string, data: Prisma.paiementUpdateInput) {
+  async update(id: string, updatePaiementDto: UpdatePaiementDto) {
     try {
+      const data: any = { ...updatePaiementDto };
+      
+      // Transformer l'ID en relation si présent
+      if (updatePaiementDto.reservation_id) {
+        data.reservation = { connect: { id: updatePaiementDto.reservation_id } };
+        delete data.reservation_id;
+      }
+      
       return await this.prisma.paiement.update({
         where: { id },
         data,

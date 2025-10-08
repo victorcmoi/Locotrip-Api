@@ -1,13 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { Prisma } from '@prisma/client';
+import { CreateSupportTicketDto } from './dto/create-support-ticket.dto';
 
 @Injectable()
 export class SupportTicketsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.support_ticketCreateInput) {
-    return this.prisma.support_ticket.create({ data });
+  async create(createSupportTicketDto: CreateSupportTicketDto) {
+    return this.prisma.support_ticket.create({
+      data: {
+        sujet: createSupportTicketDto.sujet,
+        statut: createSupportTicketDto.statut,
+        utilisateur: {
+          connect: { id: createSupportTicketDto.utilisateur_id },
+        },
+      },
+    });
   }
 
   async findAll() {
@@ -60,8 +68,16 @@ export class SupportTicketsService {
     });
   }
 
-  async update(id: string, data: Prisma.support_ticketUpdateInput) {
+  async update(id: string, updateData: Partial<CreateSupportTicketDto>) {
     try {
+      const data: any = { ...updateData };
+      
+      // Transformer l'ID en relation si présent
+      if (updateData.utilisateur_id) {
+        data.utilisateur = { connect: { id: updateData.utilisateur_id } };
+        delete data.utilisateur_id;
+      }
+      
       return await this.prisma.support_ticket.update({
         where: { id },
         data,

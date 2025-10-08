@@ -1,13 +1,28 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { Prisma } from '@prisma/client';
+import { CreateExperienceDto } from './dto/create-experience.dto';
+import { UpdateExperienceDto } from './dto/update-experience.dto';
 
 @Injectable()
 export class ExperiencesService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.experienceCreateInput) {
-    return this.prisma.experience.create({ data });
+  async create(createExperienceDto: CreateExperienceDto) {
+    return this.prisma.experience.create({
+      data: {
+        titre: createExperienceDto.titre,
+        description: createExperienceDto.description,
+        prix: createExperienceDto.prix,
+        duree: createExperienceDto.duree,
+        capacite_max: createExperienceDto.capacite_max,
+        ville: {
+          connect: { id: createExperienceDto.ville_id },
+        },
+        guide: {
+          connect: { id: createExperienceDto.guide_id },
+        },
+      },
+    });
   }
 
   async findAll() {
@@ -89,8 +104,21 @@ export class ExperiencesService {
     });
   }
 
-  async update(id: string, data: Prisma.experienceUpdateInput) {
+  async update(id: string, updateExperienceDto: UpdateExperienceDto) {
     try {
+      const data: any = { ...updateExperienceDto };
+      
+      // Transformer les IDs en relations si présents
+      if (updateExperienceDto.ville_id) {
+        data.ville = { connect: { id: updateExperienceDto.ville_id } };
+        delete data.ville_id;
+      }
+      
+      if (updateExperienceDto.guide_id) {
+        data.guide = { connect: { id: updateExperienceDto.guide_id } };
+        delete data.guide_id;
+      }
+      
       return await this.prisma.experience.update({
         where: { id },
         data,

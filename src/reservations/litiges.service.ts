@@ -1,12 +1,29 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { Prisma } from '@prisma/client';
+import { CreateLitigeDto } from './dto/create-litige.dto';
+import { UpdateLitigeDto } from './dto/update-litige.dto';
 
 @Injectable()
 export class LitigesService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.litigeCreateInput) {
+  async create(createLitigeDto: CreateLitigeDto) {
+    const data: any = {
+      motif: createLitigeDto.motif,
+      statut: createLitigeDto.statut,
+      reservation: {
+        connect: { id: createLitigeDto.reservation_id },
+      },
+      utilisateur: {
+        connect: { id: createLitigeDto.utilisateur_id },
+      },
+    };
+    
+    // Ajouter l'admin si fourni
+    if (createLitigeDto.admin_id) {
+      data.admin = { connect: { id: createLitigeDto.admin_id } };
+    }
+    
     return this.prisma.litige.create({ data });
   }
 
@@ -73,8 +90,26 @@ export class LitigesService {
     });
   }
 
-  async update(id: string, data: Prisma.litigeUpdateInput) {
+  async update(id: string, updateLitigeDto: UpdateLitigeDto) {
     try {
+      const data: any = { ...updateLitigeDto };
+      
+      // Transformer les IDs en relations si présents
+      if (updateLitigeDto.reservation_id) {
+        data.reservation = { connect: { id: updateLitigeDto.reservation_id } };
+        delete data.reservation_id;
+      }
+      
+      if (updateLitigeDto.utilisateur_id) {
+        data.utilisateur = { connect: { id: updateLitigeDto.utilisateur_id } };
+        delete data.utilisateur_id;
+      }
+      
+      if (updateLitigeDto.admin_id) {
+        data.admin = { connect: { id: updateLitigeDto.admin_id } };
+        delete data.admin_id;
+      }
+      
       return await this.prisma.litige.update({
         where: { id },
         data,

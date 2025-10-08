@@ -193,4 +193,7 @@ npx prisma:seed
 
 # Lancer le serveur de développement
 npm start:dev
+
+# Accéder au swagger de l'API
+http://localhost:3000/api
 ```

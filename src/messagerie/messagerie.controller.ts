@@ -1,8 +1,17 @@
 import { Controller, Get, Post, Delete, Body, Param, HttpCode, HttpStatus } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { ConversationsService } from './conversations.service';
 import { MessagesService } from './messages.service';
-import { Prisma } from '@prisma/client';
+import { CreateConversationDto } from './dto/create-conversation.dto';
+import { CreateMessageDto } from './dto/create-message.dto';
+import {
+  ApiCreateResponse,
+  ApiGetManyResponse,
+  ApiGetOneResponse,
+  ApiDeleteResponse,
+} from '../common/decorators/api-standard-responses.decorator';
 
+@ApiTags('Messagerie')
 @Controller('conversations')
 export class ConversationsController {
   constructor(
@@ -12,27 +21,40 @@ export class ConversationsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() data: Prisma.conversationCreateInput) {
-    return this.conversationsService.create(data);
+  @ApiOperation({ summary: 'Créer une conversation' })
+  @ApiCreateResponse(Object)
+  create(@Body() createConversationDto: CreateConversationDto) {
+    return this.conversationsService.create(createConversationDto);
   }
 
   @Get()
+  @ApiOperation({ summary: 'Récupérer toutes les conversations' })
+  @ApiGetManyResponse(Object)
   findAll() {
     return this.conversationsService.findAll();
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Récupérer une conversation' })
+  @ApiParam({ name: 'id', description: 'ID de la conversation' })
+  @ApiGetOneResponse(Object)
   findOne(@Param('id') id: string) {
     return this.conversationsService.findOne(id);
   }
 
   @Get('reservation/:reservationId')
+  @ApiOperation({ summary: 'Récupérer la conversation d\'une réservation' })
+  @ApiParam({ name: 'reservationId', description: 'ID de la réservation' })
+  @ApiGetOneResponse(Object)
   findByReservation(@Param('reservationId') reservationId: string) {
     return this.conversationsService.findByReservation(reservationId);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Supprimer une conversation' })
+  @ApiParam({ name: 'id', description: 'ID de la conversation' })
+  @ApiDeleteResponse()
   delete(@Param('id') id: string) {
     return this.conversationsService.delete(id);
   }
@@ -40,32 +62,47 @@ export class ConversationsController {
   // Messages
   @Post(':conversationId/messages')
   @HttpCode(HttpStatus.CREATED)
-  createMessage(@Body() data: Prisma.messageCreateInput) {
-    return this.messagesService.create(data);
+  @ApiOperation({ summary: 'Envoyer un message' })
+  @ApiParam({ name: 'conversationId', description: 'ID de la conversation' })
+  @ApiCreateResponse(Object)
+  createMessage(@Body() createMessageDto: CreateMessageDto) {
+    return this.messagesService.create(createMessageDto);
   }
 
   @Get(':conversationId/messages')
+  @ApiOperation({ summary: 'Récupérer les messages d\'une conversation' })
+  @ApiParam({ name: 'conversationId', description: 'ID de la conversation' })
+  @ApiGetManyResponse(Object)
   findMessagesByConversation(@Param('conversationId') conversationId: string) {
     return this.messagesService.findByConversation(conversationId);
   }
 }
 
+@ApiTags('Messages')
 @Controller('messages')
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
   @Get()
+  @ApiOperation({ summary: 'Récupérer tous les messages' })
+  @ApiGetManyResponse(Object)
   findAll() {
     return this.messagesService.findAll();
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Récupérer un message' })
+  @ApiParam({ name: 'id', description: 'ID du message' })
+  @ApiGetOneResponse(Object)
   findOne(@Param('id') id: string) {
     return this.messagesService.findOne(id);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Supprimer un message' })
+  @ApiParam({ name: 'id', description: 'ID du message' })
+  @ApiDeleteResponse()
   delete(@Param('id') id: string) {
     return this.messagesService.delete(id);
   }

@@ -1,13 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { Prisma } from '@prisma/client';
+import { CreateBoostOfferDto } from './dto/create-boost-offer.dto';
+import { UpdateBoostOfferDto } from './dto/update-boost-offer.dto';
 
 @Injectable()
 export class BoostOffersService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.boost_offerCreateInput) {
-    return this.prisma.boost_offer.create({ data });
+  async create(createBoostOfferDto: CreateBoostOfferDto) {
+    return this.prisma.boost_offer.create({
+      data: createBoostOfferDto,
+    });
   }
 
   async findAll() {
@@ -26,11 +29,11 @@ export class BoostOffersService {
     return offer;
   }
 
-  async update(id: string, data: Prisma.boost_offerUpdateInput) {
+  async update(id: string, updateBoostOfferDto: UpdateBoostOfferDto) {
     try {
       return await this.prisma.boost_offer.update({
         where: { id },
-        data,
+        data: updateBoostOfferDto,
       });
     } catch (error) {
       throw new NotFoundException(`Offre de boost avec l'ID ${id} introuvable`);

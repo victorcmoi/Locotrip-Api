@@ -1,13 +1,22 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { Prisma } from '@prisma/client';
+import { CreateGuideAvailabilityDto } from './dto/create-guide-availability.dto';
 
 @Injectable()
 export class GuideAvailabilityService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.guide_availabilityCreateInput) {
-    return this.prisma.guide_availability.create({ data });
+  async create(createAvailabilityDto: CreateGuideAvailabilityDto) {
+    return this.prisma.guide_availability.create({
+      data: {
+        date_debut: createAvailabilityDto.date_debut,
+        date_fin: createAvailabilityDto.date_fin,
+        statut: createAvailabilityDto.statut,
+        guide: {
+          connect: { id: createAvailabilityDto.guide_id },
+        },
+      },
+    });
   }
 
   async findAll() {
@@ -40,8 +49,16 @@ export class GuideAvailabilityService {
     });
   }
 
-  async update(id: string, data: Prisma.guide_availabilityUpdateInput) {
+  async update(id: string, updateData: Partial<CreateGuideAvailabilityDto>) {
     try {
+      const data: any = { ...updateData };
+      
+      // Transformer l'ID en relation si présent
+      if (updateData.guide_id) {
+        data.guide = { connect: { id: updateData.guide_id } };
+        delete data.guide_id;
+      }
+      
       return await this.prisma.guide_availability.update({
         where: { id },
         data,

@@ -1,0 +1,28 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { IsUUID, IsNotEmpty, IsString } from 'class-validator';
+
+export class CreateTicketMessageDto {
+  @ApiProperty({
+    description: 'ID du ticket',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  @IsUUID()
+  @IsNotEmpty()
+  ticket_id: string;
+
+  @ApiProperty({
+    description: 'ID de l\'auteur du message',
+    example: '660e8400-e29b-41d4-a716-446655440001',
+  })
+  @IsUUID()
+  @IsNotEmpty()
+  auteur_id: string;
+
+  @ApiProperty({
+    description: 'Contenu du message',
+    example: 'Bonjour, j\'ai besoin d\'aide concernant ma réservation.',
+  })
+  @IsString()
+  @IsNotEmpty()
+  contenu: string;
+}

@@ -14,6 +14,87 @@ datasource db {
 }
 
 // ============================================
+// ENUMS
+// ============================================
+enum RoleUtilisateur {
+  CLIENT
+  ADMIN
+  GUIDE
+}
+
+enum StatutReservation {
+  en_attente
+  confirmee
+  annulee
+  terminee
+}
+
+enum StatutGuide {
+  local
+  pro
+}
+
+enum VerificationStatus {
+  en_attente
+  authentifié
+  rejeté
+}
+
+enum StatutBoost {
+  active
+  expirée
+}
+
+enum StatutDisponibilite {
+  disponible
+  indisponible
+  bloqué
+}
+
+enum TypeDocument {
+  CV
+  diplôme
+  justificatif_de_domicile
+}
+
+enum TypeMedia {
+  photo
+  video
+  document
+  audio
+}
+
+enum StatutPaiement {
+  en_attente
+  effectué
+  remboursé
+}
+
+enum StatutLitige {
+  ouvert
+  en_attente
+  résolu
+  refusé
+}
+
+enum TypeAbonnement {
+  loco_plus
+  standard
+}
+
+enum StatutSupportTicket {
+  ouvert
+  en_cours
+  fermé
+}
+
+enum TypeNotification {
+  rappel_reservation
+  nouveau_message
+}
+
+// ============================================
+// MODELS
 // UTILISATEURS & COMPTES
 // ============================================
 
@@ -23,7 +104,7 @@ model utilisateur {
   prenom          String    @db.VarChar(50)
   email           String    @unique @db.VarChar(100)
   mot_de_passe    String    @db.VarChar(255)
-  role            String    @db.VarChar(20) // client, guide, admin
+  role            RoleUtilisateur
   date_creation   DateTime  @default(now()) @db.Timestamp(6)
   
   guides          guide[]
@@ -50,7 +131,7 @@ model guide {
   bio                       String?             @db.Text
   langues                   String?             @db.VarChar(100)
   experience_annees         Int?
-  statut_guide              String              @db.VarChar(20) // "local" ou "pro"
+  statut_guide              StatutGuide
   carte_pro                 Boolean             @default(false)
   pays                      String?             @db.VarChar(50)
   date_demande_carte        DateTime?           @db.Timestamp(6)
@@ -72,8 +153,8 @@ model guide {
 model guide_document {
   id                    String    @id @default(uuid()) @db.Uuid
   guide_id              String    @db.Uuid
-  type_document         String    @db.VarChar(50) // "CV", "diplôme", "justificatif de domicile"
-  verification_status   String    @db.VarChar(20) // "en_attente", "authentifié", "rejeté"
+  type_document         TypeDocument
+  verification_status   VerificationStatus
   commentaire_verif     String?   @db.Text
   date_upload           DateTime  @default(now()) @db.Timestamp(6)
   date_verification     DateTime? @db.Timestamp(6)
@@ -89,7 +170,7 @@ model guide_availability {
   guide_id    String    @db.Uuid
   date_debut  DateTime  @db.Timestamp(6)
   date_fin    DateTime  @db.Timestamp(6)
-  statut      String    @db.VarChar(20) // "disponible", "indisponible", "bloqué"
+  statut      StatutDisponibilite
   
   guide       guide     @relation(fields: [guide_id], references: [id])
   
@@ -120,7 +201,7 @@ model guide_boost {
   boost_offer_id  String      @db.Uuid
   date_achat      DateTime    @default(now()) @db.Timestamp(6)
   date_expiration DateTime    @db.Timestamp(6)
-  statut          String      @db.VarChar(20) // "active", "expirée"
+  statut          StatutBoost
   
   guide           guide       @relation(fields: [guide_id], references: [id])
   boost_offer     boost_offer @relation(fields: [boost_offer_id], references: [id])
@@ -198,7 +279,7 @@ model reservation {
   utilisateur_id        String         @db.Uuid
   experience_id         String         @db.Uuid
   date_reservation      DateTime       @db.Timestamp(6)
-  statut                String         @db.VarChar(20) // en_attente, confirmee, annulee, terminee
+  statut                StatutReservation
   nombre_participants   Int
   prix_total            Decimal        @db.Decimal(10, 2)
   
@@ -219,7 +300,7 @@ model paiement {
   montant         Decimal     @db.Decimal(10, 2)
   date_paiement   DateTime    @default(now()) @db.Timestamp(6)
   methode         String      @db.VarChar(50)
-  statut          String      @db.VarChar(20) // en_attente, effectue, rembourse
+  statut          StatutPaiement
   stripe_id       String?     @db.VarChar(100)
   
   reservation     reservation @relation(fields: [reservation_id], references: [id])
@@ -233,7 +314,7 @@ model litige {
   reservation_id    String      @db.Uuid
   utilisateur_id    String      @db.Uuid
   motif             String      @db.Text
-  statut            String      @db.VarChar(20) // ouvert, en_attente, resolu, refuse
+  statut            StatutLitige
   date_creation     DateTime    @default(now()) @db.Timestamp(6)
   date_resolution   DateTime?   @db.Timestamp(6)
   admin_id          String?     @db.Uuid
@@ -271,7 +352,7 @@ model avis {
 model abonnement {
   id                String      @id @default(uuid()) @db.Uuid
   utilisateur_id    String      @db.Uuid
-  type_abonnement   String      @db.VarChar(50) // "loco_plus", "standard"
+  type_abonnement   TypeAbonnement
   date_debut        DateTime    @db.Timestamp(6)
   date_fin          DateTime    @db.Timestamp(6)
   statut            String      @db.VarChar(20) // "actif", "suspendu", "terminé"
@@ -322,7 +403,7 @@ model media {
   entity_type   String    @db.VarChar(50) // "experience", "guide", "utilisateur", "reservation"
   entity_id     String    @db.Uuid
   url           String    @db.VarChar(255)
-  type_media    String    @db.VarChar(20) // "photo", "video", "document", "audio"
+  type_media    TypeMedia
   description   String?   @db.Text
   date_upload   DateTime  @default(now()) @db.Timestamp(6)
   
@@ -338,7 +419,7 @@ model support_ticket {
   id              String            @id @default(uuid()) @db.Uuid
   utilisateur_id  String            @db.Uuid
   sujet           String            @db.VarChar(150)
-  statut          String            @db.VarChar(20) // "ouvert", "en_cours", "fermé"
+  statut          StatutSupportTicket
   date_creation   DateTime          @default(now()) @db.Timestamp(6)
   date_fermeture  DateTime?         @db.Timestamp(6)
   
@@ -371,7 +452,7 @@ model ticket_message {
 model notification {
   id              String      @id @default(uuid()) @db.Uuid
   utilisateur_id  String      @db.Uuid
-  type            String      @db.VarChar(50) // "rappel_reservation", "nouveau_message"
+  type            TypeNotification
   contenu         String      @db.Text
   lu              Boolean     @default(false)
   date_envoi      DateTime    @default(now()) @db.Timestamp(6)
