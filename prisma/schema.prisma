@@ -6,10 +6,406 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+// ============================================
+// UTILISATEURS & COMPTES
+// ============================================
+
+model utilisateur {
+  id              String    @id @default(uuid()) @db.Uuid
+  nom             String    @db.VarChar(100)
+  prenom          String    @db.VarChar(50)
+  email           String    @unique @db.VarChar(100)
+  mot_de_passe    String    @db.VarChar(255)
+  role            String    @db.VarChar(20) // client, guide, admin
+  date_creation   DateTime  @default(now()) @db.Timestamp(6)
+  
+  guides          guide[]
+  reservations    reservation[]
+  litiges_ouverts litige[]  @relation("LitigeUtilisateur")
+  litiges_resolus litige[]  @relation("LitigeAdmin")
+  avis            avis[]
+  abonnements     abonnement[]
+  messages        message[]
+  support_tickets support_ticket[]
+  ticket_messages ticket_message[]
+  notifications   notification[]
+  
+  @@map("utilisateur")
+}
+
+// ============================================
+// GUIDES & DOCUMENTS
+// ============================================
+
+model guide {
+  id                        String              @id @default(uuid()) @db.Uuid
+  utilisateur_id            String              @db.Uuid
+  bio                       String?             @db.Text
+  langues                   String?             @db.VarChar(100)
+  experience_annees         Int?
+  statut_guide              String              @db.VarChar(20) // "local" ou "pro"
+  carte_pro                 Boolean             @default(false)
+  pays                      String?             @db.VarChar(50)
+  date_demande_carte        DateTime?           @db.Timestamp(6)
+  date_verification_carte   DateTime?           @db.Timestamp(6)
+  commentaire_interne       String?             @db.Text
+  date_creation             DateTime            @default(now()) @db.Timestamp(6)
+  date_maj                  DateTime            @updatedAt @db.Timestamp(6)
+  
+  utilisateur               utilisateur         @relation(fields: [utilisateur_id], references: [id])
+  documents                 guide_document[]
+  disponibilites            guide_availability[]
+  boosts                    guide_boost[]
+  experiences               experience[]
+  
+  @@index([utilisateur_id])
+  @@map("guide")
+}
+
+model guide_document {
+  id                    String    @id @default(uuid()) @db.Uuid
+  guide_id              String    @db.Uuid
+  type_document         String    @db.VarChar(50) // "CV", "diplôme", "justificatif de domicile"
+  verification_status   String    @db.VarChar(20) // "en_attente", "authentifié", "rejeté"
+  commentaire_verif     String?   @db.Text
+  date_upload           DateTime  @default(now()) @db.Timestamp(6)
+  date_verification     DateTime? @db.Timestamp(6)
+  
+  guide                 guide     @relation(fields: [guide_id], references: [id])
+  
+  @@index([guide_id])
+  @@map("guide_document")
+}
+
+model guide_availability {
+  id          String    @id @default(uuid()) @db.Uuid
+  guide_id    String    @db.Uuid
+  date_debut  DateTime  @db.Timestamp(6)
+  date_fin    DateTime  @db.Timestamp(6)
+  statut      String    @db.VarChar(20) // "disponible", "indisponible", "bloqué"
+  
+  guide       guide     @relation(fields: [guide_id], references: [id])
+  
+  @@index([guide_id])
+  @@map("guide_availability")
+}
+
+// ============================================
+// BOOST & OFFRES
+// ============================================
+
+model boost_offer {
+  id                      String        @id @default(uuid()) @db.Uuid
+  nom                     String        @db.VarChar(100)
+  description             String?       @db.Text
+  duree_jours             Int
+  pourcentage_reduction   Int
+  prix                    Decimal       @db.Decimal(10, 2)
+  
+  guide_boosts            guide_boost[]
+  
+  @@map("boost_offer")
+}
+
+model guide_boost {
+  id              String      @id @default(uuid()) @db.Uuid
+  guide_id        String      @db.Uuid
+  boost_offer_id  String      @db.Uuid
+  date_achat      DateTime    @default(now()) @db.Timestamp(6)
+  date_expiration DateTime    @db.Timestamp(6)
+  statut          String      @db.VarChar(20) // "active", "expirée"
+  
+  guide           guide       @relation(fields: [guide_id], references: [id])
+  boost_offer     boost_offer @relation(fields: [boost_offer_id], references: [id])
+  
+  @@index([guide_id])
+  @@index([boost_offer_id])
+  @@map("guide_boost")
+}
+
+// ============================================
+// VILLES & EXPÉRIENCES
+// ============================================
+
+model ville {
+  id          String       @id @default(uuid()) @db.Uuid
+  nom         String       @db.VarChar(100)
+  pays        String       @db.VarChar(50)
+  description String?      @db.Text
+  
+  experiences experience[]
+  
+  @@map("ville")
+}
+
+model experience {
+  id              String                  @id @default(uuid()) @db.Uuid
+  titre           String                  @db.VarChar(150)
+  description     String?                 @db.Text
+  prix            Decimal                 @db.Decimal(10, 2)
+  duree           Int // en minutes
+  ville_id        String                  @db.Uuid
+  guide_id        String                  @db.Uuid
+  capacite_max    Int?
+  
+  ville           ville                   @relation(fields: [ville_id], references: [id])
+  guide           guide                   @relation(fields: [guide_id], references: [id])
+  reservations    reservation[]
+  avis            avis[]
+  categories      experience_categorie[]
+  prix_devises    experience_prix[]
+  
+  @@index([ville_id])
+  @@index([guide_id])
+  @@map("experience")
+}
+
+model categorie {
+  id          String                  @id @default(uuid()) @db.Uuid
+  nom         String                  @db.VarChar(50)
+  
+  experiences experience_categorie[]
+  
+  @@map("categorie")
+}
+
+model experience_categorie {
+  experience_id String     @db.Uuid
+  categorie_id  String     @db.Uuid
+  
+  experience    experience @relation(fields: [experience_id], references: [id])
+  categorie     categorie  @relation(fields: [categorie_id], references: [id])
+  
+  @@id([experience_id, categorie_id])
+  @@index([experience_id])
+  @@index([categorie_id])
+  @@map("experience_categorie")
+}
+
+// ============================================
+// RÉSERVATIONS & PAIEMENTS
+// ============================================
+
+model reservation {
+  id                    String         @id @default(uuid()) @db.Uuid
+  utilisateur_id        String         @db.Uuid
+  experience_id         String         @db.Uuid
+  date_reservation      DateTime       @db.Timestamp(6)
+  statut                String         @db.VarChar(20) // en_attente, confirmee, annulee, terminee
+  nombre_participants   Int
+  prix_total            Decimal        @db.Decimal(10, 2)
+  
+  utilisateur           utilisateur    @relation(fields: [utilisateur_id], references: [id])
+  experience            experience     @relation(fields: [experience_id], references: [id])
+  paiements             paiement[]
+  litiges               litige[]
+  conversations         conversation[]
+  
+  @@index([utilisateur_id])
+  @@index([experience_id])
+  @@map("reservation")
+}
+
+model paiement {
+  id              String      @id @default(uuid()) @db.Uuid
+  reservation_id  String      @db.Uuid
+  montant         Decimal     @db.Decimal(10, 2)
+  date_paiement   DateTime    @default(now()) @db.Timestamp(6)
+  methode         String      @db.VarChar(50)
+  statut          String      @db.VarChar(20) // en_attente, effectue, rembourse
+  stripe_id       String?     @db.VarChar(100)
+  
+  reservation     reservation @relation(fields: [reservation_id], references: [id])
+  
+  @@index([reservation_id])
+  @@map("paiement")
+}
+
+model litige {
+  id                String      @id @default(uuid()) @db.Uuid
+  reservation_id    String      @db.Uuid
+  utilisateur_id    String      @db.Uuid
+  motif             String      @db.Text
+  statut            String      @db.VarChar(20) // ouvert, en_attente, resolu, refuse
+  date_creation     DateTime    @default(now()) @db.Timestamp(6)
+  date_resolution   DateTime?   @db.Timestamp(6)
+  admin_id          String?     @db.Uuid
+  
+  reservation       reservation @relation(fields: [reservation_id], references: [id])
+  utilisateur       utilisateur @relation("LitigeUtilisateur", fields: [utilisateur_id], references: [id])
+  admin             utilisateur? @relation("LitigeAdmin", fields: [admin_id], references: [id])
+  
+  @@index([reservation_id])
+  @@index([utilisateur_id])
+  @@index([admin_id])
+  @@map("litige")
+}
+
+// ============================================
+// AVIS & ABONNEMENTS
+// ============================================
+
+model avis {
+  id              String      @id @default(uuid()) @db.Uuid
+  utilisateur_id  String      @db.Uuid
+  experience_id   String      @db.Uuid
+  note            Int // de 1 à 5
+  commentaire     String?     @db.Text
+  date_avis       DateTime    @default(now()) @db.Timestamp(6)
+  
+  utilisateur     utilisateur @relation(fields: [utilisateur_id], references: [id])
+  experience      experience  @relation(fields: [experience_id], references: [id])
+  
+  @@index([utilisateur_id])
+  @@index([experience_id])
+  @@map("avis")
+}
+
+model abonnement {
+  id                String      @id @default(uuid()) @db.Uuid
+  utilisateur_id    String      @db.Uuid
+  type_abonnement   String      @db.VarChar(50) // "loco_plus", "standard"
+  date_debut        DateTime    @db.Timestamp(6)
+  date_fin          DateTime    @db.Timestamp(6)
+  statut            String      @db.VarChar(20) // "actif", "suspendu", "terminé"
+  
+  utilisateur       utilisateur @relation(fields: [utilisateur_id], references: [id])
+  
+  @@index([utilisateur_id])
+  @@map("abonnement")
+}
+
+// ============================================
+// MESSAGERIE
+// ============================================
+
+model conversation {
+  id              String      @id @default(uuid()) @db.Uuid
+  reservation_id  String      @db.Uuid
+  date_creation   DateTime    @default(now()) @db.Timestamp(6)
+  
+  reservation     reservation @relation(fields: [reservation_id], references: [id])
+  messages        message[]
+  
+  @@index([reservation_id])
+  @@map("conversation")
+}
+
+model message {
+  id                String        @id @default(uuid()) @db.Uuid
+  conversation_id   String        @db.Uuid
+  auteur_id         String        @db.Uuid
+  contenu           String        @db.Text
+  date_envoi        DateTime      @default(now()) @db.Timestamp(6)
+  
+  conversation      conversation  @relation(fields: [conversation_id], references: [id])
+  auteur            utilisateur   @relation(fields: [auteur_id], references: [id])
+  
+  @@index([conversation_id])
+  @@index([auteur_id])
+  @@map("message")
+}
+
+// ============================================
+// MÉDIA
+// ============================================
+
+model media {
+  id            String    @id @default(uuid()) @db.Uuid
+  entity_type   String    @db.VarChar(50) // "experience", "guide", "utilisateur", "reservation"
+  entity_id     String    @db.Uuid
+  url           String    @db.VarChar(255)
+  type_media    String    @db.VarChar(20) // "photo", "video", "document", "audio"
+  description   String?   @db.Text
+  date_upload   DateTime  @default(now()) @db.Timestamp(6)
+  
+  @@index([entity_type, entity_id])
+  @@map("media")
+}
+
+// ============================================
+// SUPPORT
+// ============================================
+
+model support_ticket {
+  id              String            @id @default(uuid()) @db.Uuid
+  utilisateur_id  String            @db.Uuid
+  sujet           String            @db.VarChar(150)
+  statut          String            @db.VarChar(20) // "ouvert", "en_cours", "fermé"
+  date_creation   DateTime          @default(now()) @db.Timestamp(6)
+  date_fermeture  DateTime?         @db.Timestamp(6)
+  
+  utilisateur     utilisateur       @relation(fields: [utilisateur_id], references: [id])
+  messages        ticket_message[]
+  
+  @@index([utilisateur_id])
+  @@map("support_ticket")
+}
+
+model ticket_message {
+  id          String          @id @default(uuid()) @db.Uuid
+  ticket_id   String          @db.Uuid
+  auteur_id   String          @db.Uuid
+  contenu     String          @db.Text
+  date_envoi  DateTime        @default(now()) @db.Timestamp(6)
+  
+  ticket      support_ticket  @relation(fields: [ticket_id], references: [id])
+  auteur      utilisateur     @relation(fields: [auteur_id], references: [id])
+  
+  @@index([ticket_id])
+  @@index([auteur_id])
+  @@map("ticket_message")
+}
+
+// ============================================
+// NOTIFICATIONS
+// ============================================
+
+model notification {
+  id              String      @id @default(uuid()) @db.Uuid
+  utilisateur_id  String      @db.Uuid
+  type            String      @db.VarChar(50) // "rappel_reservation", "nouveau_message"
+  contenu         String      @db.Text
+  lu              Boolean     @default(false)
+  date_envoi      DateTime    @default(now()) @db.Timestamp(6)
+  
+  utilisateur     utilisateur @relation(fields: [utilisateur_id], references: [id])
+  
+  @@index([utilisateur_id])
+  @@map("notification")
+}
+
+// ============================================
+// DEVISES & TARIFICATION
+// ============================================
+
+model devise {
+  code         String            @id @db.Char(3) // "EUR", "USD"
+  nom          String            @db.VarChar(50)
+  taux_change  Decimal           @db.Decimal(10, 4)
+  
+  prix         experience_prix[]
+  
+  @@map("devise")
+}
+
+model experience_prix {
+  experience_id String     @db.Uuid
+  devise_code   String     @db.Char(3)
+  prix          Decimal    @db.Decimal(10, 2)
+  
+  experience    experience @relation(fields: [experience_id], references: [id])
+  devise        devise     @relation(fields: [devise_code], references: [code])
+  
+  @@id([experience_id, devise_code])
+  @@index([experience_id])
+  @@index([devise_code])
+  @@map("experience_prix")
 }

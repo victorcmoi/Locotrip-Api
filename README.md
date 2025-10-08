@@ -1,98 +1,196 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Locotrip API - Documentation
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API REST complète pour la plateforme Locotrip avec NestJS et Prisma.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 📚 Modules et Endpoints
 
-## Description
+### 👥 Utilisateurs (`/utilisateurs`)
+- `POST /utilisateurs` - Créer un utilisateur
+- `GET /utilisateurs` - Liste des utilisateurs
+- `GET /utilisateurs/:id` - Détails d'un utilisateur
+- `GET /utilisateurs/email/:email` - Recherche par email
+- `PUT /utilisateurs/:id` - Mettre à jour un utilisateur
+- `DELETE /utilisateurs/:id` - Supprimer un utilisateur
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### 🎯 Guides (`/guides`)
+- `POST /guides` - Créer un guide
+- `GET /guides` - Liste des guides
+- `GET /guides/:id` - Détails d'un guide
+- `GET /guides/utilisateur/:utilisateurId` - Guides d'un utilisateur
+- `PUT /guides/:id` - Mettre à jour un guide
+- `DELETE /guides/:id` - Supprimer un guide
 
-## Project setup
+#### Documents
+- `POST /guides/:guideId/documents` - Ajouter un document
+- `GET /guides/:guideId/documents` - Documents d'un guide
+
+#### Disponibilités
+- `POST /guides/:guideId/availability` - Ajouter une disponibilité
+- `GET /guides/:guideId/availability` - Disponibilités d'un guide
+
+#### Boosts
+- `POST /guides/:guideId/boosts` - Acheter un boost
+- `GET /guides/:guideId/boosts` - Boosts d'un guide
+
+### 🌍 Expériences
+
+#### Villes (`/villes`)
+- `POST /villes` - Créer une ville
+- `GET /villes` - Liste des villes
+- `GET /villes/:id` - Détails d'une ville
+- `PUT /villes/:id` - Mettre à jour une ville
+- `DELETE /villes/:id` - Supprimer une ville
+
+#### Expériences (`/experiences`)
+- `POST /experiences` - Créer une expérience
+- `GET /experiences` - Liste des expériences
+- `GET /experiences/:id` - Détails d'une expérience
+- `GET /experiences/ville/:villeId` - Expériences par ville
+- `GET /experiences/guide/:guideId` - Expériences par guide
+- `PUT /experiences/:id` - Mettre à jour une expérience
+- `DELETE /experiences/:id` - Supprimer une expérience
+
+#### Catégories (`/categories`)
+- `POST /categories` - Créer une catégorie
+- `GET /categories` - Liste des catégories
+- `GET /categories/:id` - Détails d'une catégorie
+- `PUT /categories/:id` - Mettre à jour une catégorie
+- `DELETE /categories/:id` - Supprimer une catégorie
+
+### 📅 Réservations (`/reservations`)
+- `POST /reservations` - Créer une réservation
+- `GET /reservations` - Liste des réservations
+- `GET /reservations/:id` - Détails d'une réservation
+- `GET /reservations/utilisateur/:utilisateurId` - Réservations d'un utilisateur
+- `PUT /reservations/:id` - Mettre à jour une réservation
+- `DELETE /reservations/:id` - Supprimer une réservation
+
+#### Paiements
+- `POST /reservations/:reservationId/paiements` - Créer un paiement
+- `GET /reservations/:reservationId/paiements` - Paiements d'une réservation
+- `GET /paiements` - Liste des paiements
+- `GET /paiements/:id` - Détails d'un paiement
+
+#### Litiges
+- `POST /reservations/:reservationId/litiges` - Créer un litige
+- `GET /litiges` - Liste des litiges
+- `GET /litiges/:id` - Détails d'un litige
+- `GET /litiges/statut/:statut` - Litiges par statut
+- `PUT /litiges/:id` - Mettre à jour un litige
+
+### ⭐ Avis et Abonnements
+
+#### Avis (`/avis`)
+- `POST /avis` - Créer un avis
+- `GET /avis` - Liste des avis
+- `GET /avis/:id` - Détails d'un avis
+- `GET /avis/experience/:experienceId` - Avis d'une expérience
+- `GET /avis/utilisateur/:utilisateurId` - Avis d'un utilisateur
+- `PUT /avis/:id` - Mettre à jour un avis
+- `DELETE /avis/:id` - Supprimer un avis
+
+#### Abonnements (`/abonnements`)
+- `POST /abonnements` - Créer un abonnement
+- `GET /abonnements` - Liste des abonnements
+- `GET /abonnements/actifs` - Abonnements actifs
+- `GET /abonnements/:id` - Détails d'un abonnement
+- `GET /abonnements/utilisateur/:utilisateurId` - Abonnements d'un utilisateur
+- `PUT /abonnements/:id` - Mettre à jour un abonnement
+
+### 💬 Messagerie
+
+#### Conversations (`/conversations`)
+- `POST /conversations` - Créer une conversation
+- `GET /conversations` - Liste des conversations
+- `GET /conversations/:id` - Détails d'une conversation
+- `GET /conversations/reservation/:reservationId` - Conversations d'une réservation
+- `DELETE /conversations/:id` - Supprimer une conversation
+
+#### Messages
+- `POST /conversations/:conversationId/messages` - Envoyer un message
+- `GET /conversations/:conversationId/messages` - Messages d'une conversation
+- `GET /messages` - Liste des messages
+- `GET /messages/:id` - Détails d'un message
+
+### 🎫 Support
+
+#### Tickets (`/support-tickets`)
+- `POST /support-tickets` - Créer un ticket
+- `GET /support-tickets` - Liste des tickets
+- `GET /support-tickets/:id` - Détails d'un ticket
+- `GET /support-tickets/statut/:statut` - Tickets par statut
+- `GET /support-tickets/utilisateur/:utilisateurId` - Tickets d'un utilisateur
+- `PUT /support-tickets/:id` - Mettre à jour un ticket
+- `DELETE /support-tickets/:id` - Supprimer un ticket
+
+#### Messages du ticket
+- `POST /support-tickets/:ticketId/messages` - Ajouter un message
+- `GET /support-tickets/:ticketId/messages` - Messages d'un ticket
+
+#### Notifications (`/notifications`)
+- `POST /notifications` - Créer une notification
+- `GET /notifications` - Liste des notifications
+- `GET /notifications/:id` - Détails d'une notification
+- `GET /notifications/utilisateur/:utilisateurId` - Notifications d'un utilisateur
+- `GET /notifications/utilisateur/:utilisateurId/non-lues` - Notifications non lues
+- `PATCH /notifications/:id/marquer-lue` - Marquer comme lue
+- `PUT /notifications/:id` - Mettre à jour une notification
+- `DELETE /notifications/:id` - Supprimer une notification
+
+### 📸 Media (`/media`)
+- `POST /media` - Upload un média
+- `GET /media` - Liste des médias
+- `GET /media?type=photo` - Filtrer par type
+- `GET /media/:id` - Détails d'un média
+- `GET /media/entity/:entityType/:entityId` - Médias d'une entité
+- `PUT /media/:id` - Mettre à jour un média
+- `DELETE /media/:id` - Supprimer un média
+
+### 💱 Devises
+
+#### Devises (`/devises`)
+- `POST /devises` - Créer une devise
+- `GET /devises` - Liste des devises
+- `GET /devises/:code` - Détails d'une devise (ex: EUR, USD)
+- `PUT /devises/:code` - Mettre à jour une devise
+- `DELETE /devises/:code` - Supprimer une devise
+
+#### Prix par devise (`/experience-prix`)
+- `POST /experience-prix` - Ajouter un prix
+- `GET /experience-prix` - Liste des prix
+- `GET /experience-prix/experience/:experienceId` - Prix d'une expérience
+- `GET /experience-prix/devise/:deviseCode` - Prix par devise
+- `PUT /experience-prix/:experienceId/:deviseCode` - Mettre à jour un prix
+- `DELETE /experience-prix/:experienceId/:deviseCode` - Supprimer un prix
+
+### 🎁 Boost Offers (`/boost-offers`)
+- `POST /boost-offers` - Créer une offre
+- `GET /boost-offers` - Liste des offres
+- `GET /boost-offers/:id` - Détails d'une offre
+- `PUT /boost-offers/:id` - Mettre à jour une offre
+- `DELETE /boost-offers/:id` - Supprimer une offre
+
+## 🔧 Installation
 
 ```bash
-$ npm install
+# Installer les dépendances
+npm install
+
+# Utiliser une bdd pgsql locale
+npx prisma dev
+print tcp urls (t)
+copy/paste DATABASE_URL and SHADOW_DATABASE_URL in .env
+add &pgbouncer=true at the end of both urls
+
+# Générer le client Prisma
+npx prisma:generate
+
+# Créer les migrations
+npx prisma:migrate
+
+# Seeder la base de données
+npx prisma:seed
+
+# Lancer le serveur de développement
+npm start:dev
 ```
-
-## Compile and run the project
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
