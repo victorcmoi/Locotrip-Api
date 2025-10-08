@@ -9,10 +9,8 @@ async function bootstrap() {
   
   const config = new DocumentBuilder()
     .setTitle('Locotrip API')
-    .setDescription(
-      'API REST complète pour la plateforme Locotrip'
-    )
-    .setVersion('1.0.0')
+    .setDescription('API REST complète pour la plateforme Locotrip')
+    .setVersion('1.2.0')
     .addTag('Utilisateurs', 'Gestion des comptes utilisateurs')
     .addTag('Guides', 'Gestion des profils guides')
     .addTag('Expériences', 'Gestion des expériences touristiques')
@@ -31,7 +29,6 @@ async function bootstrap() {
     .addTag('Devises', 'Gestion devises et taux de change')
     .addTag('Messagerie', 'Gestion des conversations entre utilisateurs')
     .addTag('Prix des expériences', 'Gestion des tarifs et promotions')
-    
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
