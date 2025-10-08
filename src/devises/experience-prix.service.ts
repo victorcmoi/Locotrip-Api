@@ -1,13 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { Prisma } from '@prisma/client';
+import { CreateExperiencePrixDto } from './dto/create-experience-prix.dto';
+import { UpdateExperiencePrixDto } from './dto/update-experience-prix.dto';
 
 @Injectable()
 export class ExperiencePrixService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.experience_prixCreateInput) {
-    return this.prisma.experience_prix.create({ data });
+  async create(createExperiencePrixDto: CreateExperiencePrixDto) {
+    return this.prisma.experience_prix.create({
+      data: {
+        prix: createExperiencePrixDto.prix,
+        experience: {
+          connect: { id: createExperiencePrixDto.experience_id },
+        },
+        devise: {
+          connect: { code: createExperiencePrixDto.devise_code },
+        },
+      },
+    });
   }
 
   async findAll() {
@@ -37,7 +48,18 @@ export class ExperiencePrixService {
     });
   }
 
-  async update(experienceId: string, deviseCode: string, data: Prisma.experience_prixUpdateInput) {
+  async update(experienceId: string, deviseCode: string, updateExperiencePrixDto: UpdateExperiencePrixDto) {
+    const data: any = { prix: updateExperiencePrixDto.prix };
+    
+    // Transformer les IDs en relations si présents
+    if (updateExperiencePrixDto.experience_id) {
+      data.experience = { connect: { id: updateExperiencePrixDto.experience_id } };
+    }
+    
+    if (updateExperiencePrixDto.devise_code) {
+      data.devise = { connect: { code: updateExperiencePrixDto.devise_code } };
+    }
+    
     return this.prisma.experience_prix.update({
       where: {
         experience_id_devise_code: {

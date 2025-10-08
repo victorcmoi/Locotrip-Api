@@ -1,13 +1,25 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { Prisma } from '@prisma/client';
+import { CreateAvisDto } from './dto/create-avis.dto';
+import { UpdateAvisDto } from './dto/update-avis.dto';
 
 @Injectable()
 export class AvisService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.avisCreateInput) {
-    return this.prisma.avis.create({ data });
+  async create(createAvisDto: CreateAvisDto) {
+    return this.prisma.avis.create({
+      data: {
+        note: createAvisDto.note,
+        commentaire: createAvisDto.commentaire,
+        utilisateur: {
+          connect: { id: createAvisDto.utilisateur_id },
+        },
+        experience: {
+          connect: { id: createAvisDto.experience_id },
+        },
+      },
+    });
   }
 
   async findAll() {
@@ -54,8 +66,21 @@ export class AvisService {
     });
   }
 
-  async update(id: string, data: Prisma.avisUpdateInput) {
+  async update(id: string, updateAvisDto: UpdateAvisDto) {
     try {
+      const data: any = { ...updateAvisDto };
+      
+      // Transformer les IDs en relations si présents
+      if (updateAvisDto.utilisateur_id) {
+        data.utilisateur = { connect: { id: updateAvisDto.utilisateur_id } };
+        delete data.utilisateur_id;
+      }
+      
+      if (updateAvisDto.experience_id) {
+        data.experience = { connect: { id: updateAvisDto.experience_id } };
+        delete data.experience_id;
+      }
+      
       return await this.prisma.avis.update({
         where: { id },
         data,

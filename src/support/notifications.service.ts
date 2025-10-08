@@ -1,13 +1,23 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { Prisma } from '@prisma/client';
+import { CreateNotificationDto } from './dto/create-notification.dto';
+import { UpdateNotificationDto } from './dto/update-notification.dto';
 
 @Injectable()
 export class NotificationsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.notificationCreateInput) {
-    return this.prisma.notification.create({ data });
+  async create(createNotificationDto: CreateNotificationDto) {
+    return this.prisma.notification.create({
+      data: {
+        type: createNotificationDto.type,
+        contenu: createNotificationDto.contenu,
+        lu: createNotificationDto.lu ?? false,
+        utilisateur: {
+          connect: { id: createNotificationDto.utilisateur_id },
+        },
+      },
+    });
   }
 
   async findAll() {
@@ -61,8 +71,16 @@ export class NotificationsService {
     }
   }
 
-  async update(id: string, data: Prisma.notificationUpdateInput) {
+  async update(id: string, updateNotificationDto: UpdateNotificationDto) {
     try {
+      const data: any = { ...updateNotificationDto };
+      
+      // Transformer l'ID en relation si présent
+      if (updateNotificationDto.utilisateur_id) {
+        data.utilisateur = { connect: { id: updateNotificationDto.utilisateur_id } };
+        delete data.utilisateur_id;
+      }
+      
       return await this.prisma.notification.update({
         where: { id },
         data,

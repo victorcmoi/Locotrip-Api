@@ -1,13 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { Prisma } from '@prisma/client';
+import { CreateVilleDto } from './dto/create-ville.dto';
+import { UpdateVilleDto } from './dto/update-ville.dto';
 
 @Injectable()
 export class VillesService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.villeCreateInput) {
-    return this.prisma.ville.create({ data });
+  async create(createVilleDto: CreateVilleDto) {
+    return this.prisma.ville.create({
+      data: createVilleDto,
+    });
   }
 
   async findAll() {
@@ -33,11 +36,11 @@ export class VillesService {
     return ville;
   }
 
-  async update(id: string, data: Prisma.villeUpdateInput) {
+  async update(id: string, updateVilleDto: UpdateVilleDto) {
     try {
       return await this.prisma.ville.update({
         where: { id },
-        data,
+        data: updateVilleDto,
       });
     } catch (error) {
       throw new NotFoundException(`Ville avec l'ID ${id} introuvable`);
