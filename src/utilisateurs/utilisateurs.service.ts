@@ -2,14 +2,20 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateUtilisateurDto } from './dto/create-utilisateur.dto';
 import { UpdateUtilisateurDto } from './dto/update-utilisateur.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UtilisateursService {
   constructor(private prisma: PrismaService) {}
 
   async create(createUtilisateurDto: CreateUtilisateurDto) {
+    const hashedPassword = await bcrypt.hash(createUtilisateurDto.mot_de_passe, 10);
+    
     return this.prisma.utilisateur.create({ 
-      data: createUtilisateurDto,
+      data: {
+        ...createUtilisateurDto,
+        mot_de_passe: hashedPassword,
+      },
     });
   }
 
@@ -50,11 +56,21 @@ export class UtilisateursService {
     });
   }
 
+  async validatePassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
+    return bcrypt.compare(plainPassword, hashedPassword);
+  }
+
   async update(id: string, updateUtilisateurDto: UpdateUtilisateurDto) {
     try {
+      const data = { ...updateUtilisateurDto };
+      
+      if (updateUtilisateurDto.mot_de_passe) {
+        data.mot_de_passe = await bcrypt.hash(updateUtilisateurDto.mot_de_passe, 10);
+      }
+      
       return await this.prisma.utilisateur.update({
         where: { id },
-        data: updateUtilisateurDto,
+        data,
       });
     } catch (error) {
       throw new NotFoundException(`Utilisateur avec l'ID ${id} introuvable`);

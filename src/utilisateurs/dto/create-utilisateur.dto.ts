@@ -41,7 +41,7 @@ export class CreateUtilisateurDto {
   mot_de_passe: string;
 
   @ApiProperty({
-    description: 'Rôle de l\'utilisateur dans la plateforme',
+    description: 'Rôle de l\'utilisateur dans la plateforme (GUIDE, CLIENT ou ADMIN)',
     enum: RoleUtilisateur,
     example: RoleUtilisateur.CLIENT,
   })
