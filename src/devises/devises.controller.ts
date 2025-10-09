@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { DevisesService } from './devises.service';
 import { ExperiencePrixService } from './experience-prix.service';
 import { CreateDeviseDto } from './dto/create-devise.dto';
@@ -13,8 +13,11 @@ import {
   ApiUpdateResponse,
   ApiDeleteResponse,
 } from '../common/decorators/api-standard-responses.decorator';
+import { RoleUtilisateur } from '../utilisateurs/enums/utilisateur.enum';
+import { Roles } from '../common/decorators/role.decorator';
 
 @ApiTags('Devises')
+@ApiBearerAuth('JWT-auth')
 @Controller('devises')
 export class DevisesController {
   constructor(
@@ -31,6 +34,7 @@ export class DevisesController {
   }
 
   @Get()
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer toutes les devises' })
   @ApiGetManyResponse(CreateDeviseDto)
   findAll() {
@@ -38,6 +42,7 @@ export class DevisesController {
   }
 
   @Get(':code')
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer une devise par son code' })
   @ApiParam({ name: 'code', description: 'Code de la devise (ex: EUR, USD)' })
   @ApiGetOneResponse(CreateDeviseDto)
@@ -64,11 +69,13 @@ export class DevisesController {
 }
 
 @ApiTags('Prix des expériences')
+@ApiBearerAuth('JWT-auth')
 @Controller('experience-prix')
 export class ExperiencePrixController {
   constructor(private readonly experiencePrixService: ExperiencePrixService) {}
 
   @Post()
+  @Roles(RoleUtilisateur.GUIDE)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Créer un prix pour une expérience' })
   @ApiCreateResponse(Object)
@@ -77,6 +84,7 @@ export class ExperiencePrixController {
   }
 
   @Get()
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer tous les prix' })
   @ApiGetManyResponse(Object)
   findAll() {
@@ -84,6 +92,7 @@ export class ExperiencePrixController {
   }
 
   @Get('experience/:experienceId')
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer les prix d\'une expérience' })
   @ApiParam({ name: 'experienceId', description: 'ID de l\'expérience' })
   @ApiGetManyResponse(Object)
@@ -92,6 +101,7 @@ export class ExperiencePrixController {
   }
 
   @Get('devise/:deviseCode')
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer les prix dans une devise' })
   @ApiParam({ name: 'deviseCode', description: 'Code de la devise' })
   @ApiGetManyResponse(Object)
@@ -100,6 +110,7 @@ export class ExperiencePrixController {
   }
 
   @Put(':experienceId/:deviseCode')
+  @Roles(RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Mettre à jour un prix' })
   @ApiParam({ name: 'experienceId', description: 'ID de l\'expérience' })
   @ApiParam({ name: 'deviseCode', description: 'Code de la devise' })
@@ -113,6 +124,7 @@ export class ExperiencePrixController {
   }
 
   @Delete(':experienceId/:deviseCode')
+  @Roles(RoleUtilisateur.GUIDE)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Supprimer un prix' })
   @ApiParam({ name: 'experienceId', description: 'ID de l\'expérience' })

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsUUID, IsNotEmpty, IsEnum, IsDateString } from 'class-validator';
-import { StatutDisponibilite } from '../../../prisma/enums';
+import { StatutDisponibilite } from '../enums/guide-availability.enum';
 
 export class CreateGuideAvailabilityDto {
   @ApiProperty({

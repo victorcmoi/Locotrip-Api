@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { AvisService } from './avis.service';
 import { AbonnementsService } from './abonnements.service';
 import { CreateAvisDto } from './dto/create-avis.dto';
@@ -14,13 +14,17 @@ import {
   ApiUpdateResponse,
   ApiDeleteResponse,
 } from '../common/decorators/api-standard-responses.decorator';
+import { RoleUtilisateur } from '../utilisateurs/enums/utilisateur.enum';
+import { Roles } from '../common/decorators/role.decorator';
 
 @ApiTags('Avis')
+@ApiBearerAuth('JWT-auth')
 @Controller('avis')
 export class AvisController {
   constructor(private readonly avisService: AvisService) {}
 
   @Post()
+
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Créer un avis' })
   @ApiCreateResponse(AvisEntity)
@@ -29,6 +33,7 @@ export class AvisController {
   }
 
   @Get()
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer tous les avis' })
   @ApiGetManyResponse(AvisEntity)
   findAll() {
@@ -36,6 +41,7 @@ export class AvisController {
   }
 
   @Get(':id')
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer un avis par son ID' })
   @ApiParam({ name: 'id', description: 'ID de l\'avis' })
   @ApiGetOneResponse(AvisEntity)
@@ -44,6 +50,7 @@ export class AvisController {
   }
 
   @Get('experience/:experienceId')
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer les avis d\'une expérience' })
   @ApiParam({ name: 'experienceId', description: 'ID de l\'expérience' })
   @ApiGetManyResponse(AvisEntity)
@@ -52,6 +59,7 @@ export class AvisController {
   }
 
   @Get('utilisateur/:utilisateurId')
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer les avis d\'un utilisateur' })
   @ApiParam({ name: 'utilisateurId', description: 'ID de l\'utilisateur' })
   @ApiGetManyResponse(AvisEntity)
@@ -60,6 +68,7 @@ export class AvisController {
   }
 
   @Put(':id')
+  @Roles(RoleUtilisateur.CLIENT)
   @ApiOperation({ summary: 'Mettre à jour un avis' })
   @ApiParam({ name: 'id', description: 'ID de l\'avis' })
   @ApiUpdateResponse(AvisEntity)
@@ -68,6 +77,7 @@ export class AvisController {
   }
 
   @Delete(':id')
+  @Roles(RoleUtilisateur.CLIENT)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Supprimer un avis' })
   @ApiParam({ name: 'id', description: 'ID de l\'avis' })
@@ -78,6 +88,7 @@ export class AvisController {
 }
 
 @ApiTags('Abonnements')
+@ApiBearerAuth('JWT-auth')
 @Controller('abonnements')
 export class AbonnementsController {
   constructor(private readonly abonnementsService: AbonnementsService) {}
@@ -91,6 +102,7 @@ export class AbonnementsController {
   }
 
   @Get()
+  @Roles(RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer tous les abonnements' })
   @ApiGetManyResponse(Object)
   findAll() {
@@ -98,6 +110,7 @@ export class AbonnementsController {
   }
 
   @Get('actifs')
+  @Roles(RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer les abonnements actifs' })
   @ApiGetManyResponse(Object)
   findActive() {
@@ -105,6 +118,7 @@ export class AbonnementsController {
   }
 
   @Get(':id')
+  @Roles(RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer un abonnement' })
   @ApiParam({ name: 'id', description: 'ID de l\'abonnement' })
   @ApiGetOneResponse(Object)
@@ -113,6 +127,7 @@ export class AbonnementsController {
   }
 
   @Get('utilisateur/:utilisateurId')
+  @Roles(RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer les abonnements d\'un utilisateur' })
   @ApiParam({ name: 'utilisateurId', description: 'ID de l\'utilisateur' })
   @ApiGetManyResponse(Object)

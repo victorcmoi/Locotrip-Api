@@ -10,25 +10,43 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('Locotrip API')
     .setDescription('API REST complète pour la plateforme Locotrip')
-    .setVersion('1.2.0')
+    .setVersion('1.2.2')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Entrez votre token JWT',
+        in: 'header',
+      },
+      'JWT-auth',
+    )
+    .addTag('Authentification', 'Authentification et gestion des sessions')
+    
     .addTag('Utilisateurs', 'Gestion des comptes utilisateurs')
     .addTag('Guides', 'Gestion des profils guides')
+    
     .addTag('Expériences', 'Gestion des expériences touristiques')
-    .addTag('Réservations', 'Gestion des réservations')
-    .addTag('Messages', 'Communication entre utilisateurs')
-    .addTag('Support', 'Service client et support')
-    .addTag('Avis', 'Système d\'évaluations et commentaires')
-    .addTag('Notifications', 'Gestion des notifications')
-    .addTag('Paiements', 'Gestion des transactions financières')
-    .addTag('Offres de Boost', 'Gestion des offres de boost pour les guides')
     .addTag('Catégories', 'Gestion des catégories d\'expériences')
-    .addTag('Villes', 'Gestion des villes disponibles sur la plateforme')
-    .addTag('Litiges', 'Gestion des litiges entre utilisateurs')
-    .addTag('Abonnements', 'Gestion des abonnements premium')
-    .addTag('Médias', 'Gestion des fichiers médias')
-    .addTag('Devises', 'Gestion devises et taux de change')
-    .addTag('Messagerie', 'Gestion des conversations entre utilisateurs')
+    .addTag('Villes', 'Gestion des villes disponibles')
+    
+    .addTag('Réservations', 'Gestion des réservations')
+    .addTag('Paiements', 'Gestion des transactions financières')
     .addTag('Prix des expériences', 'Gestion des tarifs et promotions')
+    .addTag('Devises', 'Gestion des devises et taux de change')
+    
+    .addTag('Avis', 'Système d\'évaluations et commentaires')
+    .addTag('Abonnements', 'Gestion des abonnements premium')
+    .addTag('Offres de Boost', 'Gestion des offres de boost pour les guides')
+    
+    .addTag('Messagerie', 'Gestion des conversations entre utilisateurs')
+    .addTag('Messages', 'Gestion des messages utilisateurs')
+    .addTag('Notifications', 'Gestion des notifications')
+    
+    .addTag('Support', 'Service client et support')
+    .addTag('Litiges', 'Gestion des litiges entre utilisateurs')
+    .addTag('Médias', 'Gestion des fichiers médias')
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);

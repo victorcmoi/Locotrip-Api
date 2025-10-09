@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CreateReservationDto } from '../dto/create-reservation.dto';
-import { StatutReservation } from '../../../prisma/enums';
+import { StatutReservation } from '../enums/reservation.enum';
 
 export class ReservationEntity extends CreateReservationDto {
   @ApiProperty({

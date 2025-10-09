@@ -1,3 +1,4 @@
+import { ChangePasswordDto } from '../auth/dto/change-password.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateUtilisateurDto } from './dto/create-utilisateur.dto';

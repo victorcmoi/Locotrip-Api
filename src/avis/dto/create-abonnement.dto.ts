@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsEnum, IsDateString } from 'class-validator';
-import { TypeAbonnement } from '../../../prisma/enums';
+import { TypeAbonnement } from '../../guides/enums/guide-availability.enum';
 
 export class CreateAbonnementDto {
   @ApiProperty({

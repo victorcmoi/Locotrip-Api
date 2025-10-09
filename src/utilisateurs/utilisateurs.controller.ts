@@ -1,5 +1,7 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { Public } from './../common/decorators/authentification-decorator';
+import { AuthentificationService } from '../auth/authentification.service';
+import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { UtilisateursService } from './utilisateurs.service';
 import { CreateUtilisateurDto } from './dto/create-utilisateur.dto';
 import { UpdateUtilisateurDto } from './dto/update-utilisateur.dto';
@@ -11,8 +13,13 @@ import {
   ApiUpdateResponse, 
   ApiDeleteResponse 
 } from '../common/decorators/api-standard-responses.decorator';
+import { ChangePasswordDto } from '../auth/dto/change-password.dto';
+import { LoginDto } from '../auth/dto/login.dto';
+import { Roles } from '../common/decorators/role.decorator';
+import { RoleUtilisateur } from './enums/utilisateur.enum';
 
 @ApiTags('Utilisateurs')
+@ApiBearerAuth('JWT-auth')
 @Controller('utilisateurs')
 export class UtilisateursController {
   constructor(private readonly utilisateursService: UtilisateursService) {}
@@ -49,6 +56,7 @@ export class UtilisateursController {
   }
 
   @Put(':id')
+  @Roles(RoleUtilisateur.CLIENT)
   @ApiOperation({ summary: 'Mettre à jour un utilisateur' })
   @ApiParam({ name: 'id', description: 'ID de l\'utilisateur (UUID)' })
   @ApiUpdateResponse(UtilisateurEntity)
@@ -57,6 +65,7 @@ export class UtilisateursController {
   }
 
   @Delete(':id')
+  @Roles(RoleUtilisateur.CLIENT)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Supprimer un utilisateur' })
   @ApiParam({ name: 'id', description: 'ID de l\'utilisateur (UUID)' })

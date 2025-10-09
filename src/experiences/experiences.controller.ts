@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { VillesService } from './villes.service';
 import { ExperiencesService } from './experiences.service';
 import { CategoriesService } from './categories.service';
@@ -18,8 +18,11 @@ import {
   ApiUpdateResponse,
   ApiDeleteResponse,
 } from '../common/decorators/api-standard-responses.decorator';
+import { Roles } from '../common/decorators/role.decorator';
+import { RoleUtilisateur } from '../utilisateurs/enums/utilisateur.enum';
 
 @ApiTags('Villes')
+@ApiBearerAuth('JWT-auth')
 @Controller('villes')
 export class VillesController {
   constructor(private readonly villesService: VillesService) {}
@@ -32,12 +35,14 @@ export class VillesController {
   }
 
   @Get()
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer toutes les villes' })
   findAll() {
     return this.villesService.findAll();
   }
 
   @Get(':id')
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer une ville' })
   @ApiParam({ name: 'id', description: 'ID de la ville' })
   findOne(@Param('id') id: string) {
@@ -62,11 +67,13 @@ export class VillesController {
 }
 
 @ApiTags('Expériences')
+@ApiBearerAuth('JWT-auth')
 @Controller('experiences')
 export class ExperiencesController {
   constructor(private readonly experiencesService: ExperiencesService) {}
 
   @Post()
+  @Roles(RoleUtilisateur.GUIDE)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Créer une expérience' })
   @ApiCreateResponse(ExperienceEntity)
@@ -75,6 +82,7 @@ export class ExperiencesController {
   }
 
   @Get()
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer toutes les expériences' })
   @ApiGetManyResponse(ExperienceEntity)
   findAll() {
@@ -82,6 +90,7 @@ export class ExperiencesController {
   }
 
   @Get(':id')
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer une expérience' })
   @ApiParam({ name: 'id', description: 'ID de l\'expérience' })
   @ApiGetOneResponse(ExperienceEntity)
@@ -90,6 +99,7 @@ export class ExperiencesController {
   }
 
   @Get('ville/:villeId')
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer les expériences d\'une ville' })
   @ApiParam({ name: 'villeId', description: 'ID de la ville' })
   @ApiGetManyResponse(ExperienceEntity)
@@ -97,15 +107,17 @@ export class ExperiencesController {
     return this.experiencesService.findByVille(villeId);
   }
 
-  @Get('guide/:guideId')
-  @ApiOperation({ summary: 'Récupérer les expériences d\'un guide' })
-  @ApiParam({ name: 'guideId', description: 'ID du guide' })
+  @Get('GUIDE/:guideId')
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
+  @ApiOperation({ summary: 'Récupérer les expériences d\'un GUIDE' })
+  @ApiParam({ name: 'guideId', description: 'ID du GUIDE' })
   @ApiGetManyResponse(ExperienceEntity)
   findByGuide(@Param('guideId') guideId: string) {
     return this.experiencesService.findByGuide(guideId);
   }
 
   @Put(':id')
+  @Roles(RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Mettre à jour une expérience' })
   @ApiParam({ name: 'id', description: 'ID de l\'expérience' })
   @ApiUpdateResponse(ExperienceEntity)
@@ -114,6 +126,7 @@ export class ExperiencesController {
   }
 
   @Delete(':id')
+  @Roles(RoleUtilisateur.GUIDE)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Supprimer une expérience' })
   @ApiParam({ name: 'id', description: 'ID de l\'expérience' })
@@ -124,6 +137,7 @@ export class ExperiencesController {
 }
 
 @ApiTags('Catégories')
+@ApiBearerAuth('JWT-auth')
 @Controller('categories')
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
@@ -137,6 +151,7 @@ export class CategoriesController {
   }
 
   @Get()
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer toutes les catégories' })
   @ApiGetManyResponse(Object)
   findAll() {
@@ -144,6 +159,7 @@ export class CategoriesController {
   }
 
   @Get(':id')
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer une catégorie' })
   @ApiParam({ name: 'id', description: 'ID de la catégorie' })
   @ApiGetOneResponse(Object)
