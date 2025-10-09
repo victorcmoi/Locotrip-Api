@@ -17,9 +17,9 @@ datasource db {
 // ENUMS
 // ============================================
 enum RoleUtilisateur {
-  CLIENT
-  ADMIN
-  GUIDE
+  client
+  admin
+  guide
 }
 
 enum StatutReservation {

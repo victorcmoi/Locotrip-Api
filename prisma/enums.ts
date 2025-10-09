@@ -1,7 +1,7 @@
 export enum RoleUtilisateur {
-    CLIENT = "CLIENT",
-    ADMIN = "ADMIN",
-    GUIDE = "GUIDE",
+    CLIENT = "client",
+    ADMIN = "admin",
+    GUIDE = "guide",
 }
 
 export enum StatutReservation {
@@ -36,7 +36,7 @@ export enum StatutDisponibilite {
 export enum TypeDocument {
     CV = "CV",
     DIPLOME = "diplôme",
-    JUSTIFICATIF_DOMICILE = "justificatif de domicile",
+    JUSTIFICATIF_DOMICILE = "justificatif_de_domicile",
 }
 
 export enum TypeMedia {

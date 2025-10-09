@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateLitigeDto } from './dto/create-litige.dto';
 import { UpdateLitigeDto } from './dto/update-litige.dto';
+import { StatutLitige, StatutReservation } from '@prisma/client';
 
 @Injectable()
 export class LitigesService {
@@ -76,7 +77,7 @@ export class LitigesService {
     });
   }
 
-  async findByStatut(statut: string) {
+  async findByStatut(statut: StatutLitige) {
     return this.prisma.litige.findMany({
       where: { statut },
       include: {

@@ -10,6 +10,7 @@ import {
   ApiUpdateResponse,
   ApiDeleteResponse,
 } from '../common/decorators/api-standard-responses.decorator';
+import { TypeMedia } from '@prisma/client';
 
 @ApiTags('Médias')
 @Controller('media')
@@ -26,7 +27,7 @@ export class MediaController {
   @Get()
   @ApiOperation({ summary: 'Récupérer tous les médias' })
   @ApiQuery({ name: 'type', required: false, description: 'Filtrer par type de média' })
-  findAll(@Query('type') type?: string) {
+  findAll(@Query('type') type?: TypeMedia) {
     if (type) {
       return this.mediaService.findByType(type);
     }

@@ -108,7 +108,6 @@ export class ExperiencesService {
     try {
       const data: any = { ...updateExperienceDto };
       
-      // Transformer les IDs en relations si présents
       if (updateExperienceDto.ville_id) {
         data.ville = { connect: { id: updateExperienceDto.ville_id } };
         delete data.ville_id;
