@@ -14,6 +14,7 @@ import {
   ApiUpdateResponse,
   ApiDeleteResponse,
 } from '../common/decorators/api-standard-responses.decorator';
+import { StatutSupportTicket } from '@prisma/client';
 
 @ApiTags('Support')
 @Controller('support-tickets')
@@ -39,7 +40,7 @@ export class SupportTicketsController {
   @Get('statut/:statut')
   @ApiOperation({ summary: 'Récupérer les tickets par statut' })
   @ApiParam({ name: 'statut', description: 'Statut du ticket (ouvert, en_cours, fermé)' })
-  findByStatut(@Param('statut') statut: string) {
+  findByStatut(@Param('statut') statut: StatutSupportTicket) {
     return this.supportTicketsService.findByStatut(statut);
   }
 

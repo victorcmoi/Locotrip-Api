@@ -176,24 +176,23 @@ API REST complète pour la plateforme Locotrip avec NestJS et Prisma.
 # Installer les dépendances
 npm install
 
-# Utiliser une bdd pgsql locale
-npx prisma dev
-print tcp urls (t)
-copy/paste DATABASE_URL and SHADOW_DATABASE_URL in .env
-add &pgbouncer=true at the end of both urls
+# Créer une base de données Prisma Postgres
+# Rendez-vous sur console.prisma.io et créez une nouvelle base
+# Copiez l'URL de connexion dans votre fichier .env
 
-# Générer le client Prisma
-npx prisma:generate
+# Configurer le fichier .env
+DATABASE_URL="prisma+postgres://accelerate.prisma-data.net/?api_key=VOTRE_API_KEY"
 
-# Créer les migrations
-npx prisma:migrate
+# Générer le client Prisma et appliquer les migrations
+npx prisma generate
+npx prisma migrate dev --name init
 
-# Seeder la base de données
-npx prisma:seed
+# 5. Lancer le serveur
+npm run start:dev
 
-# Lancer le serveur de développement
-npm start:dev
+# Ouvrir Prisma Studio
+npx prisma studio
 
-# Accéder au swagger de l'API
-http://localhost:3000/api
+# Seeder la base
+npm run prisma:seed
 ```

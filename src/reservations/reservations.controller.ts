@@ -17,6 +17,7 @@ import {
   ApiUpdateResponse,
   ApiDeleteResponse,
 } from '../common/decorators/api-standard-responses.decorator';
+import { StatutLitige } from '@prisma/client';
 
 @ApiTags('Réservations')
 @Controller('reservations')
@@ -154,7 +155,7 @@ export class LitigesController {
   @ApiOperation({ summary: 'Récupérer les litiges par statut' })
   @ApiParam({ name: 'statut', description: 'Statut du litige' })
   @ApiGetManyResponse(Object)
-  findByStatut(@Param('statut') statut: string) {
+  findByStatut(@Param('statut') statut: StatutLitige) {
     return this.litigesService.findByStatut(statut);
   }
 

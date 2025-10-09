@@ -212,7 +212,7 @@ async function main() {
       reservation_id: reservation1.id,
       montant: 99.98,
       methode: 'carte_bancaire',
-      statut: 'effectue',
+      statut: 'effectué',
       stripe_id: 'pi_test_123456789',
     },
   });
@@ -353,15 +353,6 @@ async function main() {
   console.log('✅ Médias ajoutés');
 
   console.log('\n🎉 Seeding terminé avec succès !');
-  console.log('\n📊 Récapitulatif:');
-  console.log(`   - ${await prisma.utilisateur.count()} utilisateurs`);
-  console.log(`   - ${await prisma.guide.count()} guide(s)`);
-  console.log(`   - ${await prisma.ville.count()} villes`);
-  console.log(`   - ${await prisma.experience.count()} expériences`);
-  console.log(`   - ${await prisma.categorie.count()} catégories`);
-  console.log(`   - ${await prisma.reservation.count()} réservation(s)`);
-  console.log(`   - ${await prisma.avis.count()} avis`);
-  console.log(`   - ${await prisma.devise.count()} devises`);
 }
 
 main()
