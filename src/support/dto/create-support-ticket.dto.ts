@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsUUID, IsNotEmpty, IsString, IsEnum } from 'class-validator';
-import { StatutSupportTicket } from '../../../prisma/enums';
+import { StatutSupportTicket } from '../enums/ticket-message.enum';
 
 export class CreateSupportTicketDto {
   @ApiProperty({

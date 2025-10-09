@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { ReservationsService } from './reservations.service';
 import { PaiementsService } from './paiements.service';
 import { LitigesService } from './litiges.service';
@@ -18,8 +18,11 @@ import {
   ApiDeleteResponse,
 } from '../common/decorators/api-standard-responses.decorator';
 import { StatutLitige } from '@prisma/client';
+import { Roles } from '../common/decorators/role.decorator';
+import { RoleUtilisateur } from '../utilisateurs/enums/utilisateur.enum';
 
 @ApiTags('Réservations')
+@ApiBearerAuth('JWT-auth')
 @Controller('reservations')
 export class ReservationsController {
   constructor(
@@ -29,6 +32,7 @@ export class ReservationsController {
   ) {}
 
   @Post()
+  @Roles(RoleUtilisateur.CLIENT)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Créer une réservation' })
   @ApiCreateResponse(ReservationEntity)
@@ -37,6 +41,7 @@ export class ReservationsController {
   }
 
   @Get()
+  @Roles(RoleUtilisateur.CLIENT)
   @ApiOperation({ summary: 'Récupérer toutes les réservations' })
   @ApiGetManyResponse(ReservationEntity)
   findAll() {
@@ -44,6 +49,7 @@ export class ReservationsController {
   }
 
   @Get(':id')
+  @Roles(RoleUtilisateur.CLIENT)
   @ApiOperation({ summary: 'Récupérer une réservation' })
   @ApiParam({ name: 'id', description: 'ID de la réservation' })
   @ApiGetOneResponse(ReservationEntity)
@@ -60,6 +66,7 @@ export class ReservationsController {
   }
 
   @Put(':id')
+  @Roles(RoleUtilisateur.CLIENT)
   @ApiOperation({ summary: 'Mettre à jour une réservation' })
   @ApiParam({ name: 'id', description: 'ID de la réservation' })
   @ApiUpdateResponse(ReservationEntity)
@@ -68,6 +75,7 @@ export class ReservationsController {
   }
 
   @Delete(':id')
+  @Roles(RoleUtilisateur.CLIENT)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Supprimer une réservation' })
   @ApiParam({ name: 'id', description: 'ID de la réservation' })
@@ -78,6 +86,7 @@ export class ReservationsController {
 
   // Paiements
   @Post(':reservationId/paiements')
+  @Roles(RoleUtilisateur.CLIENT)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Ajouter un paiement' })
   @ApiParam({ name: 'reservationId', description: 'ID de la réservation' })
@@ -86,6 +95,7 @@ export class ReservationsController {
   }
 
   @Get(':reservationId/paiements')
+  @Roles(RoleUtilisateur.CLIENT)
   @ApiOperation({ summary: 'Récupérer les paiements d\'une réservation' })
   @ApiParam({ name: 'reservationId', description: 'ID de la réservation' })
   findPaiementsByReservation(@Param('reservationId') reservationId: string) {
@@ -94,6 +104,7 @@ export class ReservationsController {
 
   // Litiges
   @Post(':reservationId/litiges')
+  @Roles(RoleUtilisateur.CLIENT)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Créer un litige' })
   @ApiParam({ name: 'reservationId', description: 'ID de la réservation' })
@@ -103,6 +114,7 @@ export class ReservationsController {
 }
 
 @ApiTags('Paiements')
+@ApiBearerAuth('JWT-auth')
 @Controller('paiements')
 export class PaiementsController {
   constructor(private readonly paiementsService: PaiementsService) {}
@@ -115,6 +127,7 @@ export class PaiementsController {
   }
 
   @Get(':id')
+  @Roles(RoleUtilisateur.CLIENT)
   @ApiOperation({ summary: 'Récupérer un paiement' })
   @ApiParam({ name: 'id', description: 'ID du paiement' })
   @ApiGetOneResponse(Object)
@@ -132,6 +145,7 @@ export class PaiementsController {
 }
 
 @ApiTags('Litiges')
+@ApiBearerAuth('JWT-auth')
 @Controller('litiges')
 export class LitigesController {
   constructor(private readonly litigesService: LitigesService) {}
@@ -144,6 +158,7 @@ export class LitigesController {
   }
 
   @Get(':id')
+  @Roles(RoleUtilisateur.CLIENT)
   @ApiOperation({ summary: 'Récupérer un litige' })
   @ApiParam({ name: 'id', description: 'ID du litige' })
   @ApiGetOneResponse(Object)
@@ -160,6 +175,7 @@ export class LitigesController {
   }
 
   @Put(':id')
+  @Roles(RoleUtilisateur.CLIENT)
   @ApiOperation({ summary: 'Mettre à jour un litige' })
   @ApiParam({ name: 'id', description: 'ID du litige' })
   @ApiUpdateResponse(Object)

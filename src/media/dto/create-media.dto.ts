@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsUUID, IsOptional, IsEnum } from 'class-validator';
-import { TypeMedia } from '../../../prisma/enums';
+import { TypeMedia } from '../enums/media.enum';
 
 export class CreateMediaDto {
   @ApiProperty({

@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { GuidesService } from './guides.service';
 import { GuideDocumentsService } from './guide-documents.service';
 import { GuideAvailabilityService } from './guide-availability.service';
@@ -20,8 +20,11 @@ import {
   ApiUpdateResponse,
   ApiDeleteResponse,
 } from '../common/decorators/api-standard-responses.decorator';
+import { Roles } from '../common/decorators/role.decorator';
+import { RoleUtilisateur } from '../utilisateurs/enums/utilisateur.enum';
 
 @ApiTags('Guides')
+@ApiBearerAuth('JWT-auth')
 @Controller('guides')
 export class GuidesController {
   constructor(
@@ -34,6 +37,7 @@ export class GuidesController {
 
   // === GUIDES ===
   @Post()
+  @Roles(RoleUtilisateur.GUIDE)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Créer un nouveau profil guide' })
   @ApiCreateResponse(GuideEntity)
@@ -42,6 +46,7 @@ export class GuidesController {
   }
 
   @Get()
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer tous les guides' })
   @ApiGetManyResponse(GuideEntity)
   findAll() {
@@ -49,14 +54,16 @@ export class GuidesController {
   }
 
   @Get(':id')
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer un guide par son ID' })
-  @ApiParam({ name: 'id', description: 'ID du guide' })
+  @ApiParam({ name: 'id', description: 'ID du GUIDE' })
   @ApiGetOneResponse(GuideEntity)
   findOne(@Param('id') id: string) {
     return this.guidesService.findOne(id);
   }
 
   @Get('utilisateur/:utilisateurId')
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer le guide associé à un utilisateur' })
   @ApiParam({ name: 'utilisateurId', description: 'ID de l\'utilisateur' })
   @ApiGetOneResponse(GuideEntity)
@@ -65,6 +72,7 @@ export class GuidesController {
   }
 
   @Put(':id')
+  @Roles(RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Mettre à jour un guide' })
   @ApiParam({ name: 'id', description: 'ID du guide' })
   @ApiUpdateResponse(GuideEntity)
@@ -73,6 +81,7 @@ export class GuidesController {
   }
 
   @Delete(':id')
+  @Roles(RoleUtilisateur.GUIDE)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Supprimer un guide' })
   @ApiParam({ name: 'id', description: 'ID du guide' })
@@ -83,6 +92,7 @@ export class GuidesController {
 
   // === DOCUMENTS ===
   @Post(':guideId/documents')
+  @Roles(RoleUtilisateur.GUIDE)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Ajouter un document au guide' })
   @ApiParam({ name: 'guideId', description: 'ID du guide' })
@@ -91,6 +101,7 @@ export class GuidesController {
   }
 
   @Get(':guideId/documents')
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer les documents d\'un guide' })
   @ApiParam({ name: 'guideId', description: 'ID du guide' })
   findDocumentsByGuide(@Param('guideId') guideId: string) {
@@ -107,6 +118,7 @@ export class GuidesController {
   }
 
   @Get(':guideId/availability')
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer les disponibilités d\'un guide' })
   @ApiParam({ name: 'guideId', description: 'ID du guide' })
   findAvailabilityByGuide(@Param('guideId') guideId: string) {
@@ -115,6 +127,7 @@ export class GuidesController {
 
   // === BOOSTS ===
   @Post(':guideId/boosts')
+  @Roles(RoleUtilisateur.GUIDE)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Activer un boost pour un guide' })
   @ApiParam({ name: 'guideId', description: 'ID du guide' })
@@ -123,6 +136,7 @@ export class GuidesController {
   }
 
   @Get(':guideId/boosts')
+  @Roles(RoleUtilisateur.GUIDE, RoleUtilisateur.CLIENT)
   @ApiOperation({ summary: 'Récupérer les boosts d\'un guide' })
   @ApiParam({ name: 'guideId', description: 'ID du guide' })
   findBoostsByGuide(@Param('guideId') guideId: string) {
@@ -131,6 +145,7 @@ export class GuidesController {
 }
 
 @ApiTags('Offres de Boost')
+@ApiBearerAuth('JWT-auth')
 @Controller('boost-offers')
 export class BoostOffersController {
   constructor(private readonly boostOffersService: BoostOffersService) {}
@@ -143,12 +158,14 @@ export class BoostOffersController {
   }
 
   @Get()
+  @Roles(RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer toutes les offres de boost' })
   findAll() {
     return this.boostOffersService.findAll();
   }
 
   @Get(':id')
+  @Roles(RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer une offre de boost' })
   @ApiParam({ name: 'id', description: 'ID de l\'offre' })
   findOne(@Param('id') id: string) {

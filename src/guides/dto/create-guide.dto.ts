@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsInt, IsBoolean, IsOptional, IsNotEmpty, IsUUID, IsEnum, Min } from 'class-validator';
-import { StatutGuide } from '../../../prisma/enums';
+import { StatutGuide } from '../enums/guide.enum';
 
 export class CreateGuideDto {
   @ApiProperty({

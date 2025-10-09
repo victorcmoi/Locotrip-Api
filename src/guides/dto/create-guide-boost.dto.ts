@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsUUID, IsNotEmpty, IsDateString, IsEnum } from 'class-validator';
-import { StatutBoost } from '../../../prisma/enums';
+import { StatutBoost } from '../enums/guide-boost.enum';
 
 export class CreateGuideBoostDto {
   @ApiProperty({

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsNumber, IsEnum, IsOptional } from 'class-validator';
-import { StatutPaiement } from '../../../prisma/enums';
+import { StatutPaiement } from '../enums/paiement.enum';
 
 export class CreatePaiementDto {
   @ApiProperty({
