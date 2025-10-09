@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsEnum, IsOptional } from 'class-validator';
-import { StatutLitige } from '../../../prisma/enums';
+import { StatutLitige } from '../enums/litige.enum';
 
 export class CreateLitigeDto {
   @ApiProperty({

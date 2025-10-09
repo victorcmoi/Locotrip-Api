@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
-import { StatutReservation } from '../../prisma/enums';
+import { StatutReservation } from './enums/reservation.enum';
 
 @Injectable()
 export class ReservationsService {

@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus, Patch } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { SupportTicketsService } from './support-tickets.service';
 import { TicketMessagesService } from './ticket-messages.service';
 import { NotificationsService } from './notifications.service';
@@ -15,8 +15,11 @@ import {
   ApiDeleteResponse,
 } from '../common/decorators/api-standard-responses.decorator';
 import { StatutSupportTicket } from '@prisma/client';
+import { Roles } from '../common/decorators/role.decorator';
+import { RoleUtilisateur } from '../utilisateurs/enums/utilisateur.enum';
 
 @ApiTags('Support')
+@ApiBearerAuth('JWT-auth')
 @Controller('support-tickets')
 export class SupportTicketsController {
   constructor(
@@ -25,6 +28,7 @@ export class SupportTicketsController {
   ) {}
 
   @Post()
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Créer un ticket de support' })
   create(@Body() createSupportTicketDto: CreateSupportTicketDto) {
@@ -76,6 +80,7 @@ export class SupportTicketsController {
 
   // Messages
   @Post(':ticketId/messages')
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Ajouter un message au ticket' })
   @ApiParam({ name: 'ticketId', description: 'ID du ticket' })
@@ -92,6 +97,7 @@ export class SupportTicketsController {
 }
 
 @ApiTags('Notifications')
+@ApiBearerAuth('JWT-auth')
 @Controller('notifications')
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
@@ -105,6 +111,7 @@ export class NotificationsController {
   }
 
   @Get()
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer toutes les notifications' })
   @ApiGetManyResponse(Object)
   findAll() {
@@ -112,6 +119,7 @@ export class NotificationsController {
   }
 
   @Get(':id')
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer une notification' })
   @ApiParam({ name: 'id', description: 'ID de la notification' })
   @ApiGetOneResponse(Object)
@@ -120,6 +128,7 @@ export class NotificationsController {
   }
 
   @Get('utilisateur/:utilisateurId')
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer les notifications d\'un utilisateur' })
   @ApiParam({ name: 'utilisateurId', description: 'ID de l\'utilisateur' })
   @ApiGetManyResponse(Object)
@@ -128,6 +137,7 @@ export class NotificationsController {
   }
 
   @Get('utilisateur/:utilisateurId/non-lues')
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer les notifications non lues' })
   @ApiParam({ name: 'utilisateurId', description: 'ID de l\'utilisateur' })
   @ApiGetManyResponse(Object)
@@ -136,6 +146,7 @@ export class NotificationsController {
   }
 
   @Patch(':id/marquer-lue')
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Marquer une notification comme lue' })
   @ApiParam({ name: 'id', description: 'ID de la notification' })
   @ApiUpdateResponse(Object)

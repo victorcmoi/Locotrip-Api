@@ -4,7 +4,19 @@ import {
   ApiBadRequestResponse,
   ApiOkResponse,
   ApiCreatedResponse,
+  ApiUnauthorizedResponse,
+  ApiForbiddenResponse,
 } from '@nestjs/swagger';
+
+/**
+ * Décorateur pour les réponses d'authentification et autorisation
+ */
+export function ApiAuthResponses() {
+  return applyDecorators(
+    ApiUnauthorizedResponse({ description: 'Non authentifié - Token manquant ou invalide' }),
+    ApiForbiddenResponse({ description: 'Accès interdit - Rôle insuffisant' }),
+  );
+}
 
 /**
  * Décorateur pour les réponses standards d'erreur
@@ -23,6 +35,7 @@ export function ApiGetOneResponse(type: Type<any>) {
   return applyDecorators(
     ApiOkResponse({ type, description: 'Ressource récupérée avec succès' }),
     ApiNotFoundResponse({ description: 'Ressource non trouvée' }),
+    ApiAuthResponses(),
   );
 }
 
@@ -35,6 +48,7 @@ export function ApiGetManyResponse(type: Type<any>) {
       type: [type], 
       description: 'Liste des ressources récupérée avec succès',
     }),
+    ApiAuthResponses(),
   );
 }
 
@@ -45,6 +59,7 @@ export function ApiCreateResponse(type: Type<any>) {
   return applyDecorators(
     ApiCreatedResponse({ type, description: 'Ressource créée avec succès' }),
     ApiBadRequestResponse({ description: 'Données invalides' }),
+    ApiAuthResponses(),
   );
 }
 
@@ -56,6 +71,7 @@ export function ApiUpdateResponse(type: Type<any>) {
     ApiOkResponse({ type, description: 'Ressource mise à jour avec succès' }),
     ApiNotFoundResponse({ description: 'Ressource non trouvée' }),
     ApiBadRequestResponse({ description: 'Données invalides' }),
+    ApiAuthResponses(),
   );
 }
 
@@ -66,5 +82,6 @@ export function ApiDeleteResponse() {
   return applyDecorators(
     ApiOkResponse({ description: 'Ressource supprimée avec succès' }),
     ApiNotFoundResponse({ description: 'Ressource non trouvée' }),
+    ApiAuthResponses(),
   );
 }

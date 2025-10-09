@@ -8,6 +8,7 @@ import { MessagerieModule } from './messagerie/messagerie.module';
 import { SupportModule } from './support/support.module';
 import { MediaModule } from './media/media.module';
 import { DevisesModule } from './devises/devises.module';
+import { AuthentificationModule } from './auth/authentifucation.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { DevisesModule } from './devises/devises.module';
     SupportModule,
     MediaModule,
     DevisesModule,
+    AuthentificationModule,
   ],
 })
 export class AppModule {}

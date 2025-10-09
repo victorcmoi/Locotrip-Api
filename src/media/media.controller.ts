@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiParam, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { MediaService } from './media.service';
 import { CreateMediaDto } from './dto/create-media.dto';
 import { UpdateMediaDto } from './dto/update-media.dto';
@@ -11,13 +11,17 @@ import {
   ApiDeleteResponse,
 } from '../common/decorators/api-standard-responses.decorator';
 import { TypeMedia } from '@prisma/client';
+import { Roles } from '../common/decorators/role.decorator';
+import { RoleUtilisateur } from '../utilisateurs/enums/utilisateur.enum';
 
 @ApiTags('Médias')
+@ApiBearerAuth('JWT-auth')
 @Controller('media')
 export class MediaController {
   constructor(private readonly mediaService: MediaService) {}
 
   @Post()
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Ajouter un média' })
   create(@Body() createMediaDto: CreateMediaDto) {
@@ -35,6 +39,7 @@ export class MediaController {
   }
 
   @Get(':id')
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Récupérer un média' })
   @ApiParam({ name: 'id', description: 'ID du média' })
   findOne(@Param('id') id: string) {
@@ -42,6 +47,7 @@ export class MediaController {
   }
 
   @Get('entity/:entityType/:entityId')
+  @Roles(RoleUtilisateur.CLIENT)
   @ApiOperation({ summary: 'Récupérer les médias d\'une entité' })
   @ApiParam({ name: 'entityType', description: 'Type d\'entité (experience, guide, etc.)' })
   @ApiParam({ name: 'entityId', description: 'ID de l\'entité' })
@@ -53,6 +59,7 @@ export class MediaController {
   }
 
   @Put(':id')
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @ApiOperation({ summary: 'Mettre à jour un média' })
   @ApiParam({ name: 'id', description: 'ID du média' })
   update(@Param('id') id: string, @Body() updateMediaDto: UpdateMediaDto) {
@@ -60,6 +67,7 @@ export class MediaController {
   }
 
   @Delete(':id')
+  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Supprimer un média' })
   @ApiParam({ name: 'id', description: 'ID du média' })
