@@ -7,16 +7,26 @@ import { HttpStatus } from "@nestjs/common/enums/http-status.enum";
 import { Post } from "@nestjs/common/decorators/http/request-mapping.decorator";
 import { HttpCode } from "@nestjs/common/decorators/http/http-code.decorator";
 import { UtilisateurEntity } from "../utilisateurs/entities/utilisateur.entity";
-import { ApiGetOneResponse, ApiUpdateResponse } from "../common/decorators/api-standard-responses.decorator";
+import { ApiCreateResponse, ApiGetOneResponse, ApiUpdateResponse } from "../common/decorators/api-standard-responses.decorator";
 import { LoginDto } from "./dto/login.dto";
 import { ChangePasswordDto } from "./dto/change-password.dto";
 import { Body, Controller } from "@nestjs/common";
+import { RegisterDto } from "./dto/register.dto";
 
 @ApiTags('Authentification')
 @ApiBearerAuth('JWT-auth')
 @Controller('auth')
 export class AuthentificationController {
     constructor(private readonly authentificationService: AuthentificationService) {}
+
+    @Public()
+    @Post('register')
+    @HttpCode(HttpStatus.CREATED)
+    @ApiOperation({ summary: 'Inscription d\'un nouvel utilisateur' })
+    @ApiCreateResponse(UtilisateurEntity)
+    register(@Body() registerDto: RegisterDto) {
+        return this.authentificationService.register(registerDto);
+    }
 
     @Public()
     @Post('login')
