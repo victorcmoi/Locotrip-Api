@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # API NestJS - Mode Développement
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+    container_name: locotrip-api-dev
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET:-dev_secret_key_change_in_production}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-7d}
+      PORT: ${API_PORT:-3000}
+    ports:
+      - "${API_PORT:-3000}:3000"
+    volumes:
+      # Volume pour hot reload - le code source est monté
+      - ..:/app
+      - /app/node_modules
+    command: sh -c "npx prisma generate && npm run start:dev"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Prisma Studio (pour visualiser la BDD)
+  prisma-studio:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+    container_name: locotrip-prisma-studio
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    ports:
+      - "${PRISMA_STUDIO_PORT:-5555}:5555"
+    volumes:
+      - ..:/app
+      - /app/node_modules
+    command: npx prisma studio
