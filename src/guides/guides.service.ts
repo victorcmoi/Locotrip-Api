@@ -11,14 +11,14 @@ export class GuidesService {
     return this.prisma.guide.create({
       data: {
         bio: createGuideDto.bio,
-        langues: createGuideDto.langues,
-        experience_annees: createGuideDto.experience_annees,
-        statut_guide: createGuideDto.statut_guide,
-        carte_pro: createGuideDto.carte_pro,
-        pays: createGuideDto.pays,
-        commentaire_interne: createGuideDto.commentaire_interne,
-        utilisateur: {
-          connect: { id: createGuideDto.utilisateur_id },
+        languages: createGuideDto.languages,
+        years_of_experience: createGuideDto.years_of_experience,
+        guide_status: createGuideDto.guide_status,
+        pro_card: createGuideDto.pro_card,
+        country: createGuideDto.country,
+        internal_comment: createGuideDto.internal_comment,
+        user: {
+          connect: { id: createGuideDto.user_id },
         },
       },
     });
@@ -27,9 +27,9 @@ export class GuidesService {
   async findAll() {
     return this.prisma.guide.findMany({
       include: {
-        utilisateur: true,
+        user: true,
         documents: true,
-        disponibilites: true,
+        availabilities: true,
         boosts: true,
         experiences: true,
       },
@@ -40,9 +40,9 @@ export class GuidesService {
     const guide = await this.prisma.guide.findUnique({
       where: { id },
       include: {
-        utilisateur: true,
+        user: true,
         documents: true,
-        disponibilites: true,
+        availabilities: true,
         boosts: {
           include: {
             boost_offer: true,
@@ -59,12 +59,12 @@ export class GuidesService {
     return guide;
   }
 
-  async findByUtilisateur(utilisateurId: string) {
+  async findByUser(userId: string) {
     return this.prisma.guide.findMany({
-      where: { utilisateur_id: utilisateurId },
+      where: { user_id: userId },
       include: {
         documents: true,
-        disponibilites: true,
+        availabilities: true,
         experiences: true,
       },
     });
@@ -75,9 +75,9 @@ export class GuidesService {
       const data: any = { ...updateGuideDto };
       
       // Transformer l'ID en relation si présent
-      if (updateGuideDto.utilisateur_id) {
-        data.utilisateur = { connect: { id: updateGuideDto.utilisateur_id } };
-        delete data.utilisateur_id;
+      if (updateGuideDto.user_id) {
+        data.user = { connect: { id: updateGuideDto.user_id } };
+        delete data.user_id;
       }
       
       return await this.prisma.guide.update({

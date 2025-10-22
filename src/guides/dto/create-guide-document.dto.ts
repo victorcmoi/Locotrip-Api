@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsUUID, IsNotEmpty, IsOptional, IsEnum } from 'class-validator';
-import { TypeDocument, VerificationStatus } from '../enums/guide-document.enum';
+import { DocumentType, VerificationStatus } from '../enums/guide-document.enum';
 
 export class CreateGuideDocumentDto {
   @ApiProperty({
@@ -13,18 +13,18 @@ export class CreateGuideDocumentDto {
 
   @ApiProperty({
     description: 'Type de document',
-    enum: TypeDocument,
-    example: TypeDocument.CV,
+    enum: DocumentType,
+    example: DocumentType.CV,
   })
-  @IsEnum(TypeDocument)
+  @IsEnum(DocumentType)
   @IsNotEmpty()
-  type_document: TypeDocument;
+  document_type: DocumentType;
 
   @ApiPropertyOptional({
     description: 'Statut de vérification du document',
     enum: VerificationStatus,
-    example: VerificationStatus.EN_ATTENTE,
-    default: VerificationStatus.EN_ATTENTE,
+    example: VerificationStatus.PENDING,
+    default: VerificationStatus.PENDING,
   })
   @IsEnum(VerificationStatus)
   @IsOptional()
@@ -36,5 +36,5 @@ export class CreateGuideDocumentDto {
   })
   @IsString()
   @IsOptional()
-  commentaire_verif?: string;
+  verification_comment?: string;
 }

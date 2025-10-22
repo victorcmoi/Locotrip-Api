@@ -4,98 +4,98 @@ API REST complète pour la plateforme Locotrip avec NestJS et Prisma.
 
 ## 📚 Modules et Endpoints
 
-### 👥 Utilisateurs (`/utilisateurs`)
-- `POST /utilisateurs` - Créer un utilisateur
-- `GET /utilisateurs` - Liste des utilisateurs
-- `GET /utilisateurs/:id` - Détails d'un utilisateur
-- `GET /utilisateurs/email/:email` - Recherche par email
-- `PUT /utilisateurs/:id` - Mettre à jour un utilisateur
-- `DELETE /utilisateurs/:id` - Supprimer un utilisateur
+### 👥 Utilisateurs (`/users`)
+- `POST /user` - Créer un user
+- `GET /users` - Liste des users
+- `GET /user/:id` - Détails d'un user
+- `GET /user/email/:email` - Recherche par email
+- `PUT /user/:id` - Mettre à jour un user
+- `DELETE /user/:id` - Supprimer un user
 
 ### 🎯 Guides (`/guides`)
-- `POST /guides` - Créer un guide
+- `POST /guide` - Créer un guide
 - `GET /guides` - Liste des guides
-- `GET /guides/:id` - Détails d'un guide
-- `GET /guides/utilisateur/:utilisateurId` - Guides d'un utilisateur
-- `PUT /guides/:id` - Mettre à jour un guide
-- `DELETE /guides/:id` - Supprimer un guide
+- `GET /guide/:id` - Détails d'un guide
+- `GET /guides/user/:userId` - Guides d'un user
+- `PUT /guide/:id` - Mettre à jour un guide
+- `DELETE /guide/:id` - Supprimer un guide
 
 #### Documents
-- `POST /guides/:guideId/documents` - Ajouter un document
-- `GET /guides/:guideId/documents` - Documents d'un guide
+- `POST /guide/:guideId/documents` - Ajouter un document
+- `GET /guide/:guideId/documents` - Documents d'un guide
 
 #### Disponibilités
-- `POST /guides/:guideId/availability` - Ajouter une disponibilité
-- `GET /guides/:guideId/availability` - Disponibilités d'un guide
+- `POST /guide/:guideId/availability` - Ajouter une disponibilité
+- `GET /guide/:guideId/availability` - Disponibilités d'un guide
 
 #### Boosts
-- `POST /guides/:guideId/boosts` - Acheter un boost
-- `GET /guides/:guideId/boosts` - Boosts d'un guide
+- `POST /guide/:guideId/boosts` - Acheter un boost
+- `GET /guide/:guideId/boosts` - Boosts d'un guide
 
 ### 🌍 Expériences
 
-#### Villes (`/villes`)
-- `POST /villes` - Créer une ville
-- `GET /villes` - Liste des villes
-- `GET /villes/:id` - Détails d'une ville
-- `PUT /villes/:id` - Mettre à jour une ville
-- `DELETE /villes/:id` - Supprimer une ville
+#### Villes (`/cities`)
+- `POST /city` - Créer une city
+- `GET /cities` - Liste des cities
+- `GET /city/:id` - Détails d'une city
+- `PUT /city/:id` - Mettre à jour une city
+- `DELETE /city/:id` - Supprimer une city
 
 #### Expériences (`/experiences`)
-- `POST /experiences` - Créer une expérience
+- `POST /experience` - Créer une expérience
 - `GET /experiences` - Liste des expériences
-- `GET /experiences/:id` - Détails d'une expérience
-- `GET /experiences/ville/:villeId` - Expériences par ville
+- `GET /experience/:id` - Détails d'une expérience
+- `GET /experiences/city/:villeId` - Expériences par city
 - `GET /experiences/guide/:guideId` - Expériences par guide
-- `PUT /experiences/:id` - Mettre à jour une expérience
-- `DELETE /experiences/:id` - Supprimer une expérience
+- `PUT /experience/:id` - Mettre à jour une expérience
+- `DELETE /experience/:id` - Supprimer une expérience
 
 #### Catégories (`/categories`)
-- `POST /categories` - Créer une catégorie
+- `POST /category` - Créer une catégorie
 - `GET /categories` - Liste des catégories
-- `GET /categories/:id` - Détails d'une catégorie
-- `PUT /categories/:id` - Mettre à jour une catégorie
-- `DELETE /categories/:id` - Supprimer une catégorie
+- `GET /category/:id` - Détails d'une catégorie
+- `PUT /category/:id` - Mettre à jour une catégorie
+- `DELETE /category/:id` - Supprimer une catégorie
 
-### 📅 Réservations (`/reservations`)
-- `POST /reservations` - Créer une réservation
-- `GET /reservations` - Liste des réservations
-- `GET /reservations/:id` - Détails d'une réservation
-- `GET /reservations/utilisateur/:utilisateurId` - Réservations d'un utilisateur
-- `PUT /reservations/:id` - Mettre à jour une réservation
-- `DELETE /reservations/:id` - Supprimer une réservation
+### 📅 Réservations (`/bookings`)
+- `POST /booking` - Créer une réservation
+- `GET /bookings` - Liste des réservations
+- `GET /booking/:id` - Détails d'une réservation
+- `GET /bookings/user/:userId` - Réservations d'un user
+- `PUT /booking/:id` - Mettre à jour une réservation
+- `DELETE /booking/:id` - Supprimer une réservation
 
 #### Paiements
-- `POST /reservations/:reservationId/paiements` - Créer un paiement
-- `GET /reservations/:reservationId/paiements` - Paiements d'une réservation
-- `GET /paiements` - Liste des paiements
-- `GET /paiements/:id` - Détails d'un paiement
+- `POST /booking/:bookingId/payment` - Créer un payment
+- `GET /bookings/:bookingId/payments` - Paiements d'une réservation
+- `GET /payments` - Liste des payments
+- `GET /payment/:id` - Détails d'un payment
 
 #### Litiges
-- `POST /reservations/:reservationId/litiges` - Créer un litige
-- `GET /litiges` - Liste des litiges
-- `GET /litiges/:id` - Détails d'un litige
-- `GET /litiges/statut/:statut` - Litiges par statut
-- `PUT /litiges/:id` - Mettre à jour un litige
+- `POST /bookings/:bookingId/dispute` - Créer un dispute
+- `GET /disputes` - Liste des disputes
+- `GET /dispute/:id` - Détails d'un dispute
+- `GET /dispute/status/:status` - Litiges par status
+- `PUT /disputes/:id` - Mettre à jour un dispute
 
 ### ⭐ Avis et Abonnements
 
-#### Avis (`/avis`)
-- `POST /avis` - Créer un avis
-- `GET /avis` - Liste des avis
-- `GET /avis/:id` - Détails d'un avis
-- `GET /avis/experience/:experienceId` - Avis d'une expérience
-- `GET /avis/utilisateur/:utilisateurId` - Avis d'un utilisateur
-- `PUT /avis/:id` - Mettre à jour un avis
-- `DELETE /avis/:id` - Supprimer un avis
+#### Avis (`/reviews`)
+- `POST /reviews` - Créer un reviews
+- `GET /reviews` - Liste des reviews
+- `GET /reviews/:id` - Détails d'un reviews
+- `GET /reviews/experience/:experienceId` - Avis d'une expérience
+- `GET /reviews/user/:userId` - Avis d'un user
+- `PUT /reviews/:id` - Mettre à jour un reviews
+- `DELETE /reviews/:id` - Supprimer un reviews
 
-#### Abonnements (`/abonnements`)
-- `POST /abonnements` - Créer un abonnement
-- `GET /abonnements` - Liste des abonnements
-- `GET /abonnements/actifs` - Abonnements actifs
-- `GET /abonnements/:id` - Détails d'un abonnement
-- `GET /abonnements/utilisateur/:utilisateurId` - Abonnements d'un utilisateur
-- `PUT /abonnements/:id` - Mettre à jour un abonnement
+#### Abonnements (`/subscriptions`)
+- `POST /subscriptions` - Créer un subscription
+- `GET /subscriptions` - Liste des subscriptions
+- `GET /subscriptions/actifs` - Abonnements actifs
+- `GET /subscriptions/:id` - Détails d'un subscription
+- `GET /subscriptions/user/:userId` - Abonnements d'un user
+- `PUT /subscriptions/:id` - Mettre à jour un subscription
 
 ### 💬 Messagerie
 
@@ -103,7 +103,7 @@ API REST complète pour la plateforme Locotrip avec NestJS et Prisma.
 - `POST /conversations` - Créer une conversation
 - `GET /conversations` - Liste des conversations
 - `GET /conversations/:id` - Détails d'une conversation
-- `GET /conversations/reservation/:reservationId` - Conversations d'une réservation
+- `GET /conversations/booking/:bookingId` - Conversations d'une réservation
 - `DELETE /conversations/:id` - Supprimer une conversation
 
 #### Messages
@@ -118,8 +118,8 @@ API REST complète pour la plateforme Locotrip avec NestJS et Prisma.
 - `POST /support-tickets` - Créer un ticket
 - `GET /support-tickets` - Liste des tickets
 - `GET /support-tickets/:id` - Détails d'un ticket
-- `GET /support-tickets/statut/:statut` - Tickets par statut
-- `GET /support-tickets/utilisateur/:utilisateurId` - Tickets d'un utilisateur
+- `GET /support-tickets/status/:status` - Tickets par status
+- `GET /support-tickets/user/:userId` - Tickets d'un user
 - `PUT /support-tickets/:id` - Mettre à jour un ticket
 - `DELETE /support-tickets/:id` - Supprimer un ticket
 
@@ -131,8 +131,8 @@ API REST complète pour la plateforme Locotrip avec NestJS et Prisma.
 - `POST /notifications` - Créer une notification
 - `GET /notifications` - Liste des notifications
 - `GET /notifications/:id` - Détails d'une notification
-- `GET /notifications/utilisateur/:utilisateurId` - Notifications d'un utilisateur
-- `GET /notifications/utilisateur/:utilisateurId/non-lues` - Notifications non lues
+- `GET /notifications/user/:userId` - Notifications d'un user
+- `GET /notifications/user/:userId/non-lues` - Notifications non lues
 - `PATCH /notifications/:id/marquer-lue` - Marquer comme lue
 - `PUT /notifications/:id` - Mettre à jour une notification
 - `DELETE /notifications/:id` - Supprimer une notification
@@ -148,20 +148,20 @@ API REST complète pour la plateforme Locotrip avec NestJS et Prisma.
 
 ### 💱 Devises
 
-#### Devises (`/devises`)
-- `POST /devises` - Créer une devise
-- `GET /devises` - Liste des devises
-- `GET /devises/:code` - Détails d'une devise (ex: EUR, USD)
-- `PUT /devises/:code` - Mettre à jour une devise
-- `DELETE /devises/:code` - Supprimer une devise
+#### Devises (`/currencies`)
+- `POST /currencies` - Créer une currency
+- `GET /currencies` - Liste des currencies
+- `GET /currencies/:code` - Détails d'une currency (ex: EUR, USD)
+- `PUT /currencies/:code` - Mettre à jour une currency
+- `DELETE /currencies/:code` - Supprimer une currency
 
-#### Prix par devise (`/experience-prix`)
-- `POST /experience-prix` - Ajouter un prix
-- `GET /experience-prix` - Liste des prix
-- `GET /experience-prix/experience/:experienceId` - Prix d'une expérience
-- `GET /experience-prix/devise/:deviseCode` - Prix par devise
-- `PUT /experience-prix/:experienceId/:deviseCode` - Mettre à jour un prix
-- `DELETE /experience-prix/:experienceId/:deviseCode` - Supprimer un prix
+#### Prix par currency (`/experience-price`)
+- `POST /experience-price` - Ajouter un price
+- `GET /experience-price` - Liste des price
+- `GET /experience-price/experience/:experienceId` - Prix d'une expérience
+- `GET /experience-price/currency/:currencyCode` - Prix par currency
+- `PUT /experience-price/:experienceId/:currencyCode` - Mettre à jour un price
+- `DELETE /experience-price/:experienceId/:currencyCode` - Supprimer un price
 
 ### 🎁 Boost Offers (`/boost-offers`)
 - `POST /boost-offers` - Créer une offre

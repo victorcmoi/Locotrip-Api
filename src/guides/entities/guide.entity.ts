@@ -13,24 +13,24 @@ export class GuideEntity extends CreateGuideDto {
     example: '2025-01-15T10:30:00.000Z',
     required: false,
   })
-  date_demande_carte?: Date;
+  card_request_date?: Date;
 
   @ApiProperty({
     description: 'Date de vérification de la carte professionnelle',
     example: '2025-01-20T14:00:00.000Z',
     required: false,
   })
-  date_verification_carte?: Date;
+  card_verification_date?: Date;
 
   @ApiProperty({
     description: 'Date de création du profil guide',
     example: '2025-01-10T09:00:00.000Z',
   })
-  date_creation: Date;
+  created_at: Date;
 
   @ApiProperty({
     description: 'Date de dernière mise à jour',
     example: '2025-01-22T16:45:00.000Z',
   })
-  date_maj: Date;
+  updated_at: Date;
 }

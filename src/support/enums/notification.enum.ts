@@ -1,4 +1,4 @@
-export enum TypeNotification {
-    RAPPEL_RESERVATION = "rappel_reservation",
-    NOUVEAU_MESSAGE = "nouveau_message",
+export enum NotificationType {
+    BOOKING_REMINDER = "booking_reminder",
+    NEW_MESSAGE = "new_message",
 }

@@ -9,7 +9,7 @@ export class CreateBoostOfferDto {
   })
   @IsString()
   @IsNotEmpty()
-  nom: string;
+  name: string;
 
   @ApiPropertyOptional({
     description: 'Description de l\'offre',
@@ -27,7 +27,7 @@ export class CreateBoostOfferDto {
   @IsInt()
   @Min(1)
   @IsNotEmpty()
-  duree_jours: number;
+  duration_days: number;
 
   @ApiProperty({
     description: 'Pourcentage de réduction accordé',
@@ -38,7 +38,7 @@ export class CreateBoostOfferDto {
   @IsInt()
   @Min(0)
   @IsNotEmpty()
-  pourcentage_reduction: number;
+  discount_percentage: number;
 
   @ApiProperty({
     description: 'Prix de l\'offre',
@@ -46,5 +46,5 @@ export class CreateBoostOfferDto {
   })
   @IsDecimal()
   @IsNotEmpty()
-  prix: number;
+  price: number;
 }

@@ -9,8 +9,8 @@ export class GuideBoostsService {
   async create(createBoostDto: CreateGuideBoostDto) {
     return this.prisma.guide_boost.create({
       data: {
-        date_expiration: createBoostDto.date_expiration,
-        statut: createBoostDto.statut,
+        expiration_date: createBoostDto.expiration_date,
+        status: createBoostDto.status,
         guide: {
           connect: { id: createBoostDto.guide_id },
         },
@@ -58,8 +58,8 @@ export class GuideBoostsService {
   async findActive() {
     return this.prisma.guide_boost.findMany({
       where: { 
-        statut: 'active',
-        date_expiration: { gte: new Date() },
+        status: 'active',
+        expiration_date: { gte: new Date() },
       },
       include: {
         guide: true,

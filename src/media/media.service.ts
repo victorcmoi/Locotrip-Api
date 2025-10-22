@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { Prisma, TypeMedia } from '@prisma/client';
+import { Prisma, MediaType } from '@prisma/client';
 
 @Injectable()
 export class MediaService {
@@ -35,9 +35,9 @@ export class MediaService {
     });
   }
 
-  async findByType(typeMedia: TypeMedia) {
+  async findByType(typeMedia: MediaType) {
     return this.prisma.media.findMany({
-      where: { type_media: typeMedia },
+      where: { media_type: typeMedia },
     });
   }
 

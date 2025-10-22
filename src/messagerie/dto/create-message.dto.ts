@@ -11,12 +11,12 @@ export class CreateMessageDto {
   conversation_id: string;
 
   @ApiProperty({
-    description: 'ID de l\'auteur du message',
+    description: 'ID de l\'author du message',
     example: '660e8400-e29b-41d4-a716-446655440001',
   })
   @IsUUID()
   @IsNotEmpty()
-  auteur_id: string;
+  author_id: string;
 
   @ApiProperty({
     description: 'Contenu du message',
@@ -24,5 +24,5 @@ export class CreateMessageDto {
   })
   @IsString()
   @IsNotEmpty()
-  contenu: string;
+  content: string;
 }

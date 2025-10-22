@@ -1,0 +1,25 @@
+# ===================================
+# Dockerfile de développement
+# ===================================
+FROM node:20-alpine
+
+# Installer les dépendances nécessaires pour Prisma
+RUN apk add --no-cache openssl curl
+
+WORKDIR /app
+
+# Copier les fichiers de dépendances
+COPY package*.json ./
+COPY prisma ./prisma/
+
+# Installer TOUTES les dépendances (y compris devDependencies)
+RUN npm ci
+
+# Copier le reste du code (sera aussi monté via volume pour hot reload)
+COPY . .
+
+# Exposer le port
+EXPOSE 3000
+
+# Commande de développement avec hot reload
+CMD ["npm", "run", "start:dev"]

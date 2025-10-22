@@ -24,28 +24,28 @@ async function bootstrap() {
     )
     .addTag('Authentification', 'Authentification et gestion des sessions')
     
-    .addTag('Utilisateurs', 'Gestion des comptes utilisateurs')
+    .addTag('Utilisateurs', 'Gestion des comptes users')
     .addTag('Guides', 'Gestion des profils guides')
     
     .addTag('Expériences', 'Gestion des expériences touristiques')
     .addTag('Catégories', 'Gestion des catégories d\'expériences')
-    .addTag('Villes', 'Gestion des villes disponibles')
+    .addTag('Villes', 'Gestion des cities disponibles')
     
     .addTag('Réservations', 'Gestion des réservations')
     .addTag('Paiements', 'Gestion des transactions financières')
     .addTag('Prix des expériences', 'Gestion des tarifs et promotions')
-    .addTag('Devises', 'Gestion des devises et taux de change')
+    .addTag('Devises', 'Gestion des currencies et taux de change')
     
     .addTag('Avis', 'Système d\'évaluations et commentaires')
-    .addTag('Abonnements', 'Gestion des abonnements premium')
+    .addTag('Abonnements', 'Gestion des subscriptions premium')
     .addTag('Offres de Boost', 'Gestion des offres de boost pour les guides')
     
-    .addTag('Messagerie', 'Gestion des conversations entre utilisateurs')
-    .addTag('Messages', 'Gestion des messages utilisateurs')
+    .addTag('Messagerie', 'Gestion des conversations entre users')
+    .addTag('Messages', 'Gestion des messages users')
     .addTag('Notifications', 'Gestion des notifications')
     
     .addTag('Support', 'Service client et support')
-    .addTag('Litiges', 'Gestion des litiges entre utilisateurs')
+    .addTag('Litiges', 'Gestion des disputes entre users')
     .addTag('Médias', 'Gestion des fichiers médias')
     .build();
 

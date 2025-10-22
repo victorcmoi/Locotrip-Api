@@ -10,7 +10,7 @@ import {
   ApiGetOneResponse,
   ApiDeleteResponse,
 } from '../common/decorators/api-standard-responses.decorator';
-import { RoleUtilisateur } from '../utilisateurs/enums/utilisateur.enum';
+import { UserRole } from '../users/enums/user.enum';
 import { Roles } from '../common/decorators/role.decorator';
 
 @ApiTags('Messagerie')
@@ -23,7 +23,7 @@ export class ConversationsController {
   ) {}
 
   @Post()
-  @Roles(RoleUtilisateur.CLIENT)
+  @Roles(UserRole.CLIENT)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Créer une conversation' })
   @ApiCreateResponse(Object)
@@ -39,7 +39,7 @@ export class ConversationsController {
   }
 
   @Get(':id')
-  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
+  @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer une conversation' })
   @ApiParam({ name: 'id', description: 'ID de la conversation' })
   @ApiGetOneResponse(Object)
@@ -47,17 +47,17 @@ export class ConversationsController {
     return this.conversationsService.findOne(id);
   }
 
-  @Get('reservation/:reservationId')
-  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
+  @Get('booking/:bookingId')
+  @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer la conversation d\'une réservation' })
-  @ApiParam({ name: 'reservationId', description: 'ID de la réservation' })
+  @ApiParam({ name: 'bookingId', description: 'ID de la réservation' })
   @ApiGetOneResponse(Object)
-  findByReservation(@Param('reservationId') reservationId: string) {
-    return this.conversationsService.findByReservation(reservationId);
+  findByBooking(@Param('bookingId') bookingId: string) {
+    return this.conversationsService.findByBooking(bookingId);
   }
 
   @Delete(':id')
-  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
+  @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Supprimer une conversation' })
   @ApiParam({ name: 'id', description: 'ID de la conversation' })
@@ -68,7 +68,7 @@ export class ConversationsController {
 
   // Messages
   @Post(':conversationId/messages')
-  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
+  @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Envoyer un message' })
   @ApiParam({ name: 'conversationId', description: 'ID de la conversation' })
@@ -78,7 +78,7 @@ export class ConversationsController {
   }
 
   @Get(':conversationId/messages')
-  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
+  @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer les messages d\'une conversation' })
   @ApiParam({ name: 'conversationId', description: 'ID de la conversation' })
   @ApiGetManyResponse(Object)
@@ -101,7 +101,7 @@ export class MessagesController {
   }
 
   @Get(':id')
-  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
+  @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer un message' })
   @ApiParam({ name: 'id', description: 'ID du message' })
   @ApiGetOneResponse(Object)
@@ -110,7 +110,7 @@ export class MessagesController {
   }
 
   @Delete(':id')
-  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
+  @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Supprimer un message' })
   @ApiParam({ name: 'id', description: 'ID du message' })

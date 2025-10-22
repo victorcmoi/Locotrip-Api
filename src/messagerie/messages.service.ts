@@ -9,12 +9,12 @@ export class MessagesService {
   async create(createMessageDto: CreateMessageDto) {
     return this.prisma.message.create({
       data: {
-        contenu: createMessageDto.contenu,
+        content: createMessageDto.content,
         conversation: {
           connect: { id: createMessageDto.conversation_id },
         },
-        auteur: {
-          connect: { id: createMessageDto.auteur_id },
+        author: {
+          connect: { id: createMessageDto.author_id },
         },
       },
     });
@@ -24,7 +24,7 @@ export class MessagesService {
     return this.prisma.message.findMany({
       include: {
         conversation: true,
-        auteur: true,
+        author: true,
       },
     });
   }
@@ -34,7 +34,7 @@ export class MessagesService {
       where: { id },
       include: {
         conversation: true,
-        auteur: true,
+        author: true,
       },
     });
 
@@ -49,9 +49,9 @@ export class MessagesService {
     return this.prisma.message.findMany({
       where: { conversation_id: conversationId },
       include: {
-        auteur: true,
+        author: true,
       },
-      orderBy: { date_envoi: 'asc' },
+      orderBy: { sent_at: 'asc' },
     });
   }
 

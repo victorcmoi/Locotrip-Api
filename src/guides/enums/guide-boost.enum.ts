@@ -1,4 +1,4 @@
-export enum StatutBoost {
+export enum BoostStatus {
     ACTIVE = "active",
-    EXPIREE = "expirée",
+    EXPIRED = "expired",
 }
