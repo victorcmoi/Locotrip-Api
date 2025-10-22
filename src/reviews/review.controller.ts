@@ -3,7 +3,7 @@ import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger'
 import { ReviewService } from './review.service';
 import { SubscriptionService } from './subscription.service';
 import { CreateReviewDto } from './dto/create-review.dto';
-import { UpdateAvisDto } from './dto/update-review.dto';
+import { UpdateReviewDto } from './dto/update-review.dto';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
 import { ReviewEntity } from './entities/review.entity';
@@ -72,8 +72,8 @@ export class ReviewsController {
   @ApiOperation({ summary: 'Mettre à jour un reviews' })
   @ApiParam({ name: 'id', description: 'ID de l\'reviews' })
   @ApiUpdateResponse(ReviewEntity)
-  update(@Param('id') id: string, @Body() updateAvisDto: UpdateAvisDto) {
-    return this.reviewService.update(id, updateAvisDto);
+  update(@Param('id') id: string, @Body() UpdateReviewDto: UpdateReviewDto) {
+    return this.reviewService.update(id, UpdateReviewDto);
   }
 
   @Delete(':id')

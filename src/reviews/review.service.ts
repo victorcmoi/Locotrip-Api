@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateReviewDto } from './dto/create-review.dto';
-import { UpdateAvisDto } from './dto/update-review.dto';
+import { UpdateReviewDto } from './dto/update-review.dto';
 
 @Injectable()
 export class ReviewService {
@@ -66,18 +66,18 @@ export class ReviewService {
     });
   }
 
-  async update(id: string, updateAvisDto: UpdateAvisDto) {
+  async update(id: string, UpdateReviewDto: UpdateReviewDto) {
     try {
-      const data: any = { ...updateAvisDto };
+      const data: any = { ...UpdateReviewDto };
       
       // Transformer les IDs en relations si présents
-      if (updateAvisDto.user_id) {
-        data.user = { connect: { id: updateAvisDto.user_id } };
+      if (UpdateReviewDto.user_id) {
+        data.user = { connect: { id: UpdateReviewDto.user_id } };
         delete data.user_id;
       }
       
-      if (updateAvisDto.experience_id) {
-        data.experience = { connect: { id: updateAvisDto.experience_id } };
+      if (UpdateReviewDto.experience_id) {
+        data.experience = { connect: { id: UpdateReviewDto.experience_id } };
         delete data.experience_id;
       }
       
