@@ -466,7 +466,7 @@ model notification {
 // CURRENCIES & PRICING (DEVISES & TARIFICATION)
 // ============================================
 
-model currency { // currency
+model currency {
   code            String            @id @db.Char(3) // "EUR", "USD"
   name            String            @db.VarChar(50)
   exchange_rate   Decimal           @db.Decimal(10, 4)

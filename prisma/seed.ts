@@ -236,7 +236,7 @@ async function main() {
       subscription_type: 'loco_plus',
       start_date: new Date(),
       end_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // +1 an
-      status: 'actif',
+      status: 'active',
     },
   });
 

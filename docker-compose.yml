@@ -1,4 +1,3 @@
-version: "3"
 services:
   postgres:
     image: postgres
@@ -8,8 +7,9 @@ services:
     environment:
       POSTGRES_USER: locotrip
       POSTGRES_PASSWORD: locotrip
+      POSTGRES_DB: locotrip_db
     volumes:
       - postgres:/var/lib/postgresql/data
-
+  
 volumes:
   postgres:
