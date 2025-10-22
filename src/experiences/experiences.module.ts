@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { VillesController, ExperiencesController, CategoriesController } from './experiences.controller';
-import { VillesService } from './villes.service';
+import { VillesService } from './cities.service';
 import { ExperiencesService } from './experiences.service';
 import { CategoriesService } from './categories.service';
 import { ExperienceCategoriesService } from './experience-categories.service';

@@ -1,5 +1,5 @@
-export enum StatutSupportTicket {
-    OUVERT = "ouvert",
-    EN_COURS = "en_cours",
-    FERME = "fermé",
+export enum SupportTicketStatus {
+    OUVERT = "open",
+    EN_COURS = "in_progress",
+    FERME = "closed",
 }

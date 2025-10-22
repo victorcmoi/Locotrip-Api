@@ -6,34 +6,34 @@ import { Prisma } from '@prisma/client';
 export class ExperienceCategoriesService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.experience_categorieCreateInput) {
-    return this.prisma.experience_categorie.create({ data });
+  async create(data: Prisma.experience_categoryCreateInput) {
+    return this.prisma.experience_category.create({ data });
   }
 
   async findAll() {
-    return this.prisma.experience_categorie.findMany({
+    return this.prisma.experience_category.findMany({
       include: {
         experience: true,
-        categorie: true,
+        category: true,
       },
     });
   }
 
   async findByExperience(experienceId: string) {
-    return this.prisma.experience_categorie.findMany({
+    return this.prisma.experience_category.findMany({
       where: { experience_id: experienceId },
       include: {
-        categorie: true,
+        category: true,
       },
     });
   }
 
   async delete(experienceId: string, categorieId: string) {
-    return this.prisma.experience_categorie.delete({
+    return this.prisma.experience_category.delete({
       where: {
-        experience_id_categorie_id: {
+        experience_id_category_id: {
           experience_id: experienceId,
-          categorie_id: categorieId,
+          category_id: categorieId,
         },
       },
     });

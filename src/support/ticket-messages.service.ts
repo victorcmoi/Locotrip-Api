@@ -9,12 +9,12 @@ export class TicketMessagesService {
   async create(createTicketMessageDto: CreateTicketMessageDto) {
     return this.prisma.ticket_message.create({
       data: {
-        contenu: createTicketMessageDto.contenu,
+        content: createTicketMessageDto.content,
         ticket: {
           connect: { id: createTicketMessageDto.ticket_id },
         },
-        auteur: {
-          connect: { id: createTicketMessageDto.auteur_id },
+        author: {
+          connect: { id: createTicketMessageDto.author_id },
         },
       },
     });
@@ -24,7 +24,7 @@ export class TicketMessagesService {
     return this.prisma.ticket_message.findMany({
       include: {
         ticket: true,
-        auteur: true,
+        author: true,
       },
     });
   }
@@ -34,7 +34,7 @@ export class TicketMessagesService {
       where: { id },
       include: {
         ticket: true,
-        auteur: true,
+        author: true,
       },
     });
 
@@ -49,9 +49,9 @@ export class TicketMessagesService {
     return this.prisma.ticket_message.findMany({
       where: { ticket_id: ticketId },
       include: {
-        auteur: true,
+        author: true,
       },
-      orderBy: { date_envoi: 'asc' },
+      orderBy: { sent_at: 'asc' },
     });
   }
 

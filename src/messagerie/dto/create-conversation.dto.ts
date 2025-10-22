@@ -8,5 +8,5 @@ export class CreateConversationDto {
   })
   @IsUUID()
   @IsNotEmpty()
-  reservation_id: string;
+  booking_id: string;
 }

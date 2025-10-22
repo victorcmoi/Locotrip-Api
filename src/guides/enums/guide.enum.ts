@@ -1,4 +1,4 @@
-export enum StatutGuide {
+export enum GuideStatus {
     LOCAL = "local",
     PRO = "pro",
 }

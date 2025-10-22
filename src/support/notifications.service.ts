@@ -11,10 +11,10 @@ export class NotificationsService {
     return this.prisma.notification.create({
       data: {
         type: createNotificationDto.type,
-        contenu: createNotificationDto.contenu,
-        lu: createNotificationDto.lu ?? false,
-        utilisateur: {
-          connect: { id: createNotificationDto.utilisateur_id },
+        content: createNotificationDto.content,
+        read: createNotificationDto.read ?? false,
+        user: {
+          connect: { id: createNotificationDto.user_id },
         },
       },
     });
@@ -23,7 +23,7 @@ export class NotificationsService {
   async findAll() {
     return this.prisma.notification.findMany({
       include: {
-        utilisateur: true,
+        user: true,
       },
     });
   }
@@ -32,7 +32,7 @@ export class NotificationsService {
     const notification = await this.prisma.notification.findUnique({
       where: { id },
       include: {
-        utilisateur: true,
+        user: true,
       },
     });
 
@@ -43,20 +43,20 @@ export class NotificationsService {
     return notification;
   }
 
-  async findByUtilisateur(utilisateurId: string) {
+  async findByUser(userId: string) {
     return this.prisma.notification.findMany({
-      where: { utilisateur_id: utilisateurId },
-      orderBy: { date_envoi: 'desc' },
+      where: { user_id: userId },
+      orderBy: { sent_at: 'desc' },
     });
   }
 
-  async findNonLues(utilisateurId: string) {
+  async findNonLues(userId: string) {
     return this.prisma.notification.findMany({
       where: {
-        utilisateur_id: utilisateurId,
-        lu: false,
+        user_id: userId,
+        read: false,
       },
-      orderBy: { date_envoi: 'desc' },
+      orderBy: { sent_at: 'desc' },
     });
   }
 
@@ -64,7 +64,7 @@ export class NotificationsService {
     try {
       return await this.prisma.notification.update({
         where: { id },
-        data: { lu: true },
+        data: { read: true },
       });
     } catch (error) {
       throw new NotFoundException(`Notification avec l'ID ${id} introuvable`);
@@ -76,9 +76,9 @@ export class NotificationsService {
       const data: any = { ...updateNotificationDto };
       
       // Transformer l'ID en relation si présent
-      if (updateNotificationDto.utilisateur_id) {
-        data.utilisateur = { connect: { id: updateNotificationDto.utilisateur_id } };
-        delete data.utilisateur_id;
+      if (updateNotificationDto.user_id) {
+        data.user = { connect: { id: updateNotificationDto.user_id } };
+        delete data.user_id;
       }
       
       return await this.prisma.notification.update({

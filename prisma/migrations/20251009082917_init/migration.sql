@@ -1,70 +1,70 @@
 -- CreateEnum
-CREATE TYPE "RoleUtilisateur" AS ENUM ('client', 'admin', 'guide');
+CREATE TYPE "UserRole" AS ENUM ('client', 'admin', 'guide');
 
 -- CreateEnum
-CREATE TYPE "StatutReservation" AS ENUM ('en_attente', 'confirmee', 'annulee', 'terminee');
+CREATE TYPE "BookingStatus" AS ENUM ('pending', 'confirmed', 'cancelled', 'completed');
 
 -- CreateEnum
-CREATE TYPE "StatutGuide" AS ENUM ('local', 'pro');
+CREATE TYPE "GuideStatus" AS ENUM ('local', 'pro');
 
 -- CreateEnum
-CREATE TYPE "VerificationStatus" AS ENUM ('en_attente', 'authentifié', 'rejeté');
+CREATE TYPE "VerificationStatus" AS ENUM ('pending', 'verified', 'rejected');
 
 -- CreateEnum
-CREATE TYPE "StatutBoost" AS ENUM ('active', 'expirée');
+CREATE TYPE "BoostStatus" AS ENUM ('active', 'expired');
 
 -- CreateEnum
-CREATE TYPE "StatutDisponibilite" AS ENUM ('disponible', 'indisponible', 'bloqué');
+CREATE TYPE "AvailabilityStatus" AS ENUM ('available', 'unavailable', 'blocked');
 
 -- CreateEnum
-CREATE TYPE "TypeDocument" AS ENUM ('CV', 'diplôme', 'justificatif_de_domicile');
+CREATE TYPE "DocumentType" AS ENUM ('CV', 'diploma', 'proof_of_residence');
 
 -- CreateEnum
-CREATE TYPE "TypeMedia" AS ENUM ('photo', 'video', 'document', 'audio');
+CREATE TYPE "MediaType" AS ENUM ('photo', 'video', 'document', 'audio');
 
 -- CreateEnum
-CREATE TYPE "StatutPaiement" AS ENUM ('en_attente', 'effectué', 'remboursé');
+CREATE TYPE "PaymentStatus" AS ENUM ('pending', 'completed', 'refunded');
 
 -- CreateEnum
-CREATE TYPE "StatutLitige" AS ENUM ('ouvert', 'en_attente', 'résolu', 'refusé');
+CREATE TYPE "DisputeStatus" AS ENUM ('open', 'pending', 'resolved', 'rejected');
 
 -- CreateEnum
-CREATE TYPE "TypeAbonnement" AS ENUM ('loco_plus', 'standard');
+CREATE TYPE "SubscriptionType" AS ENUM ('loco_plus', 'standard');
 
 -- CreateEnum
-CREATE TYPE "StatutSupportTicket" AS ENUM ('ouvert', 'en_cours', 'fermé');
+CREATE TYPE "SupportTicketStatus" AS ENUM ('open', 'in_progress', 'closed');
 
 -- CreateEnum
-CREATE TYPE "TypeNotification" AS ENUM ('rappel_reservation', 'nouveau_message');
+CREATE TYPE "NotificationType" AS ENUM ('booking_reminder', 'new_message');
 
 -- CreateTable
-CREATE TABLE "utilisateur" (
+CREATE TABLE "user" (
     "id" UUID NOT NULL,
-    "nom" VARCHAR(100) NOT NULL,
-    "prenom" VARCHAR(50) NOT NULL,
+    "last_name" VARCHAR(100) NOT NULL,
+    "first_name" VARCHAR(50) NOT NULL,
     "email" VARCHAR(100) NOT NULL,
-    "mot_de_passe" VARCHAR(255) NOT NULL,
-    "role" "RoleUtilisateur" NOT NULL,
-    "date_creation" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "password" VARCHAR(255) NOT NULL,
+    "role" "UserRole" NOT NULL,
+    "created_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "utilisateur_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "user_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "guide" (
     "id" UUID NOT NULL,
-    "utilisateur_id" UUID NOT NULL,
+    "user_id" UUID NOT NULL,
     "bio" TEXT,
-    "langues" VARCHAR(100),
-    "experience_annees" INTEGER,
-    "statut_guide" "StatutGuide" NOT NULL,
-    "carte_pro" BOOLEAN NOT NULL DEFAULT false,
-    "pays" VARCHAR(50),
-    "date_demande_carte" TIMESTAMP(6),
-    "date_verification_carte" TIMESTAMP(6),
-    "commentaire_interne" TEXT,
-    "date_creation" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "date_maj" TIMESTAMP(6) NOT NULL,
+    "languages" VARCHAR(100),
+    "years_of_experience" INTEGER,
+    "guide_status" "GuideStatus" NOT NULL,
+    "pro_card" BOOLEAN NOT NULL DEFAULT false,
+    "country" VARCHAR(50),
+    "card_request_date" TIMESTAMP(6),
+    "card_verification_date" TIMESTAMP(6),
+    "internal_comment" TEXT,
+    "created_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(6) NOT NULL,
 
     CONSTRAINT "guide_pkey" PRIMARY KEY ("id")
 );
@@ -73,10 +73,10 @@ CREATE TABLE "guide" (
 CREATE TABLE "guide_document" (
     "id" UUID NOT NULL,
     "guide_id" UUID NOT NULL,
-    "type_document" "TypeDocument" NOT NULL,
+    "document_type" "DocumentType" NOT NULL,
     "verification_status" "VerificationStatus" NOT NULL,
-    "commentaire_verif" TEXT,
-    "date_upload" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "verification_comment" TEXT,
+    "upload_date" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "date_verification" TIMESTAMP(6),
 
     CONSTRAINT "guide_document_pkey" PRIMARY KEY ("id")
@@ -86,9 +86,9 @@ CREATE TABLE "guide_document" (
 CREATE TABLE "guide_availability" (
     "id" UUID NOT NULL,
     "guide_id" UUID NOT NULL,
-    "date_debut" TIMESTAMP(6) NOT NULL,
-    "date_fin" TIMESTAMP(6) NOT NULL,
-    "statut" "StatutDisponibilite" NOT NULL,
+    "start_date" TIMESTAMP(6) NOT NULL,
+    "end_date" TIMESTAMP(6) NOT NULL,
+    "status" "AvailabilityStatus" NOT NULL,
 
     CONSTRAINT "guide_availability_pkey" PRIMARY KEY ("id")
 );
@@ -96,11 +96,11 @@ CREATE TABLE "guide_availability" (
 -- CreateTable
 CREATE TABLE "boost_offer" (
     "id" UUID NOT NULL,
-    "nom" VARCHAR(100) NOT NULL,
+    "name" VARCHAR(100) NOT NULL,
     "description" TEXT,
-    "duree_jours" INTEGER NOT NULL,
-    "pourcentage_reduction" INTEGER NOT NULL,
-    "prix" DECIMAL(10,2) NOT NULL,
+    "duration_days" INTEGER NOT NULL,
+    "discount_percentage" INTEGER NOT NULL,
+    "price" DECIMAL(10,2) NOT NULL,
 
     CONSTRAINT "boost_offer_pkey" PRIMARY KEY ("id")
 );
@@ -110,18 +110,18 @@ CREATE TABLE "guide_boost" (
     "id" UUID NOT NULL,
     "guide_id" UUID NOT NULL,
     "boost_offer_id" UUID NOT NULL,
-    "date_achat" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "date_expiration" TIMESTAMP(6) NOT NULL,
-    "statut" "StatutBoost" NOT NULL,
+    "purchase_date" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "expiration_date" TIMESTAMP(6) NOT NULL,
+    "status" "BoostStatus" NOT NULL,
 
     CONSTRAINT "guide_boost_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "ville" (
+CREATE TABLE "city" (
     "id" UUID NOT NULL,
-    "nom" VARCHAR(100) NOT NULL,
-    "pays" VARCHAR(50) NOT NULL,
+    "name" VARCHAR(100) NOT NULL,
+    "country" VARCHAR(50) NOT NULL,
     "description" TEXT,
 
     CONSTRAINT "ville_pkey" PRIMARY KEY ("id")
@@ -130,93 +130,93 @@ CREATE TABLE "ville" (
 -- CreateTable
 CREATE TABLE "experience" (
     "id" UUID NOT NULL,
-    "titre" VARCHAR(150) NOT NULL,
+    "title" VARCHAR(150) NOT NULL,
     "description" TEXT,
-    "prix" DECIMAL(10,2) NOT NULL,
-    "duree" INTEGER NOT NULL,
-    "ville_id" UUID NOT NULL,
+    "price" DECIMAL(10,2) NOT NULL,
+    "duration" INTEGER NOT NULL,
+    "city_id" UUID NOT NULL,
     "guide_id" UUID NOT NULL,
-    "capacite_max" INTEGER,
+    "max_capacity" INTEGER,
 
     CONSTRAINT "experience_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "categorie" (
+CREATE TABLE "category" (
     "id" UUID NOT NULL,
-    "nom" VARCHAR(50) NOT NULL,
+    "name" VARCHAR(50) NOT NULL,
 
     CONSTRAINT "categorie_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "experience_categorie" (
+CREATE TABLE "experience_category" (
     "experience_id" UUID NOT NULL,
-    "categorie_id" UUID NOT NULL,
+    "category_id" UUID NOT NULL,
 
-    CONSTRAINT "experience_categorie_pkey" PRIMARY KEY ("experience_id","categorie_id")
+    CONSTRAINT "experience_categorie_pkey" PRIMARY KEY ("experience_id","category_id")
 );
 
 -- CreateTable
-CREATE TABLE "reservation" (
+CREATE TABLE "booking" (
     "id" UUID NOT NULL,
-    "utilisateur_id" UUID NOT NULL,
+    "user_id" UUID NOT NULL,
     "experience_id" UUID NOT NULL,
-    "date_reservation" TIMESTAMP(6) NOT NULL,
-    "statut" "StatutReservation" NOT NULL,
-    "nombre_participants" INTEGER NOT NULL,
-    "prix_total" DECIMAL(10,2) NOT NULL,
+    "booking_date" TIMESTAMP(6) NOT NULL,
+    "status" "BookingStatus" NOT NULL,
+    "number_of_participants" INTEGER NOT NULL,
+    "total_price" DECIMAL(10,2) NOT NULL,
 
-    CONSTRAINT "reservation_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "booking_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "paiement" (
+CREATE TABLE "payment" (
     "id" UUID NOT NULL,
-    "reservation_id" UUID NOT NULL,
-    "montant" DECIMAL(10,2) NOT NULL,
-    "date_paiement" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "methode" VARCHAR(50) NOT NULL,
-    "statut" "StatutPaiement" NOT NULL,
+    "booking_id" UUID NOT NULL,
+    "amount" DECIMAL(10,2) NOT NULL,
+    "payment_date" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "method" VARCHAR(50) NOT NULL,
+    "status" "PaymentStatus" NOT NULL,
     "stripe_id" VARCHAR(100),
 
     CONSTRAINT "paiement_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "litige" (
+CREATE TABLE "dispute" (
     "id" UUID NOT NULL,
-    "reservation_id" UUID NOT NULL,
-    "utilisateur_id" UUID NOT NULL,
-    "motif" TEXT NOT NULL,
-    "statut" "StatutLitige" NOT NULL,
-    "date_creation" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "date_resolution" TIMESTAMP(6),
+    "booking_id" UUID NOT NULL,
+    "user_id" UUID NOT NULL,
+    "reason" TEXT NOT NULL,
+    "status" "DisputeStatus" NOT NULL,
+    "created_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "resolution_date" TIMESTAMP(6),
     "admin_id" UUID,
 
     CONSTRAINT "litige_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "avis" (
+CREATE TABLE "reviews" (
     "id" UUID NOT NULL,
-    "utilisateur_id" UUID NOT NULL,
+    "user_id" UUID NOT NULL,
     "experience_id" UUID NOT NULL,
-    "note" INTEGER NOT NULL,
-    "commentaire" TEXT,
-    "date_avis" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "rating" INTEGER NOT NULL,
+    "comment" TEXT,
+    "review_date" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "avis_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "abonnement" (
+CREATE TABLE "subscription" (
     "id" UUID NOT NULL,
-    "utilisateur_id" UUID NOT NULL,
-    "type_abonnement" "TypeAbonnement" NOT NULL,
-    "date_debut" TIMESTAMP(6) NOT NULL,
-    "date_fin" TIMESTAMP(6) NOT NULL,
-    "statut" VARCHAR(20) NOT NULL,
+    "user_id" UUID NOT NULL,
+    "subscription_type" "SubscriptionType" NOT NULL,
+    "start_date" TIMESTAMP(6) NOT NULL,
+    "end_date" TIMESTAMP(6) NOT NULL,
+    "status" VARCHAR(20) NOT NULL,
 
     CONSTRAINT "abonnement_pkey" PRIMARY KEY ("id")
 );
@@ -224,8 +224,8 @@ CREATE TABLE "abonnement" (
 -- CreateTable
 CREATE TABLE "conversation" (
     "id" UUID NOT NULL,
-    "reservation_id" UUID NOT NULL,
-    "date_creation" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "booking_id" UUID NOT NULL,
+    "created_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "conversation_pkey" PRIMARY KEY ("id")
 );
@@ -234,9 +234,9 @@ CREATE TABLE "conversation" (
 CREATE TABLE "message" (
     "id" UUID NOT NULL,
     "conversation_id" UUID NOT NULL,
-    "auteur_id" UUID NOT NULL,
-    "contenu" TEXT NOT NULL,
-    "date_envoi" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "author_id" UUID NOT NULL,
+    "content" TEXT NOT NULL,
+    "sent_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "message_pkey" PRIMARY KEY ("id")
 );
@@ -247,9 +247,9 @@ CREATE TABLE "media" (
     "entity_type" VARCHAR(50) NOT NULL,
     "entity_id" UUID NOT NULL,
     "url" VARCHAR(255) NOT NULL,
-    "type_media" "TypeMedia" NOT NULL,
+    "media_type" "MediaType" NOT NULL,
     "description" TEXT,
-    "date_upload" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "upload_date" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "media_pkey" PRIMARY KEY ("id")
 );
@@ -257,11 +257,11 @@ CREATE TABLE "media" (
 -- CreateTable
 CREATE TABLE "support_ticket" (
     "id" UUID NOT NULL,
-    "utilisateur_id" UUID NOT NULL,
-    "sujet" VARCHAR(150) NOT NULL,
-    "statut" "StatutSupportTicket" NOT NULL,
-    "date_creation" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "date_fermeture" TIMESTAMP(6),
+    "user_id" UUID NOT NULL,
+    "subject" VARCHAR(150) NOT NULL,
+    "status" "SupportTicketStatus" NOT NULL,
+    "created_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "closed_at" TIMESTAMP(6),
 
     CONSTRAINT "support_ticket_pkey" PRIMARY KEY ("id")
 );
@@ -270,9 +270,9 @@ CREATE TABLE "support_ticket" (
 CREATE TABLE "ticket_message" (
     "id" UUID NOT NULL,
     "ticket_id" UUID NOT NULL,
-    "auteur_id" UUID NOT NULL,
-    "contenu" TEXT NOT NULL,
-    "date_envoi" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "author_id" UUID NOT NULL,
+    "content" TEXT NOT NULL,
+    "sent_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "ticket_message_pkey" PRIMARY KEY ("id")
 );
@@ -280,38 +280,38 @@ CREATE TABLE "ticket_message" (
 -- CreateTable
 CREATE TABLE "notification" (
     "id" UUID NOT NULL,
-    "utilisateur_id" UUID NOT NULL,
-    "type" "TypeNotification" NOT NULL,
-    "contenu" TEXT NOT NULL,
-    "lu" BOOLEAN NOT NULL DEFAULT false,
-    "date_envoi" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "user_id" UUID NOT NULL,
+    "type" "NotificationType" NOT NULL,
+    "content" TEXT NOT NULL,
+    "read" BOOLEAN NOT NULL DEFAULT false,
+    "sent_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "notification_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "devise" (
+CREATE TABLE "currency" (
     "code" CHAR(3) NOT NULL,
-    "nom" VARCHAR(50) NOT NULL,
-    "taux_change" DECIMAL(10,4) NOT NULL,
+    "name" VARCHAR(50) NOT NULL,
+    "exchange_rate" DECIMAL(10,4) NOT NULL,
 
-    CONSTRAINT "devise_pkey" PRIMARY KEY ("code")
+    CONSTRAINT "currency_pkey" PRIMARY KEY ("code")
 );
 
 -- CreateTable
-CREATE TABLE "experience_prix" (
+CREATE TABLE "experience_price" (
     "experience_id" UUID NOT NULL,
-    "devise_code" CHAR(3) NOT NULL,
-    "prix" DECIMAL(10,2) NOT NULL,
+    "currency_code" CHAR(3) NOT NULL,
+    "price" DECIMAL(10,2) NOT NULL,
 
-    CONSTRAINT "experience_prix_pkey" PRIMARY KEY ("experience_id","devise_code")
+    CONSTRAINT "experience_prix_pkey" PRIMARY KEY ("experience_id","currency_code")
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "utilisateur_email_key" ON "utilisateur"("email");
+CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 
 -- CreateIndex
-CREATE INDEX "guide_utilisateur_id_idx" ON "guide"("utilisateur_id");
+CREATE INDEX "guide_user_id_idx" ON "guide"("user_id");
 
 -- CreateIndex
 CREATE INDEX "guide_document_guide_id_idx" ON "guide_document"("guide_id");
@@ -326,76 +326,76 @@ CREATE INDEX "guide_boost_guide_id_idx" ON "guide_boost"("guide_id");
 CREATE INDEX "guide_boost_boost_offer_id_idx" ON "guide_boost"("boost_offer_id");
 
 -- CreateIndex
-CREATE INDEX "experience_ville_id_idx" ON "experience"("ville_id");
+CREATE INDEX "experience_ville_id_idx" ON "experience"("city_id");
 
 -- CreateIndex
 CREATE INDEX "experience_guide_id_idx" ON "experience"("guide_id");
 
 -- CreateIndex
-CREATE INDEX "experience_categorie_experience_id_idx" ON "experience_categorie"("experience_id");
+CREATE INDEX "experience_categorie_experience_id_idx" ON "experience_category"("experience_id");
 
 -- CreateIndex
-CREATE INDEX "experience_categorie_categorie_id_idx" ON "experience_categorie"("categorie_id");
+CREATE INDEX "experience_categorie_categorie_id_idx" ON "experience_category"("category_id");
 
 -- CreateIndex
-CREATE INDEX "reservation_utilisateur_id_idx" ON "reservation"("utilisateur_id");
+CREATE INDEX "booking_user_id_idx" ON "booking"("user_id");
 
 -- CreateIndex
-CREATE INDEX "reservation_experience_id_idx" ON "reservation"("experience_id");
+CREATE INDEX "booking_experience_id_idx" ON "booking"("experience_id");
 
 -- CreateIndex
-CREATE INDEX "paiement_reservation_id_idx" ON "paiement"("reservation_id");
+CREATE INDEX "paiement_booking_id_idx" ON "payment"("booking_id");
 
 -- CreateIndex
-CREATE INDEX "litige_reservation_id_idx" ON "litige"("reservation_id");
+CREATE INDEX "litige_booking_id_idx" ON "dispute"("booking_id");
 
 -- CreateIndex
-CREATE INDEX "litige_utilisateur_id_idx" ON "litige"("utilisateur_id");
+CREATE INDEX "litige_user_id_idx" ON "dispute"("user_id");
 
 -- CreateIndex
-CREATE INDEX "litige_admin_id_idx" ON "litige"("admin_id");
+CREATE INDEX "litige_admin_id_idx" ON "dispute"("admin_id");
 
 -- CreateIndex
-CREATE INDEX "avis_utilisateur_id_idx" ON "avis"("utilisateur_id");
+CREATE INDEX "avis_user_id_idx" ON "reviews"("user_id");
 
 -- CreateIndex
-CREATE INDEX "avis_experience_id_idx" ON "avis"("experience_id");
+CREATE INDEX "avis_experience_id_idx" ON "reviews"("experience_id");
 
 -- CreateIndex
-CREATE INDEX "abonnement_utilisateur_id_idx" ON "abonnement"("utilisateur_id");
+CREATE INDEX "abonnement_user_id_idx" ON "subscription"("user_id");
 
 -- CreateIndex
-CREATE INDEX "conversation_reservation_id_idx" ON "conversation"("reservation_id");
+CREATE INDEX "conversation_booking_id_idx" ON "conversation"("booking_id");
 
 -- CreateIndex
 CREATE INDEX "message_conversation_id_idx" ON "message"("conversation_id");
 
 -- CreateIndex
-CREATE INDEX "message_auteur_id_idx" ON "message"("auteur_id");
+CREATE INDEX "message_auteur_id_idx" ON "message"("author_id");
 
 -- CreateIndex
 CREATE INDEX "media_entity_type_entity_id_idx" ON "media"("entity_type", "entity_id");
 
 -- CreateIndex
-CREATE INDEX "support_ticket_utilisateur_id_idx" ON "support_ticket"("utilisateur_id");
+CREATE INDEX "support_ticket_user_id_idx" ON "support_ticket"("user_id");
 
 -- CreateIndex
 CREATE INDEX "ticket_message_ticket_id_idx" ON "ticket_message"("ticket_id");
 
 -- CreateIndex
-CREATE INDEX "ticket_message_auteur_id_idx" ON "ticket_message"("auteur_id");
+CREATE INDEX "ticket_message_auteur_id_idx" ON "ticket_message"("author_id");
 
 -- CreateIndex
-CREATE INDEX "notification_utilisateur_id_idx" ON "notification"("utilisateur_id");
+CREATE INDEX "notification_user_id_idx" ON "notification"("user_id");
 
 -- CreateIndex
-CREATE INDEX "experience_prix_experience_id_idx" ON "experience_prix"("experience_id");
+CREATE INDEX "experience_prix_experience_id_idx" ON "experience_price"("experience_id");
 
 -- CreateIndex
-CREATE INDEX "experience_prix_devise_code_idx" ON "experience_prix"("devise_code");
+CREATE INDEX "experience_prix_currency_code_idx" ON "experience_price"("currency_code");
 
 -- AddForeignKey
-ALTER TABLE "guide" ADD CONSTRAINT "guide_utilisateur_id_fkey" FOREIGN KEY ("utilisateur_id") REFERENCES "utilisateur"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "guide" ADD CONSTRAINT "guide_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "guide_document" ADD CONSTRAINT "guide_document_guide_id_fkey" FOREIGN KEY ("guide_id") REFERENCES "guide"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -410,67 +410,67 @@ ALTER TABLE "guide_boost" ADD CONSTRAINT "guide_boost_guide_id_fkey" FOREIGN KEY
 ALTER TABLE "guide_boost" ADD CONSTRAINT "guide_boost_boost_offer_id_fkey" FOREIGN KEY ("boost_offer_id") REFERENCES "boost_offer"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "experience" ADD CONSTRAINT "experience_ville_id_fkey" FOREIGN KEY ("ville_id") REFERENCES "ville"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "experience" ADD CONSTRAINT "experience_ville_id_fkey" FOREIGN KEY ("city_id") REFERENCES "city"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "experience" ADD CONSTRAINT "experience_guide_id_fkey" FOREIGN KEY ("guide_id") REFERENCES "guide"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "experience_categorie" ADD CONSTRAINT "experience_categorie_experience_id_fkey" FOREIGN KEY ("experience_id") REFERENCES "experience"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "experience_category" ADD CONSTRAINT "experience_categorie_experience_id_fkey" FOREIGN KEY ("experience_id") REFERENCES "experience"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "experience_categorie" ADD CONSTRAINT "experience_categorie_categorie_id_fkey" FOREIGN KEY ("categorie_id") REFERENCES "categorie"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "experience_category" ADD CONSTRAINT "experience_categorie_categorie_id_fkey" FOREIGN KEY ("category_id") REFERENCES "category"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "reservation" ADD CONSTRAINT "reservation_utilisateur_id_fkey" FOREIGN KEY ("utilisateur_id") REFERENCES "utilisateur"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "booking" ADD CONSTRAINT "booking_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "reservation" ADD CONSTRAINT "reservation_experience_id_fkey" FOREIGN KEY ("experience_id") REFERENCES "experience"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "booking" ADD CONSTRAINT "booking_experience_id_fkey" FOREIGN KEY ("experience_id") REFERENCES "experience"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "paiement" ADD CONSTRAINT "paiement_reservation_id_fkey" FOREIGN KEY ("reservation_id") REFERENCES "reservation"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "payment" ADD CONSTRAINT "paiement_booking_id_fkey" FOREIGN KEY ("booking_id") REFERENCES "booking"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "litige" ADD CONSTRAINT "litige_reservation_id_fkey" FOREIGN KEY ("reservation_id") REFERENCES "reservation"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "dispute" ADD CONSTRAINT "litige_booking_id_fkey" FOREIGN KEY ("booking_id") REFERENCES "booking"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "litige" ADD CONSTRAINT "litige_utilisateur_id_fkey" FOREIGN KEY ("utilisateur_id") REFERENCES "utilisateur"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "dispute" ADD CONSTRAINT "litige_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "litige" ADD CONSTRAINT "litige_admin_id_fkey" FOREIGN KEY ("admin_id") REFERENCES "utilisateur"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "dispute" ADD CONSTRAINT "litige_admin_id_fkey" FOREIGN KEY ("admin_id") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "avis" ADD CONSTRAINT "avis_utilisateur_id_fkey" FOREIGN KEY ("utilisateur_id") REFERENCES "utilisateur"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "reviews" ADD CONSTRAINT "avis_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "avis" ADD CONSTRAINT "avis_experience_id_fkey" FOREIGN KEY ("experience_id") REFERENCES "experience"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "reviews" ADD CONSTRAINT "avis_experience_id_fkey" FOREIGN KEY ("experience_id") REFERENCES "experience"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "abonnement" ADD CONSTRAINT "abonnement_utilisateur_id_fkey" FOREIGN KEY ("utilisateur_id") REFERENCES "utilisateur"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "subscription" ADD CONSTRAINT "abonnement_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "conversation" ADD CONSTRAINT "conversation_reservation_id_fkey" FOREIGN KEY ("reservation_id") REFERENCES "reservation"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "conversation" ADD CONSTRAINT "conversation_booking_id_fkey" FOREIGN KEY ("booking_id") REFERENCES "booking"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "message" ADD CONSTRAINT "message_conversation_id_fkey" FOREIGN KEY ("conversation_id") REFERENCES "conversation"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "message" ADD CONSTRAINT "message_auteur_id_fkey" FOREIGN KEY ("auteur_id") REFERENCES "utilisateur"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "message" ADD CONSTRAINT "message_auteur_id_fkey" FOREIGN KEY ("author_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "support_ticket" ADD CONSTRAINT "support_ticket_utilisateur_id_fkey" FOREIGN KEY ("utilisateur_id") REFERENCES "utilisateur"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "support_ticket" ADD CONSTRAINT "support_ticket_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ticket_message" ADD CONSTRAINT "ticket_message_ticket_id_fkey" FOREIGN KEY ("ticket_id") REFERENCES "support_ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ticket_message" ADD CONSTRAINT "ticket_message_auteur_id_fkey" FOREIGN KEY ("auteur_id") REFERENCES "utilisateur"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ticket_message" ADD CONSTRAINT "ticket_message_auteur_id_fkey" FOREIGN KEY ("author_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "notification" ADD CONSTRAINT "notification_utilisateur_id_fkey" FOREIGN KEY ("utilisateur_id") REFERENCES "utilisateur"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "notification" ADD CONSTRAINT "notification_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "experience_prix" ADD CONSTRAINT "experience_prix_experience_id_fkey" FOREIGN KEY ("experience_id") REFERENCES "experience"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "experience_price" ADD CONSTRAINT "experience_prix_experience_id_fkey" FOREIGN KEY ("experience_id") REFERENCES "experience"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "experience_prix" ADD CONSTRAINT "experience_prix_devise_code_fkey" FOREIGN KEY ("devise_code") REFERENCES "devise"("code") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "experience_price" ADD CONSTRAINT "experience_prix_currency_code_fkey" FOREIGN KEY ("currency_code") REFERENCES "currency"("code") ON DELETE RESTRICT ON UPDATE CASCADE;

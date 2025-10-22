@@ -9,9 +9,9 @@ export class GuideDocumentsService {
   async create(createGuideDocumentDto: CreateGuideDocumentDto) {
     return this.prisma.guide_document.create({
       data: {
-        type_document: createGuideDocumentDto.type_document,
-        verification_status: createGuideDocumentDto.verification_status || 'en_attente',
-        commentaire_verif: createGuideDocumentDto.commentaire_verif,
+        document_type: createGuideDocumentDto.document_type,
+        verification_status: createGuideDocumentDto.verification_status || 'pending',
+        verification_comment: createGuideDocumentDto.verification_comment,
         guide: {
           connect: { id: createGuideDocumentDto.guide_id },
         },

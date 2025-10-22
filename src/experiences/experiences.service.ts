@@ -10,13 +10,13 @@ export class ExperiencesService {
   async create(createExperienceDto: CreateExperienceDto) {
     return this.prisma.experience.create({
       data: {
-        titre: createExperienceDto.titre,
+        title: createExperienceDto.title,
         description: createExperienceDto.description,
-        prix: createExperienceDto.prix,
-        duree: createExperienceDto.duree,
-        capacite_max: createExperienceDto.capacite_max,
-        ville: {
-          connect: { id: createExperienceDto.ville_id },
+        price: createExperienceDto.price,
+        duration: createExperienceDto.duration,
+        max_capacity: createExperienceDto.max_capacity,
+        city: {
+          connect: { id: createExperienceDto.city_id },
         },
         guide: {
           connect: { id: createExperienceDto.guide_id },
@@ -28,18 +28,18 @@ export class ExperiencesService {
   async findAll() {
     return this.prisma.experience.findMany({
       include: {
-        ville: true,
+        city: true,
         guide: {
           include: {
-            utilisateur: true,
+            user: true,
           },
         },
         categories: {
           include: {
-            categorie: true,
+            category: true,
           },
         },
-        avis: true,
+        reviews: true,
       },
     });
   }
@@ -48,22 +48,22 @@ export class ExperiencesService {
     const experience = await this.prisma.experience.findUnique({
       where: { id },
       include: {
-        ville: true,
+        city: true,
         guide: {
           include: {
-            utilisateur: true,
+            user: true,
           },
         },
-        reservations: true,
-        avis: true,
+        bookings: true,
+        reviews: true,
         categories: {
           include: {
-            categorie: true,
+            category: true,
           },
         },
-        prix_devises: {
+        currency_prices: {
           include: {
-            devise: true,
+            currency: true,
           },
         },
       },
@@ -78,16 +78,16 @@ export class ExperiencesService {
 
   async findByVille(villeId: string) {
     return this.prisma.experience.findMany({
-      where: { ville_id: villeId },
+      where: { city_id: villeId },
       include: {
         guide: {
           include: {
-            utilisateur: true,
+            user: true,
           },
         },
         categories: {
           include: {
-            categorie: true,
+            category: true,
           },
         },
       },
@@ -98,8 +98,8 @@ export class ExperiencesService {
     return this.prisma.experience.findMany({
       where: { guide_id: guideId },
       include: {
-        ville: true,
-        avis: true,
+        city: true,
+        reviews: true,
       },
     });
   }
@@ -108,9 +108,9 @@ export class ExperiencesService {
     try {
       const data: any = { ...updateExperienceDto };
       
-      if (updateExperienceDto.ville_id) {
-        data.ville = { connect: { id: updateExperienceDto.ville_id } };
-        delete data.ville_id;
+      if (updateExperienceDto.city_id) {
+        data.city = { connect: { id: updateExperienceDto.city_id } };
+        delete data.city_id;
       }
       
       if (updateExperienceDto.guide_id) {

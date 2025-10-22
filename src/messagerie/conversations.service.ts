@@ -9,8 +9,8 @@ export class ConversationsService {
   async create(createConversationDto: CreateConversationDto) {
     return this.prisma.conversation.create({
       data: {
-        reservation: {
-          connect: { id: createConversationDto.reservation_id },
+        booking: {
+          connect: { id: createConversationDto.booking_id },
         },
       },
     });
@@ -19,10 +19,10 @@ export class ConversationsService {
   async findAll() {
     return this.prisma.conversation.findMany({
       include: {
-        reservation: {
+        booking: {
           include: {
             experience: true,
-            utilisateur: true,
+            user: true,
           },
         },
         messages: true,
@@ -34,25 +34,25 @@ export class ConversationsService {
     const conversation = await this.prisma.conversation.findUnique({
       where: { id },
       include: {
-        reservation: {
+        booking: {
           include: {
             experience: {
               include: {
                 guide: {
                   include: {
-                    utilisateur: true,
+                    user: true,
                   },
                 },
               },
             },
-            utilisateur: true,
+            user: true,
           },
         },
         messages: {
           include: {
-            auteur: true,
+            author: true,
           },
-          orderBy: { date_envoi: 'asc' },
+          orderBy: { sent_at: 'asc' },
         },
       },
     });
@@ -64,13 +64,13 @@ export class ConversationsService {
     return conversation;
   }
 
-  async findByReservation(reservationId: string) {
+  async findByBooking(bookingId: string) {
     return this.prisma.conversation.findMany({
-      where: { reservation_id: reservationId },
+      where: { booking_id: bookingId },
       include: {
         messages: {
           include: {
-            auteur: true,
+            author: true,
           },
         },
       },

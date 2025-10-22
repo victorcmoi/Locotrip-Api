@@ -13,7 +13,7 @@ import {
  */
 export function ApiAuthResponses() {
   return applyDecorators(
-    ApiUnauthorizedResponse({ description: 'Non authentifié - Token manquant ou invalide' }),
+    ApiUnauthorizedResponse({ description: 'Non verified - Token manquant ou invalide' }),
     ApiForbiddenResponse({ description: 'Accès interdit - Rôle insuffisant' }),
   );
 }

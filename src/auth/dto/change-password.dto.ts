@@ -3,7 +3,7 @@ import { IsEmail, IsNotEmpty, IsString, MinLength } from "class-validator";
 
 export class ChangePasswordDto {
     @ApiProperty({
-        description: 'Adresse email de l\'utilisateur',
+        description: 'Adresse email de l\'user',
         example: 'jean.dupont@example.com',
         maxLength: 100,
     })
@@ -12,12 +12,12 @@ export class ChangePasswordDto {
     email: string;
 
     @ApiProperty({
-        description: 'Nouveau mot de passe de l\'utilisateur',
+        description: 'Nouveau mot de passe de l\'user',
         example: 'NouveauMotDePasse123!',
         minLength: 8,
     })
     @IsString()
     @IsNotEmpty()
     @MinLength(8)
-    mot_de_passe: string;
+    password: string;
 }

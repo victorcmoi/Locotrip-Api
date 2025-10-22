@@ -1,28 +1,28 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEmail, IsEnum, IsNotEmpty, IsString, MinLength } from "class-validator";
-import { RoleUtilisateur } from "../../utilisateurs/enums/utilisateur.enum";
+import { UserRole } from "../../users/enums/user.enum";
 
 export class RegisterDto {
       @ApiProperty({
-        description: 'Nom de famille de l\'utilisateur',
+        description: 'Nom de famille de l\'user',
         example: 'Dupont',
         maxLength: 100,
       })
       @IsString()
       @IsNotEmpty()
-      nom: string;
+      last_name: string;
     
       @ApiProperty({
-        description: 'Prénom de l\'utilisateur',
+        description: 'Prénom de l\'user',
         example: 'Jean',
         maxLength: 50,
       })
       @IsString()
       @IsNotEmpty()
-      prenom: string;
+      first_name: string;
     
       @ApiProperty({
-        description: 'Adresse email de l\'utilisateur',
+        description: 'Adresse email de l\'user',
         example: 'jean.dupont@example.com',
         maxLength: 100,
       })
@@ -31,23 +31,23 @@ export class RegisterDto {
       email: string;
     
       @ApiProperty({
-        description: 'Mot de passe de l\'utilisateur (minimum 8 caractères)',
+        description: 'Mot de passe de l\'user (minimum 8 caractères)',
         example: 'MonMotDePasse123!',
         minLength: 8,
       })
       @IsString()
       @IsNotEmpty()
       @MinLength(8)
-      mot_de_passe: string;
+      password: string;
 
       @ApiProperty({
-        description: 'Rôle de l\'utilisateur : CLIENT (voyageur) ou GUIDE (guide touristique)',
-        enum: [RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE],
-        example: RoleUtilisateur.CLIENT,
+        description: 'Rôle de l\'user : CLIENT (voyageur) ou GUIDE (guide touristique)',
+        enum: [UserRole.CLIENT, UserRole.GUIDE],
+        example: UserRole.CLIENT,
       })
-      @IsEnum(RoleUtilisateur, {
+      @IsEnum(UserRole, {
         message: 'Le rôle doit être CLIENT ou GUIDE',
       })
       @IsNotEmpty()
-      role: RoleUtilisateur.CLIENT | RoleUtilisateur.GUIDE;
+      role: UserRole.CLIENT | UserRole.GUIDE;
 }

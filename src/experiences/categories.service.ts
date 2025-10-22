@@ -6,12 +6,12 @@ import { Prisma } from '@prisma/client';
 export class CategoriesService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.categorieCreateInput) {
-    return this.prisma.categorie.create({ data });
+  async create(data: Prisma.categoryCreateInput) {
+    return this.prisma.category.create({ data });
   }
 
   async findAll() {
-    return this.prisma.categorie.findMany({
+    return this.prisma.category.findMany({
       include: {
         experiences: {
           include: {
@@ -23,7 +23,7 @@ export class CategoriesService {
   }
 
   async findOne(id: string) {
-    const categorie = await this.prisma.categorie.findUnique({
+    const category = await this.prisma.category.findUnique({
       where: { id },
       include: {
         experiences: {
@@ -34,16 +34,16 @@ export class CategoriesService {
       },
     });
 
-    if (!categorie) {
+    if (!category) {
       throw new NotFoundException(`Catégorie avec l'ID ${id} introuvable`);
     }
 
-    return categorie;
+    return category;
   }
 
-  async update(id: string, data: Prisma.categorieUpdateInput) {
+  async update(id: string, data: Prisma.categoryUpdateInput) {
     try {
-      return await this.prisma.categorie.update({
+      return await this.prisma.category.update({
         where: { id },
         data,
       });
@@ -54,7 +54,7 @@ export class CategoriesService {
 
   async delete(id: string) {
     try {
-      return await this.prisma.categorie.delete({
+      return await this.prisma.category.delete({
         where: { id },
       });
     } catch (error) {
