@@ -3,7 +3,7 @@ import { IsString, IsNotEmpty, IsDecimal, Length } from 'class-validator';
 
 export class CreateCurrencyDto {
   @ApiProperty({
-    description: 'Code de la currency (ISO 4217)',
+    description: 'Code de la devise (ISO 4217)',
     example: 'EUR',
     minLength: 3,
     maxLength: 3,
@@ -14,7 +14,7 @@ export class CreateCurrencyDto {
   code: string;
 
   @ApiProperty({
-    description: 'Nom de la currency',
+    description: 'Nom de la devise',
     example: 'Euro',
     maxLength: 50,
   })
@@ -23,7 +23,7 @@ export class CreateCurrencyDto {
   name: string;
 
   @ApiProperty({
-    description: 'Taux de change par rapport à la currency de référence',
+    description: 'Taux de change par rapport à la devise de référence',
     example: 1.0,
   })
   @IsDecimal()

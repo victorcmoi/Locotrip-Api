@@ -16,7 +16,7 @@ import {
 import { UserRole } from '../users/enums/user.enum';
 import { Roles } from '../common/decorators/role.decorator';
 
-@ApiTags('Devises')
+@ApiTags('Currencies')
 @ApiBearerAuth('JWT-auth')
 @Controller('currencies')
 export class CurrenciesController {
@@ -27,7 +27,7 @@ export class CurrenciesController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Créer une currency' })
+  @ApiOperation({ summary: 'Créer une devise' })
   @ApiCreateResponse(CreateCurrencyDto)
   create(@Body() createCurrencyDto: CreateCurrencyDto) {
     return this.currenciesService.create(createCurrencyDto);
@@ -35,7 +35,7 @@ export class CurrenciesController {
 
   @Get()
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
-  @ApiOperation({ summary: 'Récupérer toutes les currencies' })
+  @ApiOperation({ summary: 'Récupérer toutes les devise' })
   @ApiGetManyResponse(CreateCurrencyDto)
   findAll() {
     return this.currenciesService.findAll();
@@ -43,16 +43,16 @@ export class CurrenciesController {
 
   @Get(':code')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
-  @ApiOperation({ summary: 'Récupérer une currency par son code' })
-  @ApiParam({ name: 'code', description: 'Code de la currency (ex: EUR, USD)' })
+  @ApiOperation({ summary: 'Récupérer une devise par son code' })
+  @ApiParam({ name: 'code', description: 'Code de la devise (ex: EUR, USD)' })
   @ApiGetOneResponse(CreateCurrencyDto)
   findOne(@Param('code') code: string) {
     return this.currenciesService.findOne(code);
   }
 
   @Put(':code')
-  @ApiOperation({ summary: 'Mettre à jour une currency' })
-  @ApiParam({ name: 'code', description: 'Code de la currency' })
+  @ApiOperation({ summary: 'Mettre à jour une devise' })
+  @ApiParam({ name: 'code', description: 'Code de la devise' })
   @ApiUpdateResponse(CreateCurrencyDto)
   update(@Param('code') code: string, @Body() updateCurrencyDto: UpdateCurrencyDto) {
     return this.currenciesService.update(code, updateCurrencyDto);
@@ -60,8 +60,8 @@ export class CurrenciesController {
 
   @Delete(':code')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Supprimer une currency' })
-  @ApiParam({ name: 'code', description: 'Code de la currency' })
+  @ApiOperation({ summary: 'Supprimer une devise' })
+  @ApiParam({ name: 'code', description: 'Code de la devise' })
   @ApiDeleteResponse()
   delete(@Param('code') code: string) {
     return this.currenciesService.delete(code);
@@ -77,7 +77,7 @@ export class ExperiencePrixController {
   @Post()
   @Roles(UserRole.GUIDE)
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Créer un price pour une expérience' })
+  @ApiOperation({ summary: 'Créer un prix pour une expérience' })
   @ApiCreateResponse(Object)
   create(@Body() createExperiencePrixDto: CreateExperiencePriceDto) {
     return this.experiencePriceService.create(createExperiencePrixDto);
@@ -85,7 +85,7 @@ export class ExperiencePrixController {
 
   @Get()
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
-  @ApiOperation({ summary: 'Récupérer tous les price' })
+  @ApiOperation({ summary: 'Récupérer tous les prix' })
   @ApiGetManyResponse(Object)
   findAll() {
     return this.experiencePriceService.findAll();
@@ -93,7 +93,7 @@ export class ExperiencePrixController {
 
   @Get('experience/:experienceId')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
-  @ApiOperation({ summary: 'Récupérer les price d\'une expérience' })
+  @ApiOperation({ summary: 'Récupérer les prix d\'une expérience' })
   @ApiParam({ name: 'experienceId', description: 'ID de l\'expérience' })
   @ApiGetManyResponse(Object)
   findByExperience(@Param('experienceId') experienceId: string) {
@@ -102,8 +102,8 @@ export class ExperiencePrixController {
 
   @Get('currency/:currencyCode')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
-  @ApiOperation({ summary: 'Récupérer les price dans une currency' })
-  @ApiParam({ name: 'currencyCode', description: 'Code de la currency' })
+  @ApiOperation({ summary: 'Récupérer les prix dans une devise' })
+  @ApiParam({ name: 'currencyCode', description: 'Code de la devise' })
   @ApiGetManyResponse(Object)
   findByCurrency(@Param('currencyCode') currencyCode: string) {
     return this.experiencePriceService.findByCurrency(currencyCode);
@@ -111,9 +111,9 @@ export class ExperiencePrixController {
 
   @Put(':experienceId/:currencyCode')
   @Roles(UserRole.GUIDE)
-  @ApiOperation({ summary: 'Mettre à jour un price' })
+  @ApiOperation({ summary: 'Mettre à jour un prix' })
   @ApiParam({ name: 'experienceId', description: 'ID de l\'expérience' })
-  @ApiParam({ name: 'currencyCode', description: 'Code de la currency' })
+  @ApiParam({ name: 'currencyCode', description: 'Code de la devise' })
   @ApiUpdateResponse(Object)
   update(
     @Param('experienceId') experienceId: string,
@@ -126,9 +126,9 @@ export class ExperiencePrixController {
   @Delete(':experienceId/:currencyCode')
   @Roles(UserRole.GUIDE)
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Supprimer un price' })
+  @ApiOperation({ summary: 'Supprimer un prix' })
   @ApiParam({ name: 'experienceId', description: 'ID de l\'expérience' })
-  @ApiParam({ name: 'currencyCode', description: 'Code de la currency' })
+  @ApiParam({ name: 'currencyCode', description: 'Code de la devise' })
   @ApiDeleteResponse()
   delete(
     @Param('experienceId') experienceId: string,
