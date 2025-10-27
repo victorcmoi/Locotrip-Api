@@ -19,8 +19,8 @@ import { RegisterDto } from "./dto/register.dto";
 export class AuthentificationController {
     constructor(private readonly authentificationService: AuthentificationService) {}
 
-    @Public()
     @Post('register')
+    @Public()
     @HttpCode(HttpStatus.CREATED)
     @ApiOperation({ summary: 'Inscription d\'un nouvel utilisateur' })
     @ApiCreateResponse(UserEntity)
@@ -28,13 +28,22 @@ export class AuthentificationController {
         return this.authentificationService.register(registerDto);
     }
 
-    @Public()
     @Post('login')
+    @Public()
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Connexion d\'un utilisateur' })
     @ApiGetOneResponse(UserEntity)
     login(@Body() loginDto: LoginDto) {
         return this.authentificationService.login(loginDto);
+    }
+
+    @Post('logout')
+    @Roles(UserRole.CLIENT, UserRole.GUIDE, UserRole.ADMIN)
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Déconnexion d\'un utilisateur' })
+    @ApiGetOneResponse(String)
+    logout() {
+        return this.authentificationService.logout();
     }
 
     @Post('change-password')

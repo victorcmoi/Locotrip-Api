@@ -33,9 +33,8 @@ export class ReviewsController {
     return this.reviewService.create(createReviewDto);
   }
 
-  @Public()
   @Get()
-  @Roles(UserRole.CLIENT, UserRole.GUIDE)
+  @Public()
   @ApiOperation({ summary: 'Récupérer tous les avis' })
   @ApiGetManyResponse(ReviewEntity)
   findAll() {
@@ -51,9 +50,8 @@ export class ReviewsController {
     return this.reviewService.findOne(id);
   }
 
-  @Public()
   @Get('experience/:experienceId')
-  @Roles(UserRole.CLIENT, UserRole.GUIDE)
+  @Public()
   @ApiOperation({ summary: 'Récupérer les avis d\'une expérience' })
   @ApiParam({ name: 'experienceId', description: 'ID de l\'expérience' })
   @ApiGetManyResponse(ReviewEntity)
@@ -61,9 +59,8 @@ export class ReviewsController {
     return this.reviewService.findByExperience(experienceId);
   }
 
-  @Public()
   @Get('user/:userId')
-  @Roles(UserRole.CLIENT, UserRole.GUIDE)
+  @Public()
   @ApiOperation({ summary: 'Récupérer les avis d\'un utilisateur' })
   @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur' })
   @ApiGetManyResponse(ReviewEntity)

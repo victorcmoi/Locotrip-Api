@@ -46,4 +46,11 @@ export class AuthentificationService {
             token: await this.jwtService.signAsync(payload),
         };
     }
+
+    async logout() {
+        return {
+            message: 'Déconnexion réussie',
+            success: true
+        };
+    }
 }

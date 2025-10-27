@@ -34,9 +34,8 @@ export class CurrenciesController {
     return this.currenciesService.create(createCurrencyDto);
   }
 
-  @Public()
   @Get()
-  @Roles(UserRole.CLIENT, UserRole.GUIDE)
+  @Public()
   @ApiOperation({ summary: 'Récupérer toutes les devise' })
   @ApiGetManyResponse(CreateCurrencyDto)
   findAll() {
@@ -85,18 +84,16 @@ export class ExperiencePrixController {
     return this.experiencePriceService.create(createExperiencePrixDto);
   }
 
-  @Public()
   @Get()
-  @Roles(UserRole.CLIENT, UserRole.GUIDE)
+  @Public()
   @ApiOperation({ summary: 'Récupérer tous les prix' })
   @ApiGetManyResponse(Object)
   findAll() {
     return this.experiencePriceService.findAll();
   }
 
-  @Public()
   @Get('experience/:experienceId')
-  @Roles(UserRole.CLIENT, UserRole.GUIDE)
+  @Public()
   @ApiOperation({ summary: 'Récupérer les prix d\'une expérience' })
   @ApiParam({ name: 'experienceId', description: 'ID de l\'expérience' })
   @ApiGetManyResponse(Object)
@@ -104,9 +101,8 @@ export class ExperiencePrixController {
     return this.experiencePriceService.findByExperience(experienceId);
   }
 
-  @Public()
   @Get('currency/:currencyCode')
-  @Roles(UserRole.CLIENT, UserRole.GUIDE)
+  @Public()
   @ApiOperation({ summary: 'Récupérer les prix dans une devise' })
   @ApiParam({ name: 'currencyCode', description: 'Code de la devise' })
   @ApiGetManyResponse(Object)

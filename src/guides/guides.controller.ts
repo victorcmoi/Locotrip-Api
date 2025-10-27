@@ -37,9 +37,8 @@ export class GuidesController {
   ) {}
 
   // === GUIDES ===
-  @Public()
   @Post()
-  @Roles(UserRole.GUIDE)
+  @Public()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Créer un nouveau profil guide' })
   @ApiCreateResponse(GuideEntity)
@@ -48,16 +47,15 @@ export class GuidesController {
   }
 
   @Get()
-  @Roles(UserRole.CLIENT, UserRole.GUIDE)
+  @Public()
   @ApiOperation({ summary: 'Récupérer tous les guides' })
   @ApiGetManyResponse(GuideEntity)
   findAll() {
     return this.guidesService.findAll();
   }
 
-  @Public()
   @Get(':id')
-  @Roles(UserRole.CLIENT, UserRole.GUIDE)
+  @Public()
   @ApiOperation({ summary: 'Récupérer un guide par son ID' })
   @ApiParam({ name: 'id', description: 'ID du GUIDE' })
   @ApiGetOneResponse(GuideEntity)
@@ -99,15 +97,16 @@ export class GuidesController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Ajouter un document au guide' })
   @ApiParam({ name: 'guideId', description: 'ID du guide' })
+  @ApiCreateResponse(Object)
   createDocument(@Body() createDocumentDto: CreateGuideDocumentDto) {
     return this.guideDocumentsService.create(createDocumentDto);
   }
 
-  @Public()
   @Get(':guideId/documents')
-  @Roles(UserRole.CLIENT, UserRole.GUIDE)
+  @Public()
   @ApiOperation({ summary: 'Récupérer les documents d\'un guide' })
   @ApiParam({ name: 'guideId', description: 'ID du guide' })
+  @ApiGetManyResponse(Object)
   findDocumentsByGuide(@Param('guideId') guideId: string) {
     return this.guideDocumentsService.findByGuide(guideId);
   }
@@ -117,15 +116,16 @@ export class GuidesController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Ajouter une disponibilité' })
   @ApiParam({ name: 'guideId', description: 'ID du guide' })
+  @ApiCreateResponse(Object)
   createAvailability(@Body() createAvailabilityDto: CreateGuideAvailabilityDto) {
     return this.guideAvailabilityService.create(createAvailabilityDto);
   }
 
-  @Public()
   @Get(':guideId/availability')
-  @Roles(UserRole.CLIENT, UserRole.GUIDE)
+  @Public()
   @ApiOperation({ summary: 'Récupérer les disponibilités d\'un guide' })
   @ApiParam({ name: 'guideId', description: 'ID du guide' })
+  @ApiGetManyResponse(Object)
   findAvailabilityByGuide(@Param('guideId') guideId: string) {
     return this.guideAvailabilityService.findByGuide(guideId);
   }
@@ -136,6 +136,7 @@ export class GuidesController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Activer un boost pour un guide' })
   @ApiParam({ name: 'guideId', description: 'ID du guide' })
+  @ApiCreateResponse(Object)
   createBoost(@Body() createBoostDto: CreateGuideBoostDto) {
     return this.guideBoostsService.create(createBoostDto);
   }
@@ -144,6 +145,7 @@ export class GuidesController {
   @Roles(UserRole.GUIDE, UserRole.CLIENT)
   @ApiOperation({ summary: 'Récupérer les boosts d\'un guide' })
   @ApiParam({ name: 'guideId', description: 'ID du guide' })
+  @ApiGetManyResponse(Object)
   findBoostsByGuide(@Param('guideId') guideId: string) {
     return this.guideBoostsService.findByGuide(guideId);
   }
@@ -158,6 +160,7 @@ export class BoostOffersController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Créer une offre de boost' })
+  @ApiCreateResponse(Object)
   create(@Body() createBoostOfferDto: CreateBoostOfferDto) {
     return this.boostOffersService.create(createBoostOfferDto);
   }
@@ -165,6 +168,7 @@ export class BoostOffersController {
   @Get()
   @Roles(UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer toutes les offres de boost' })
+  @ApiGetManyResponse(Object)
   findAll() {
     return this.boostOffersService.findAll();
   }
@@ -173,6 +177,7 @@ export class BoostOffersController {
   @Roles(UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer une offre de boost' })
   @ApiParam({ name: 'id', description: 'ID de l\'offre' })
+  @ApiGetOneResponse(Object)
   findOne(@Param('id') id: string) {
     return this.boostOffersService.findOne(id);
   }
@@ -180,6 +185,7 @@ export class BoostOffersController {
   @Put(':id')
   @ApiOperation({ summary: 'Mettre à jour une offre de boost' })
   @ApiParam({ name: 'id', description: 'ID de l\'offre' })
+  @ApiUpdateResponse(Object)
   update(@Param('id') id: string, @Body() updateBoostOfferDto: UpdateBoostOfferDto) {
     return this.boostOffersService.update(id, updateBoostOfferDto);
   }
@@ -188,6 +194,7 @@ export class BoostOffersController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Supprimer une offre de boost' })
   @ApiParam({ name: 'id', description: 'ID de l\'offre' })
+  @ApiDeleteResponse()
   delete(@Param('id') id: string) {
     return this.boostOffersService.delete(id);
   }

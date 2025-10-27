@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { PrismaService } from './prisma.service';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -10,7 +11,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('Locotrip API')
     .setDescription('API REST complète pour la plateforme Locotrip')
-    .setVersion('1.2.2')
+    .setVersion('1.3.0')
     .addBearerAuth(
       {
         type: 'http',
@@ -64,17 +65,23 @@ async function bootstrap() {
     },
   });
 
+  // Sécuriser les en-têtes HTTP
+  app.use(helmet());
+
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
     forbidNonWhitelisted: true,
     transform: true,
   }));
 
+  // Configurer CORS
   app.enableCors({
     origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
+
+  // TO DO : add CRSF protection for form
 
   const prismaService = app.get(PrismaService);
   await prismaService.enableShutdownHooks(app);

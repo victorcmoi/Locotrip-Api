@@ -58,7 +58,7 @@ export function ApiGetManyResponse(type: Type<any>) {
 export function ApiCreateResponse(type: Type<any>) {
   return applyDecorators(
     ApiCreatedResponse({ type, description: 'Ressource créée avec succès' }),
-    ApiBadRequestResponse({ description: 'Données invalides' }),
+    ApiBadRequestResponse({ description: 'Données invalides - Compte existant' }),
     ApiAuthResponses(),
   );
 }
