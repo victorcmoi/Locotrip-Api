@@ -5,6 +5,7 @@ import { AuthGuard } from "./guards/authentification.guard";
 import { AuthentificationController } from "./authentification.controller";
 import { AuthentificationService } from "./authentification.service";
 import { UsersModule } from "../users/user.module";
+import { AppThrottlerGuard } from './guards/app-throttler.guard';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { UsersModule } from "../users/user.module";
   providers: [
     AuthentificationService,
     {provide: 'APP_GUARD', useClass: AuthGuard}, 
-    {provide: 'APP_GUARD', useClass: RolesGuard}
+    {provide: 'APP_GUARD', useClass: RolesGuard},
+    {provide: 'APP_GUARD', useClass: AppThrottlerGuard},
   ]
 })
 export class AuthentificationModule {}

@@ -10,7 +10,8 @@ import { UserEntity } from "../users/entities/user.entity";
 import { ApiCreateResponse, ApiGetOneResponse, ApiUpdateResponse } from "../common/decorators/api-standard-responses.decorator";
 import { LoginDto } from "./dto/login.dto";
 import { ChangePasswordDto } from "./dto/change-password.dto";
-import { Body, Controller } from "@nestjs/common";
+import { RefreshTokenDto } from "./dto/refresh-token.dto";
+import { Body, Controller, Request } from "@nestjs/common";
 import { RegisterDto } from "./dto/register.dto";
 
 @ApiTags('Authentification')
@@ -19,8 +20,8 @@ import { RegisterDto } from "./dto/register.dto";
 export class AuthentificationController {
     constructor(private readonly authentificationService: AuthentificationService) {}
 
-    @Public()
     @Post('register')
+    @Public()
     @HttpCode(HttpStatus.CREATED)
     @ApiOperation({ summary: 'Inscription d\'un nouvel utilisateur' })
     @ApiCreateResponse(UserEntity)
@@ -28,13 +29,37 @@ export class AuthentificationController {
         return this.authentificationService.register(registerDto);
     }
 
-    @Public()
     @Post('login')
+    @Public()
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Connexion d\'un utilisateur' })
-    @ApiGetOneResponse(UserEntity)
+    @ApiGetOneResponse(Object)
     login(@Body() loginDto: LoginDto) {
         return this.authentificationService.login(loginDto);
+    }
+
+    @Post('refresh')
+    @Public()
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ 
+        summary: 'Rafraîchir l\'access token',
+        description: 'Utiliser le refresh token pour obtenir un nouveau access token et un nouveau refresh token'
+    })
+    @ApiGetOneResponse(Object)
+    refreshTokens(@Body() refreshTokenDto: RefreshTokenDto) {
+        return this.authentificationService.refreshTokens(refreshTokenDto.refreshToken);
+    }
+
+    @Post('logout')
+    @Roles(UserRole.CLIENT, UserRole.GUIDE, UserRole.ADMIN)
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ 
+        summary: 'Déconnexion d\'un utilisateur',
+        description: 'Révoque le refresh token de l\'utilisateur'
+    })
+    @ApiGetOneResponse(Object)
+    logout(@Request() req) {
+        return this.authentificationService.logout(req.user.sub);
     }
 
     @Post('change-password')

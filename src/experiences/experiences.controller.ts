@@ -20,6 +20,7 @@ import {
 } from '../common/decorators/api-standard-responses.decorator';
 import { Roles } from '../common/decorators/role.decorator';
 import { UserRole } from '../users/enums/user.enum';
+import { Public } from '../common/decorators/authentification-decorator';
 
 @ApiTags('Villes')
 @ApiBearerAuth('JWT-auth')
@@ -30,21 +31,24 @@ export class CitiesController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Créer une ville' })
+  @ApiCreateResponse(Object)
   create(@Body() createCityDto: CreateCityDto) {
     return this.citiesService.create(createCityDto);
   }
 
   @Get()
-  @Roles(UserRole.CLIENT, UserRole.GUIDE)
+  @Public()
   @ApiOperation({ summary: 'Récupérer toutes les villes' })
+  @ApiGetManyResponse(Object)
   findAll() {
     return this.citiesService.findAll();
   }
 
   @Get(':id')
-  @Roles(UserRole.CLIENT, UserRole.GUIDE)
+  @Public()
   @ApiOperation({ summary: 'Récupérer une ville' })
   @ApiParam({ name: 'id', description: 'ID de la ville' })
+  @ApiGetOneResponse(Object)
   findOne(@Param('id') id: string) {
     return this.citiesService.findOne(id);
   }
@@ -52,6 +56,7 @@ export class CitiesController {
   @Put(':id')
   @ApiOperation({ summary: 'Mettre à jour une ville' })
   @ApiParam({ name: 'id', description: 'ID de la ville' })
+  @ApiUpdateResponse(Object)
   update(@Param('id') id: string, @Body() updateVilleDto: UpdateCityDto) {
     return this.citiesService.update(id, updateVilleDto);
   }
@@ -82,7 +87,7 @@ export class ExperiencesController {
   }
 
   @Get()
-  @Roles(UserRole.CLIENT, UserRole.GUIDE)
+  @Public()
   @ApiOperation({ summary: 'Récupérer toutes les expériences' })
   @ApiGetManyResponse(ExperienceEntity)
   findAll() {
@@ -90,7 +95,7 @@ export class ExperiencesController {
   }
 
   @Get(':id')
-  @Roles(UserRole.CLIENT, UserRole.GUIDE)
+  @Public()
   @ApiOperation({ summary: 'Récupérer une expérience' })
   @ApiParam({ name: 'id', description: 'ID de l\'expérience' })
   @ApiGetOneResponse(ExperienceEntity)
@@ -99,7 +104,7 @@ export class ExperiencesController {
   }
 
   @Get('city/:cityId')
-  @Roles(UserRole.CLIENT, UserRole.GUIDE)
+  @Public()
   @ApiOperation({ summary: 'Récupérer les expériences d\'une ville' })
   @ApiParam({ name: 'cityId', description: 'ID de la ville' })
   @ApiGetManyResponse(ExperienceEntity)
@@ -108,7 +113,7 @@ export class ExperiencesController {
   }
 
   @Get('guide/:guideId')
-  @Roles(UserRole.CLIENT, UserRole.GUIDE)
+  @Public()
   @ApiOperation({ summary: 'Récupérer les expériences d\'un guide' })
   @ApiParam({ name: 'guideId', description: 'ID du guide' })
   @ApiGetManyResponse(ExperienceEntity)
@@ -151,7 +156,7 @@ export class CategoriesController {
   }
 
   @Get()
-  @Roles(UserRole.CLIENT, UserRole.GUIDE)
+  @Public()
   @ApiOperation({ summary: 'Récupérer toutes les catégories' })
   @ApiGetManyResponse(Object)
   findAll() {
@@ -159,7 +164,7 @@ export class CategoriesController {
   }
 
   @Get(':id')
-  @Roles(UserRole.CLIENT, UserRole.GUIDE)
+  @Public()
   @ApiOperation({ summary: 'Récupérer une catégorie' })
   @ApiParam({ name: 'id', description: 'ID de la catégorie' })
   @ApiGetOneResponse(Object)
