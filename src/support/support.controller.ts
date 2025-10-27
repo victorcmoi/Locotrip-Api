@@ -31,12 +31,14 @@ export class SupportTicketsController {
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Créer un ticket de support' })
+  @ApiCreateResponse(Object)
   create(@Body() createSupportTicketDto: CreateSupportTicketDto) {
     return this.supportTicketsService.create(createSupportTicketDto);
   }
 
   @Get()
   @ApiOperation({ summary: 'Récupérer tous les tickets' })
+  @ApiGetManyResponse(Object)
   findAll() {
     return this.supportTicketsService.findAll();
   }
@@ -44,6 +46,7 @@ export class SupportTicketsController {
   @Get('status/:status')
   @ApiOperation({ summary: 'Récupérer les tickets par statut' })
   @ApiParam({ name: 'status', description: 'Statut du ticket (open, in_progress, closed)' })
+  @ApiGetManyResponse(Object)
   findByStatut(@Param('status') status: SupportTicketStatus) {
     return this.supportTicketsService.findByStatut(status);
   }
@@ -51,6 +54,7 @@ export class SupportTicketsController {
   @Get(':id')
   @ApiOperation({ summary: 'Récupérer un ticket' })
   @ApiParam({ name: 'id', description: 'ID du ticket' })
+  @ApiGetOneResponse(Object)
   findOne(@Param('id') id: string) {
     return this.supportTicketsService.findOne(id);
   }
@@ -58,6 +62,7 @@ export class SupportTicketsController {
   @Get('user/:userId')
   @ApiOperation({ summary: 'Récupérer les tickets d\'un utilisateur' })
   @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur' })
+  @ApiGetManyResponse(Object)
   findByUser(@Param('userId') userId: string) {
     return this.supportTicketsService.findByUser(userId);
   }
@@ -65,6 +70,7 @@ export class SupportTicketsController {
   @Put(':id')
   @ApiOperation({ summary: 'Mettre à jour un ticket' })
   @ApiParam({ name: 'id', description: 'ID du ticket' })
+  @ApiUpdateResponse(Object)
   update(@Param('id') id: string, @Body() data: any) {
     return this.supportTicketsService.update(id, data);
   }
@@ -84,6 +90,7 @@ export class SupportTicketsController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Ajouter un message au ticket' })
   @ApiParam({ name: 'ticketId', description: 'ID du ticket' })
+  @ApiCreateResponse(Object)
   createMessage(@Body() createTicketMessageDto: CreateTicketMessageDto) {
     return this.ticketMessagesService.create(createTicketMessageDto);
   }
@@ -91,6 +98,7 @@ export class SupportTicketsController {
   @Get(':ticketId/messages')
   @ApiOperation({ summary: 'Récupérer les messages d\'un ticket' })
   @ApiParam({ name: 'ticketId', description: 'ID du ticket' })
+  @ApiGetManyResponse(Object)
   findMessagesByTicket(@Param('ticketId') ticketId: string) {
     return this.ticketMessagesService.findByTicket(ticketId);
   }
