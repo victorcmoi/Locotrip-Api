@@ -22,6 +22,7 @@ import {
 } from '../common/decorators/api-standard-responses.decorator';
 import { Roles } from '../common/decorators/role.decorator';
 import { UserRole } from '../users/enums/user.enum';
+import { Public } from '../common/decorators/authentification-decorator';
 
 @ApiTags('Guides')
 @ApiBearerAuth('JWT-auth')
@@ -36,6 +37,7 @@ export class GuidesController {
   ) {}
 
   // === GUIDES ===
+  @Public()
   @Post()
   @Roles(UserRole.GUIDE)
   @HttpCode(HttpStatus.CREATED)
@@ -53,6 +55,7 @@ export class GuidesController {
     return this.guidesService.findAll();
   }
 
+  @Public()
   @Get(':id')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer un guide par son ID' })
@@ -100,6 +103,7 @@ export class GuidesController {
     return this.guideDocumentsService.create(createDocumentDto);
   }
 
+  @Public()
   @Get(':guideId/documents')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer les documents d\'un guide' })
@@ -117,6 +121,7 @@ export class GuidesController {
     return this.guideAvailabilityService.create(createAvailabilityDto);
   }
 
+  @Public()
   @Get(':guideId/availability')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer les disponibilités d\'un guide' })

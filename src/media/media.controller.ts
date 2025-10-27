@@ -13,6 +13,7 @@ import {
 import { MediaType } from '@prisma/client';
 import { Roles } from '../common/decorators/role.decorator';
 import { UserRole } from '../users/enums/user.enum';
+import { Public } from '../common/decorators/authentification-decorator';
 
 @ApiTags('Médias')
 @ApiBearerAuth('JWT-auth')
@@ -46,6 +47,7 @@ export class MediaController {
     return this.mediaService.findOne(id);
   }
 
+  @Public()
   @Get('entity/:entityType/:entityId')
   @Roles(UserRole.CLIENT)
   @ApiOperation({ summary: 'Récupérer les médias d\'une entité' })

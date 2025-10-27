@@ -16,6 +16,7 @@ import {
 } from '../common/decorators/api-standard-responses.decorator';
 import { UserRole } from '../users/enums/user.enum';
 import { Roles } from '../common/decorators/role.decorator';
+import { Public } from '../common/decorators/authentification-decorator';
 
 @ApiTags('Avis')
 @ApiBearerAuth('JWT-auth')
@@ -32,6 +33,7 @@ export class ReviewsController {
     return this.reviewService.create(createReviewDto);
   }
 
+  @Public()
   @Get()
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer tous les avis' })
@@ -49,6 +51,7 @@ export class ReviewsController {
     return this.reviewService.findOne(id);
   }
 
+  @Public()
   @Get('experience/:experienceId')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer les avis d\'une expérience' })
@@ -58,6 +61,7 @@ export class ReviewsController {
     return this.reviewService.findByExperience(experienceId);
   }
 
+  @Public()
   @Get('user/:userId')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer les avis d\'un utilisateur' })

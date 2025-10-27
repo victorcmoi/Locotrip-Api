@@ -15,6 +15,7 @@ import {
 } from '../common/decorators/api-standard-responses.decorator';
 import { UserRole } from '../users/enums/user.enum';
 import { Roles } from '../common/decorators/role.decorator';
+import { Public } from '../common/decorators/authentification-decorator';
 
 @ApiTags('Devises')
 @ApiBearerAuth('JWT-auth')
@@ -33,6 +34,7 @@ export class CurrenciesController {
     return this.currenciesService.create(createCurrencyDto);
   }
 
+  @Public()
   @Get()
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer toutes les devise' })
@@ -83,6 +85,7 @@ export class ExperiencePrixController {
     return this.experiencePriceService.create(createExperiencePrixDto);
   }
 
+  @Public()
   @Get()
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer tous les prix' })
@@ -91,6 +94,7 @@ export class ExperiencePrixController {
     return this.experiencePriceService.findAll();
   }
 
+  @Public()
   @Get('experience/:experienceId')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer les prix d\'une expérience' })
@@ -100,6 +104,7 @@ export class ExperiencePrixController {
     return this.experiencePriceService.findByExperience(experienceId);
   }
 
+  @Public()
   @Get('currency/:currencyCode')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer les prix dans une devise' })

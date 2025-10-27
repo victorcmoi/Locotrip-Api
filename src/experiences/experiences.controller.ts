@@ -20,6 +20,7 @@ import {
 } from '../common/decorators/api-standard-responses.decorator';
 import { Roles } from '../common/decorators/role.decorator';
 import { UserRole } from '../users/enums/user.enum';
+import { Public } from '../common/decorators/authentification-decorator';
 
 @ApiTags('Villes')
 @ApiBearerAuth('JWT-auth')
@@ -34,6 +35,7 @@ export class CitiesController {
     return this.citiesService.create(createCityDto);
   }
 
+  @Public()
   @Get()
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer toutes les villes' })
@@ -41,6 +43,7 @@ export class CitiesController {
     return this.citiesService.findAll();
   }
 
+  @Public()
   @Get(':id')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer une ville' })
@@ -81,6 +84,7 @@ export class ExperiencesController {
     return this.experiencesService.create(createExperienceDto);
   }
 
+  @Public()
   @Get()
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer toutes les expériences' })
@@ -89,6 +93,7 @@ export class ExperiencesController {
     return this.experiencesService.findAll();
   }
 
+  @Public()
   @Get(':id')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer une expérience' })
@@ -98,6 +103,7 @@ export class ExperiencesController {
     return this.experiencesService.findOne(id);
   }
 
+  @Public()
   @Get('city/:cityId')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer les expériences d\'une ville' })
@@ -107,6 +113,7 @@ export class ExperiencesController {
     return this.experiencesService.findByVille(cityId);
   }
 
+  @Public()
   @Get('guide/:guideId')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer les expériences d\'un guide' })
@@ -150,6 +157,7 @@ export class CategoriesController {
     return this.categoriesService.create(createCategoryDto);
   }
 
+  @Public()
   @Get()
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer toutes les catégories' })
@@ -158,6 +166,7 @@ export class CategoriesController {
     return this.categoriesService.findAll();
   }
 
+  @Public()
   @Get(':id')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer une catégorie' })
