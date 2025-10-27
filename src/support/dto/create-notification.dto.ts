@@ -4,7 +4,7 @@ import { NotificationType } from '../enums/notification.enum';
 
 export class CreateNotificationDto {
   @ApiProperty({
-    description: 'ID de l\'utiilisateur',
+    description: 'ID de l\'utilisateur',
     example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @IsNotEmpty()

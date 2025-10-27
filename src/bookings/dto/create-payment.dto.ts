@@ -12,7 +12,7 @@ export class CreatePaymentDto {
   booking_id: string;
 
   @ApiProperty({
-    description: 'Montant du payment',
+    description: 'Montant du paiement',
     example: 150.50,
   })
   @IsNotEmpty()
@@ -20,7 +20,7 @@ export class CreatePaymentDto {
   amount: number;
 
   @ApiProperty({
-    description: 'Méthode de payment',
+    description: 'Méthode de paiement',
     example: 'carte_bancaire',
     maxLength: 50,
   })
@@ -29,7 +29,7 @@ export class CreatePaymentDto {
   method: string;
 
   @ApiProperty({
-    description: 'Statut du payment',
+    description: 'Statut du paiement',
     enum: PaymentStatus,
     example: PaymentStatus.PENDING,
   })
@@ -38,7 +38,7 @@ export class CreatePaymentDto {
   status: PaymentStatus;
 
   @ApiProperty({
-    description: 'ID Stripe du payment (optionnel)',
+    description: 'ID Stripe du paiement (optionnel)',
     example: 'pi_1ABC23def456GHI',
     required: false,
   })

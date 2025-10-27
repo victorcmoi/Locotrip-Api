@@ -1,5 +1,3 @@
-import { Public } from '../common/decorators/authentification-decorator';
-import { AuthentificationService } from '../auth/authentification.service';
 import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './user.service';
@@ -13,12 +11,10 @@ import {
   ApiUpdateResponse, 
   ApiDeleteResponse 
 } from '../common/decorators/api-standard-responses.decorator';
-import { ChangePasswordDto } from '../auth/dto/change-password.dto';
-import { LoginDto } from '../auth/dto/login.dto';
 import { Roles } from '../common/decorators/role.decorator';
 import { UserRole } from './enums/user.enum';
 
-@ApiTags('Users')
+@ApiTags('Utilisateurs')
 @ApiBearerAuth('JWT-auth')
 @Controller('users')
 export class UsersController {
@@ -26,30 +22,30 @@ export class UsersController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Créer un nouvel user' })
+  @ApiOperation({ summary: 'Créer un nouvel utilisateur' })
   @ApiCreateResponse(UserEntity)
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Récupérer tous les users' })
+  @ApiOperation({ summary: 'Récupérer tous les utilisateurs' })
   @ApiGetManyResponse(UserEntity)
   findAll() {
     return this.usersService.findAll();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Récupérer un user par son ID' })
-  @ApiParam({ name: 'id', description: 'ID de l\'user (UUID)' })
+  @ApiOperation({ summary: 'Récupérer un utilisateur par son ID' })
+  @ApiParam({ name: 'id', description: 'ID de l\'utilisateur (UUID)' })
   @ApiGetOneResponse(UserEntity)
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
   }
 
   @Get('email/:email')
-  @ApiOperation({ summary: 'Récupérer un user par son email' })
-  @ApiParam({ name: 'email', description: 'Email de l\'user' })
+  @ApiOperation({ summary: 'Récupérer un utilisateur par son email' })
+  @ApiParam({ name: 'email', description: 'Email de l\'utilisateur' })
   @ApiGetOneResponse(UserEntity)
   findByEmail(@Param('email') email: string) {
     return this.usersService.findByEmail(email);
@@ -57,8 +53,8 @@ export class UsersController {
 
   @Put(':id')
   @Roles(UserRole.CLIENT)
-  @ApiOperation({ summary: 'Mettre à jour un user' })
-  @ApiParam({ name: 'id', description: 'ID de l\'user (UUID)' })
+  @ApiOperation({ summary: 'Mettre à jour un utilisateur' })
+  @ApiParam({ name: 'id', description: 'ID de l\'utilisateur (UUID)' })
   @ApiUpdateResponse(UserEntity)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
@@ -67,8 +63,8 @@ export class UsersController {
   @Delete(':id')
   @Roles(UserRole.CLIENT)
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Supprimer un user' })
-  @ApiParam({ name: 'id', description: 'ID de l\'user (UUID)' })
+  @ApiOperation({ summary: 'Supprimer un utilisateur' })
+  @ApiParam({ name: 'id', description: 'ID de l\'utilisateur (UUID)' })
   @ApiDeleteResponse()
   delete(@Param('id') id: string) {
     return this.usersService.delete(id);

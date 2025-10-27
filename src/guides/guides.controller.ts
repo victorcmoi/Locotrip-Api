@@ -64,8 +64,8 @@ export class GuidesController {
 
   @Get('user/:userId')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
-  @ApiOperation({ summary: 'Récupérer le guide associé à un user' })
-  @ApiParam({ name: 'userId', description: 'ID de l\'user' })
+  @ApiOperation({ summary: 'Récupérer le guide associé à un utilisateur' })
+  @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur' })
   @ApiGetOneResponse(GuideEntity)
   findByUser(@Param('userId') userId: string) {
     return this.guidesService.findByUser(userId);

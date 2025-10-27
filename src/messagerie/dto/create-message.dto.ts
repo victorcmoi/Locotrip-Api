@@ -11,7 +11,7 @@ export class CreateMessageDto {
   conversation_id: string;
 
   @ApiProperty({
-    description: 'ID de l\'author du message',
+    description: 'ID de l\'auteur du message',
     example: '660e8400-e29b-41d4-a716-446655440001',
   })
   @IsUUID()

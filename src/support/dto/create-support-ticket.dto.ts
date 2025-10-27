@@ -4,7 +4,7 @@ import { SupportTicketStatus } from '../enums/ticket-message.enum';
 
 export class CreateSupportTicketDto {
   @ApiProperty({
-    description: 'ID de l\'user qui crée le ticket',
+    description: 'ID de l\'utilisateur qui crée le ticket',
     example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @IsUUID()

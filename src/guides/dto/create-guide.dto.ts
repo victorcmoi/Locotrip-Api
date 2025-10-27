@@ -4,7 +4,7 @@ import { GuideStatus } from '../enums/guide.enum';
 
 export class CreateGuideDto {
   @ApiProperty({
-    description: 'ID de l\'user associé au guide',
+    description: 'ID de l\'utilisateur associé au guide',
     example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @IsUUID()

@@ -38,7 +38,7 @@ export class CreateExperienceDto {
   duration: number;
 
   @ApiProperty({
-    description: 'ID de la city où se déroule l\'expérience',
+    description: 'ID de la ville où se déroule l\'expérience',
     example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @IsUUID()

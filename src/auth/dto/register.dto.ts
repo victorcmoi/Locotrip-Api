@@ -4,7 +4,7 @@ import { UserRole } from "../../users/enums/user.enum";
 
 export class RegisterDto {
       @ApiProperty({
-        description: 'Nom de famille de l\'user',
+        description: 'Nom de famille de l\'utilisateur',
         example: 'Dupont',
         maxLength: 100,
       })
@@ -13,7 +13,7 @@ export class RegisterDto {
       last_name: string;
     
       @ApiProperty({
-        description: 'Prénom de l\'user',
+        description: 'Prénom de l\'utilisateur',
         example: 'Jean',
         maxLength: 50,
       })
@@ -22,7 +22,7 @@ export class RegisterDto {
       first_name: string;
     
       @ApiProperty({
-        description: 'Adresse email de l\'user',
+        description: 'Adresse email de l\'utilisateur',
         example: 'jean.dupont@example.com',
         maxLength: 100,
       })
@@ -31,7 +31,7 @@ export class RegisterDto {
       email: string;
     
       @ApiProperty({
-        description: 'Mot de passe de l\'user (minimum 8 caractères)',
+        description: 'Mot de passe de l\'utilisateur (minimum 8 caractères)',
         example: 'MonMotDePasse123!',
         minLength: 8,
       })
@@ -41,7 +41,7 @@ export class RegisterDto {
       password: string;
 
       @ApiProperty({
-        description: 'Rôle de l\'user : CLIENT (voyageur) ou GUIDE (guide touristique)',
+        description: 'Rôle de l\'utilisateur : CLIENT (voyageur) ou GUIDE (guide touristique)',
         enum: [UserRole.CLIENT, UserRole.GUIDE],
         example: UserRole.CLIENT,
       })

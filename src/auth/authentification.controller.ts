@@ -22,7 +22,7 @@ export class AuthentificationController {
     @Public()
     @Post('register')
     @HttpCode(HttpStatus.CREATED)
-    @ApiOperation({ summary: 'Inscription d\'un nouvel user' })
+    @ApiOperation({ summary: 'Inscription d\'un nouvel utilisateur' })
     @ApiCreateResponse(UserEntity)
     register(@Body() registerDto: RegisterDto) {
         return this.authentificationService.register(registerDto);
@@ -31,7 +31,7 @@ export class AuthentificationController {
     @Public()
     @Post('login')
     @HttpCode(HttpStatus.OK)
-    @ApiOperation({ summary: 'Connexion d\'un user' })
+    @ApiOperation({ summary: 'Connexion d\'un utilisateur' })
     @ApiGetOneResponse(UserEntity)
     login(@Body() loginDto: LoginDto) {
         return this.authentificationService.login(loginDto);
@@ -39,7 +39,7 @@ export class AuthentificationController {
 
     @Post('change-password')
     @Roles(UserRole.CLIENT, UserRole.GUIDE)
-    @ApiOperation({ summary: 'Changer le mot de passe d\'un user' })
+    @ApiOperation({ summary: 'Changer le mot de passe d\'un utilisateur' })
     @ApiUpdateResponse(UserEntity)
     changePassword(@Body() changePasswordDto: ChangePasswordDto) {
         return this.authentificationService.changePassword(changePasswordDto);

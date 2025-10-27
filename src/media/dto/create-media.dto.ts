@@ -4,7 +4,7 @@ import { MediaType } from '../enums/media.enum';
 
 export class CreateMediaDto {
   @ApiProperty({
-    description: 'Type d\'entité (experience, guide, user, booking)',
+    description: 'Type d\'entité (experience, guide, utilisateur, réservation)',
     example: 'experience',
     maxLength: 50,
   })

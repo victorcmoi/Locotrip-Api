@@ -58,8 +58,8 @@ export class BookingsController {
   }
 
   @Get('user/:userId')
-  @ApiOperation({ summary: 'Récupérer les réservations d\'un user' })
-  @ApiParam({ name: 'userId', description: 'ID de l\'user' })
+  @ApiOperation({ summary: 'Récupérer les réservations d\'un utilisateur' })
+  @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur' })
   @ApiGetManyResponse(BookingEntity)
   findByUser(@Param('userId') userId: string) {
     return this.bookingsService.findByUser(userId);
@@ -106,7 +106,7 @@ export class BookingsController {
   @Post(':bookingId/disputes')
   @Roles(UserRole.CLIENT)
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Créer un dispute' })
+  @ApiOperation({ summary: 'Créer un litige' })
   @ApiParam({ name: 'bookingId', description: 'ID de la réservation' })
   createDispute(@Body() createDisputeDto: CreateDisputeDto) {
     return this.DisputesService.create(createDisputeDto);
@@ -120,7 +120,7 @@ export class PaiementsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Récupérer tous les payments' })
+  @ApiOperation({ summary: 'Récupérer tous les paiements' })
   @ApiGetManyResponse(Object)
   findAll() {
     return this.paymentsService.findAll();
@@ -128,16 +128,16 @@ export class PaiementsController {
 
   @Get(':id')
   @Roles(UserRole.CLIENT)
-  @ApiOperation({ summary: 'Récupérer un payment' })
-  @ApiParam({ name: 'id', description: 'ID du payment' })
+  @ApiOperation({ summary: 'Récupérer un paiement' })
+  @ApiParam({ name: 'id', description: 'ID du paiement' })
   @ApiGetOneResponse(Object)
   findOne(@Param('id') id: string) {
     return this.paymentsService.findOne(id);
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Mettre à jour un payment' })
-  @ApiParam({ name: 'id', description: 'ID du payment' })
+  @ApiOperation({ summary: 'Mettre à jour un paiement' })
+  @ApiParam({ name: 'id', description: 'ID du paiement' })
   @ApiUpdateResponse(Object)
   update(@Param('id') id: string, @Body() updatePaymentDto: UpdatePaymentDto) {
     return this.paymentsService.update(id, updatePaymentDto);
@@ -151,7 +151,7 @@ export class DisputesController {
   constructor(private readonly DisputesService: DisputesService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Récupérer tous les disputes' })
+  @ApiOperation({ summary: 'Récupérer tous les litiges' })
   @ApiGetManyResponse(Object)
   findAll() {
     return this.DisputesService.findAll();
@@ -159,7 +159,7 @@ export class DisputesController {
 
   @Get(':id')
   @Roles(UserRole.CLIENT)
-  @ApiOperation({ summary: 'Récupérer un dispute' })
+  @ApiOperation({ summary: 'Récupérer un litige' })
   @ApiParam({ name: 'id', description: 'ID du dispute' })
   @ApiGetOneResponse(Object)
   findOne(@Param('id') id: string) {
@@ -167,8 +167,8 @@ export class DisputesController {
   }
 
   @Get('status/:status')
-  @ApiOperation({ summary: 'Récupérer les disputes par status' })
-  @ApiParam({ name: 'status', description: 'Statut du dispute' })
+  @ApiOperation({ summary: 'Récupérer les litiges par statut' })
+  @ApiParam({ name: 'status', description: 'Statut du litige' })
   @ApiGetManyResponse(Object)
   findByStatut(@Param('status') status: DisputeStatus) {
     return this.DisputesService.findByStatut(status);
@@ -176,8 +176,8 @@ export class DisputesController {
 
   @Put(':id')
   @Roles(UserRole.CLIENT)
-  @ApiOperation({ summary: 'Mettre à jour un dispute' })
-  @ApiParam({ name: 'id', description: 'ID du dispute' })
+  @ApiOperation({ summary: 'Mettre à jour un litige' })
+  @ApiParam({ name: 'id', description: 'ID du litige' })
   @ApiUpdateResponse(Object)
   update(@Param('id') id: string, @Body() updateDisputeDto: UpdateDisputeDto) {
     return this.DisputesService.update(id, updateDisputeDto);
@@ -185,8 +185,8 @@ export class DisputesController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Supprimer un dispute' })
-  @ApiParam({ name: 'id', description: 'ID du dispute' })
+  @ApiOperation({ summary: 'Supprimer un litige' })
+  @ApiParam({ name: 'id', description: 'ID du litige' })
   @ApiDeleteResponse()
   delete(@Param('id') id: string) {
     return this.DisputesService.delete(id);

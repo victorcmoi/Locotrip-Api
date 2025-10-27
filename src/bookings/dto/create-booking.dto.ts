@@ -3,7 +3,7 @@ import { IsUUID, IsNotEmpty, IsInt, IsDecimal, IsDateString, Min } from 'class-v
 
 export class CreateBookingDto {
   @ApiProperty({
-    description: 'ID de l\'user qui réserve',
+    description: 'ID de l\'utilisateur qui réserve',
     example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @IsUUID()

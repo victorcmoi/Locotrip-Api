@@ -16,7 +16,7 @@ import {
 import { UserRole } from '../users/enums/user.enum';
 import { Roles } from '../common/decorators/role.decorator';
 
-@ApiTags('Currencies')
+@ApiTags('Devises')
 @ApiBearerAuth('JWT-auth')
 @Controller('currencies')
 export class CurrenciesController {

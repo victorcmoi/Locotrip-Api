@@ -4,7 +4,7 @@ import { SubscriptionType } from '../../guides/enums/guide-availability.enum';
 
 export class CreateSubscriptionDto {
   @ApiProperty({
-    description: 'ID de l\'user',
+    description: 'ID de l\'utilisateur',
     example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @IsNotEmpty()
@@ -12,7 +12,7 @@ export class CreateSubscriptionDto {
   user_id: string;
 
   @ApiProperty({
-    description: 'Type d\'subscription',
+    description: 'Type d\'abonnement',
     enum: SubscriptionType,
     example: SubscriptionType.LOCO_PLUS,
   })
@@ -21,7 +21,7 @@ export class CreateSubscriptionDto {
   subscription_type: SubscriptionType;
 
   @ApiProperty({
-    description: 'Date de début de l\'subscription',
+    description: 'Date de début de l\'abonnement',
     example: '2025-01-01T00:00:00.000Z',
   })
   @IsDateString()
@@ -29,7 +29,7 @@ export class CreateSubscriptionDto {
   start_date: Date;
 
   @ApiProperty({
-    description: 'Date de fin de l\'subscription',
+    description: 'Date de fin de l\'abonnement',
     example: '2025-12-31T23:59:59.000Z',
   })
   @IsDateString()
@@ -37,7 +37,7 @@ export class CreateSubscriptionDto {
   end_date: Date;
 
   @ApiProperty({
-    description: 'Statut de l\'subscription',
+    description: 'Statut de l\'abonnement',
     example: 'actif',
     maxLength: 20,
   })

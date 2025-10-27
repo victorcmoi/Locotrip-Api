@@ -17,7 +17,7 @@ import {
 import { UserRole } from '../users/enums/user.enum';
 import { Roles } from '../common/decorators/role.decorator';
 
-@ApiTags('Reviews')
+@ApiTags('Avis')
 @ApiBearerAuth('JWT-auth')
 @Controller('reviews')
 export class ReviewsController {
@@ -26,7 +26,7 @@ export class ReviewsController {
   @Post()
 
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Créer un reviews' })
+  @ApiOperation({ summary: 'Créer un avis' })
   @ApiCreateResponse(ReviewEntity)
   create(@Body() createReviewDto: CreateReviewDto) {
     return this.reviewService.create(createReviewDto);
@@ -34,7 +34,7 @@ export class ReviewsController {
 
   @Get()
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
-  @ApiOperation({ summary: 'Récupérer tous les reviews' })
+  @ApiOperation({ summary: 'Récupérer tous les avis' })
   @ApiGetManyResponse(ReviewEntity)
   findAll() {
     return this.reviewService.findAll();
@@ -42,8 +42,8 @@ export class ReviewsController {
 
   @Get(':id')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
-  @ApiOperation({ summary: 'Récupérer un reviews par son ID' })
-  @ApiParam({ name: 'id', description: 'ID de l\'reviews' })
+  @ApiOperation({ summary: 'Récupérer un avis par son ID' })
+  @ApiParam({ name: 'id', description: 'ID de l\'avis' })
   @ApiGetOneResponse(ReviewEntity)
   findOne(@Param('id') id: string) {
     return this.reviewService.findOne(id);
@@ -51,7 +51,7 @@ export class ReviewsController {
 
   @Get('experience/:experienceId')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
-  @ApiOperation({ summary: 'Récupérer les reviews d\'une expérience' })
+  @ApiOperation({ summary: 'Récupérer les avis d\'une expérience' })
   @ApiParam({ name: 'experienceId', description: 'ID de l\'expérience' })
   @ApiGetManyResponse(ReviewEntity)
   findByExperience(@Param('experienceId') experienceId: string) {
@@ -60,8 +60,8 @@ export class ReviewsController {
 
   @Get('user/:userId')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
-  @ApiOperation({ summary: 'Récupérer les reviews d\'un user' })
-  @ApiParam({ name: 'userId', description: 'ID de l\'user' })
+  @ApiOperation({ summary: 'Récupérer les avis d\'un utilisateur' })
+  @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur' })
   @ApiGetManyResponse(ReviewEntity)
   findByUser(@Param('userId') userId: string) {
     return this.reviewService.findByUser(userId);
@@ -69,8 +69,8 @@ export class ReviewsController {
 
   @Put(':id')
   @Roles(UserRole.CLIENT)
-  @ApiOperation({ summary: 'Mettre à jour un reviews' })
-  @ApiParam({ name: 'id', description: 'ID de l\'reviews' })
+  @ApiOperation({ summary: 'Mettre à jour un avis' })
+  @ApiParam({ name: 'id', description: 'ID de l\'avis' })
   @ApiUpdateResponse(ReviewEntity)
   update(@Param('id') id: string, @Body() UpdateReviewDto: UpdateReviewDto) {
     return this.reviewService.update(id, UpdateReviewDto);
@@ -79,8 +79,8 @@ export class ReviewsController {
   @Delete(':id')
   @Roles(UserRole.CLIENT)
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Supprimer un reviews' })
-  @ApiParam({ name: 'id', description: 'ID de l\'reviews' })
+  @ApiOperation({ summary: 'Supprimer un avis' })
+  @ApiParam({ name: 'id', description: 'ID de l\'avis' })
   @ApiDeleteResponse()
   delete(@Param('id') id: string) {
     return this.reviewService.delete(id);
@@ -95,7 +95,7 @@ export class AbonnementsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Créer un subscription' })
+  @ApiOperation({ summary: 'Créer un abonnement' })
   @ApiCreateResponse(Object)
   create(@Body() createSubscriptionDto: CreateSubscriptionDto) {
     return this.abonnementsService.create(createSubscriptionDto);
@@ -103,7 +103,7 @@ export class AbonnementsController {
 
   @Get()
   @Roles(UserRole.GUIDE)
-  @ApiOperation({ summary: 'Récupérer tous les subscriptions' })
+  @ApiOperation({ summary: 'Récupérer tous les abonnements' })
   @ApiGetManyResponse(Object)
   findAll() {
     return this.abonnementsService.findAll();
@@ -111,7 +111,7 @@ export class AbonnementsController {
 
   @Get('actifs')
   @Roles(UserRole.GUIDE)
-  @ApiOperation({ summary: 'Récupérer les subscriptions actifs' })
+  @ApiOperation({ summary: 'Récupérer les abonnements actifs' })
   @ApiGetManyResponse(Object)
   findActive() {
     return this.abonnementsService.findActive();
@@ -119,8 +119,8 @@ export class AbonnementsController {
 
   @Get(':id')
   @Roles(UserRole.GUIDE)
-  @ApiOperation({ summary: 'Récupérer un subscription' })
-  @ApiParam({ name: 'id', description: 'ID de l\'subscription' })
+  @ApiOperation({ summary: 'Récupérer un abonnement' })
+  @ApiParam({ name: 'id', description: 'ID de l\'abonnement' })
   @ApiGetOneResponse(Object)
   findOne(@Param('id') id: string) {
     return this.abonnementsService.findOne(id);
@@ -128,16 +128,16 @@ export class AbonnementsController {
 
   @Get('user/:userId')
   @Roles(UserRole.GUIDE)
-  @ApiOperation({ summary: 'Récupérer les subscriptions d\'un user' })
-  @ApiParam({ name: 'userId', description: 'ID de l\'user' })
+  @ApiOperation({ summary: 'Récupérer les abonnements d\'un utilisateur' })
+  @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur' })
   @ApiGetManyResponse(Object)
   findByUser(@Param('userId') userId: string) {
     return this.abonnementsService.findByUser(userId);
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Mettre à jour un subscription' })
-  @ApiParam({ name: 'id', description: 'ID de l\'subscription' })
+  @ApiOperation({ summary: 'Mettre à jour un abonnement' })
+  @ApiParam({ name: 'id', description: 'ID de l\'abonnement' })
   @ApiUpdateResponse(Object)
   update(@Param('id') id: string, @Body() updateSubscriptionDto: UpdateSubscriptionDto) {
     return this.abonnementsService.update(id, updateSubscriptionDto);
@@ -145,8 +145,8 @@ export class AbonnementsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Supprimer un subscription' })
-  @ApiParam({ name: 'id', description: 'ID de l\'subscription' })
+  @ApiOperation({ summary: 'Supprimer un abonnement' })
+  @ApiParam({ name: 'id', description: 'ID de l\'abonnement' })
   @ApiDeleteResponse()
   delete(@Param('id') id: string) {
     return this.abonnementsService.delete(id);

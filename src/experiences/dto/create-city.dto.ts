@@ -3,7 +3,7 @@ import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateCityDto {
   @ApiProperty({
-    description: 'Nom de la city',
+    description: 'Nom de la ville',
     example: 'Paris',
     maxLength: 100,
   })
@@ -12,7 +12,7 @@ export class CreateCityDto {
   name: string;
 
   @ApiProperty({
-    description: 'Pays de la city',
+    description: 'Pays de la ville',
     example: 'France',
     maxLength: 50,
   })
@@ -21,7 +21,7 @@ export class CreateCityDto {
   country: string;
 
   @ApiPropertyOptional({
-    description: 'Description de la city',
+    description: 'Description de la ville',
     example: 'La capitale française, connue pour sa tour Eiffel',
   })
   @IsString()

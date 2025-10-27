@@ -4,7 +4,7 @@ import { CreateCityDto } from './dto/create-city.dto';
 import { UpdateCityDto } from './dto/update-city.dto';
 
 @Injectable()
-export class VillesService {
+export class CitiesService {
   constructor(private prisma: PrismaService) {}
 
   async create(createCityDto: CreateCityDto) {

@@ -42,7 +42,7 @@ export class SupportTicketsController {
   }
 
   @Get('status/:status')
-  @ApiOperation({ summary: 'Récupérer les tickets par status' })
+  @ApiOperation({ summary: 'Récupérer les tickets par statut' })
   @ApiParam({ name: 'status', description: 'Statut du ticket (open, in_progress, closed)' })
   findByStatut(@Param('status') status: SupportTicketStatus) {
     return this.supportTicketsService.findByStatut(status);
@@ -56,8 +56,8 @@ export class SupportTicketsController {
   }
 
   @Get('user/:userId')
-  @ApiOperation({ summary: 'Récupérer les tickets d\'un user' })
-  @ApiParam({ name: 'userId', description: 'ID de l\'user' })
+  @ApiOperation({ summary: 'Récupérer les tickets d\'un utilisateur' })
+  @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur' })
   findByUser(@Param('userId') userId: string) {
     return this.supportTicketsService.findByUser(userId);
   }
@@ -129,8 +129,8 @@ export class NotificationsController {
 
   @Get('user/:userId')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
-  @ApiOperation({ summary: 'Récupérer les notifications d\'un user' })
-  @ApiParam({ name: 'userId', description: 'ID de l\'user' })
+  @ApiOperation({ summary: 'Récupérer les notifications d\'un utilisateur' })
+  @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur' })
   @ApiGetManyResponse(Object)
   findByUser(@Param('userId') userId: string) {
     return this.notificationsService.findByUser(userId);
@@ -139,7 +139,7 @@ export class NotificationsController {
   @Get('user/:userId/non-lues')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer les notifications non lues' })
-  @ApiParam({ name: 'userId', description: 'ID de l\'user' })
+  @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur' })
   @ApiGetManyResponse(Object)
   findNonLues(@Param('userId') userId: string) {
     return this.notificationsService.findNonLues(userId);

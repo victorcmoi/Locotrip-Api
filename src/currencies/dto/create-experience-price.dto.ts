@@ -11,7 +11,7 @@ export class CreateExperiencePriceDto {
   experience_id: string;
 
   @ApiProperty({
-    description: 'Code de la currency (3 caractères)',
+    description: 'Code de la devise (3 caractères)',
     example: 'EUR',
     maxLength: 3,
   })
@@ -20,7 +20,7 @@ export class CreateExperiencePriceDto {
   currency_code: string;
 
   @ApiProperty({
-    description: 'Prix dans la currency spécifiée',
+    description: 'Prix dans la devise spécifiée',
     example: 49.99,
   })
   @IsNotEmpty()

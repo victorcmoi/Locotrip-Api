@@ -3,7 +3,7 @@ import { IsUUID, IsNotEmpty, IsInt, IsString, IsOptional, Min, Max } from 'class
 
 export class CreateReviewDto {
   @ApiProperty({
-    description: 'ID de l\'user qui donne l\'reviews',
+    description: 'ID de l\'utilisateur qui donne l\'avis',
     example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @IsUUID()
@@ -31,7 +31,7 @@ export class CreateReviewDto {
   rating: number;
 
   @ApiPropertyOptional({
-    description: 'Commentaire de l\'user',
+    description: 'Commentaire de l\'utilisateur',
     example: 'Excellente expérience, guide très professionnel !',
   })
   @IsString()
