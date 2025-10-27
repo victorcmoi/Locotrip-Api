@@ -5,71 +5,71 @@ API REST complète pour la plateforme Locotrip avec NestJS et Prisma.
 ## 📚 Modules et Endpoints
 
 ### 👥 Utilisateurs (`/users`)
-- `POST /user` - Créer un user
+- `POST /users` - Créer un user
 - `GET /users` - Liste des users
-- `GET /user/:id` - Détails d'un user
-- `GET /user/email/:email` - Recherche par email
-- `PUT /user/:id` - Mettre à jour un user
-- `DELETE /user/:id` - Supprimer un user
+- `GET /users/:id` - Détails d'un user
+- `GET /users/email/:email` - Recherche par email
+- `PUT /users/:id` - Mettre à jour un user
+- `DELETE /users/:id` - Supprimer un user
 
 ### 🎯 Guides (`/guides`)
-- `POST /guide` - Créer un guide
+- `POST /guides` - Créer un guide
 - `GET /guides` - Liste des guides
-- `GET /guide/:id` - Détails d'un guide
-- `GET /guides/user/:userId` - Guides d'un user
-- `PUT /guide/:id` - Mettre à jour un guide
-- `DELETE /guide/:id` - Supprimer un guide
+- `GET /guides/:id` - Détails d'un guide
+- `GET /guides/users/:userId` - Guides d'un user
+- `PUT /guides/:id` - Mettre à jour un guide
+- `DELETE /guides/:id` - Supprimer un guide
 
 #### Documents
-- `POST /guide/:guideId/documents` - Ajouter un document
-- `GET /guide/:guideId/documents` - Documents d'un guide
+- `POST /guides/:guideId/documents` - Ajouter un document
+- `GET /guides/:guideId/documents` - Documents d'un guide
 
 #### Disponibilités
-- `POST /guide/:guideId/availability` - Ajouter une disponibilité
-- `GET /guide/:guideId/availability` - Disponibilités d'un guide
+- `POST /guides/:guideId/availability` - Ajouter une disponibilité
+- `GET /guides/:guideId/availability` - Disponibilités d'un guide
 
 #### Boosts
-- `POST /guide/:guideId/boosts` - Acheter un boost
-- `GET /guide/:guideId/boosts` - Boosts d'un guide
+- `POST /guides/:guideId/boosts` - Acheter un boost
+- `GET /guides/:guideId/boosts` - Boosts d'un guide
 
 ### 🌍 Expériences
 
 #### Villes (`/cities`)
-- `POST /city` - Créer une city
+- `POST /cities` - Créer une city
 - `GET /cities` - Liste des cities
-- `GET /city/:id` - Détails d'une city
-- `PUT /city/:id` - Mettre à jour une city
-- `DELETE /city/:id` - Supprimer une city
+- `GET /cities/:id` - Détails d'une city
+- `PUT /cities/:id` - Mettre à jour une city
+- `DELETE /cities/:id` - Supprimer une city
 
 #### Expériences (`/experiences`)
 - `POST /experience` - Créer une expérience
 - `GET /experiences` - Liste des expériences
 - `GET /experience/:id` - Détails d'une expérience
-- `GET /experiences/city/:villeId` - Expériences par city
-- `GET /experiences/guide/:guideId` - Expériences par guide
+- `GET /experiences/cities/:villeId` - Expériences par city
+- `GET /experiences/guides/:guideId` - Expériences par guide
 - `PUT /experience/:id` - Mettre à jour une expérience
 - `DELETE /experience/:id` - Supprimer une expérience
 
 #### Catégories (`/categories`)
-- `POST /category` - Créer une catégorie
+- `POST /categories` - Créer une catégorie
 - `GET /categories` - Liste des catégories
-- `GET /category/:id` - Détails d'une catégorie
-- `PUT /category/:id` - Mettre à jour une catégorie
-- `DELETE /category/:id` - Supprimer une catégorie
+- `GET /categories/:id` - Détails d'une catégorie
+- `PUT /categories/:id` - Mettre à jour une catégorie
+- `DELETE /categories/:id` - Supprimer une catégorie
 
 ### 📅 Réservations (`/bookings`)
-- `POST /booking` - Créer une réservation
+- `POST /bookings` - Créer une réservation
 - `GET /bookings` - Liste des réservations
-- `GET /booking/:id` - Détails d'une réservation
-- `GET /bookings/user/:userId` - Réservations d'un user
-- `PUT /booking/:id` - Mettre à jour une réservation
-- `DELETE /booking/:id` - Supprimer une réservation
+- `GET /bookings/:id` - Détails d'une réservation
+- `GET /bookings/users/:userId` - Réservations d'un user
+- `PUT /bookings/:id` - Mettre à jour une réservation
+- `DELETE /bookings/:id` - Supprimer une réservation
 
 #### Paiements
-- `POST /booking/:bookingId/payment` - Créer un payment
+- `POST /bookings/:bookingId/payments` - Créer un payment
 - `GET /bookings/:bookingId/payments` - Paiements d'une réservation
 - `GET /payments` - Liste des payments
-- `GET /payment/:id` - Détails d'un payment
+- `GET /payments/:id` - Détails d'un payment
 
 #### Litiges
 - `POST /bookings/:bookingId/dispute` - Créer un dispute
@@ -85,7 +85,7 @@ API REST complète pour la plateforme Locotrip avec NestJS et Prisma.
 - `GET /reviews` - Liste des reviews
 - `GET /reviews/:id` - Détails d'un reviews
 - `GET /reviews/experience/:experienceId` - Avis d'une expérience
-- `GET /reviews/user/:userId` - Avis d'un user
+- `GET /reviews/users/:userId` - Avis d'un user
 - `PUT /reviews/:id` - Mettre à jour un reviews
 - `DELETE /reviews/:id` - Supprimer un reviews
 
@@ -94,7 +94,7 @@ API REST complète pour la plateforme Locotrip avec NestJS et Prisma.
 - `GET /subscriptions` - Liste des subscriptions
 - `GET /subscriptions/actifs` - Abonnements actifs
 - `GET /subscriptions/:id` - Détails d'un subscription
-- `GET /subscriptions/user/:userId` - Abonnements d'un user
+- `GET /subscriptions/users/:userId` - Abonnements d'un user
 - `PUT /subscriptions/:id` - Mettre à jour un subscription
 
 ### 💬 Messagerie
@@ -103,7 +103,7 @@ API REST complète pour la plateforme Locotrip avec NestJS et Prisma.
 - `POST /conversations` - Créer une conversation
 - `GET /conversations` - Liste des conversations
 - `GET /conversations/:id` - Détails d'une conversation
-- `GET /conversations/booking/:bookingId` - Conversations d'une réservation
+- `GET /conversations/bookings/:bookingId` - Conversations d'une réservation
 - `DELETE /conversations/:id` - Supprimer une conversation
 
 #### Messages
@@ -119,7 +119,7 @@ API REST complète pour la plateforme Locotrip avec NestJS et Prisma.
 - `GET /support-tickets` - Liste des tickets
 - `GET /support-tickets/:id` - Détails d'un ticket
 - `GET /support-tickets/status/:status` - Tickets par status
-- `GET /support-tickets/user/:userId` - Tickets d'un user
+- `GET /support-tickets/users/:userId` - Tickets d'un user
 - `PUT /support-tickets/:id` - Mettre à jour un ticket
 - `DELETE /support-tickets/:id` - Supprimer un ticket
 
@@ -131,8 +131,8 @@ API REST complète pour la plateforme Locotrip avec NestJS et Prisma.
 - `POST /notifications` - Créer une notification
 - `GET /notifications` - Liste des notifications
 - `GET /notifications/:id` - Détails d'une notification
-- `GET /notifications/user/:userId` - Notifications d'un user
-- `GET /notifications/user/:userId/non-lues` - Notifications non lues
+- `GET /notifications/users/:userId` - Notifications d'un user
+- `GET /notifications/users/:userId/non-lues` - Notifications non lues
 - `PATCH /notifications/:id/marquer-lue` - Marquer comme lue
 - `PUT /notifications/:id` - Mettre à jour une notification
 - `DELETE /notifications/:id` - Supprimer une notification
