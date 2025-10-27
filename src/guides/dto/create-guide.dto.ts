@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsInt, IsBoolean, IsOptional, IsNotEmpty, IsUUID, IsEnum, Min } from 'class-validator';
-import { StatutGuide } from '../enums/guide.enum';
+import { GuideStatus } from '../enums/guide.enum';
 
 export class CreateGuideDto {
   @ApiProperty({
@@ -9,7 +9,7 @@ export class CreateGuideDto {
   })
   @IsUUID()
   @IsNotEmpty()
-  utilisateur_id: string;
+  user_id: string;
 
   @ApiPropertyOptional({
     description: 'Biographie du guide',
@@ -26,7 +26,7 @@ export class CreateGuideDto {
   })
   @IsString()
   @IsOptional()
-  langues?: string;
+  languages?: string;
 
   @ApiPropertyOptional({
     description: 'Années d\'expérience en tant que guide',
@@ -36,16 +36,16 @@ export class CreateGuideDto {
   @IsInt()
   @Min(0)
   @IsOptional()
-  experience_annees?: number;
+  years_of_experience?: number;
 
   @ApiProperty({
     description: 'Statut du guide',
-    enum: StatutGuide,
-    example: StatutGuide.LOCAL,
+    enum: GuideStatus,
+    example: GuideStatus.LOCAL,
   })
-  @IsEnum(StatutGuide)
+  @IsEnum(GuideStatus)
   @IsNotEmpty()
-  statut_guide: StatutGuide;
+  guide_status: GuideStatus;
 
   @ApiPropertyOptional({
     description: 'Indique si le guide possède une carte professionnelle',
@@ -54,7 +54,7 @@ export class CreateGuideDto {
   })
   @IsBoolean()
   @IsOptional()
-  carte_pro?: boolean;
+  pro_card?: boolean;
 
   @ApiPropertyOptional({
     description: 'Pays du guide',
@@ -63,7 +63,7 @@ export class CreateGuideDto {
   })
   @IsString()
   @IsOptional()
-  pays?: string;
+  country?: string;
 
   @ApiPropertyOptional({
     description: 'Commentaire interne (visible uniquement par les admins)',
@@ -71,5 +71,5 @@ export class CreateGuideDto {
   })
   @IsString()
   @IsOptional()
-  commentaire_interne?: string;
+  internal_comment?: string;
 }

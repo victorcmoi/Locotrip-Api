@@ -9,9 +9,9 @@ export class GuideAvailabilityService {
   async create(createAvailabilityDto: CreateGuideAvailabilityDto) {
     return this.prisma.guide_availability.create({
       data: {
-        date_debut: createAvailabilityDto.date_debut,
-        date_fin: createAvailabilityDto.date_fin,
-        statut: createAvailabilityDto.statut,
+        start_date: createAvailabilityDto.start_date,
+        end_date: createAvailabilityDto.end_date,
+        status: createAvailabilityDto.status,
         guide: {
           connect: { id: createAvailabilityDto.guide_id },
         },
@@ -45,7 +45,7 @@ export class GuideAvailabilityService {
   async findByGuide(guideId: string) {
     return this.prisma.guide_availability.findMany({
       where: { guide_id: guideId },
-      orderBy: { date_debut: 'asc' },
+      orderBy: { start_date: 'asc' },
     });
   }
 

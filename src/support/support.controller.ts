@@ -14,9 +14,9 @@ import {
   ApiUpdateResponse,
   ApiDeleteResponse,
 } from '../common/decorators/api-standard-responses.decorator';
-import { StatutSupportTicket } from '@prisma/client';
+import { SupportTicketStatus } from '@prisma/client';
 import { Roles } from '../common/decorators/role.decorator';
-import { RoleUtilisateur } from '../utilisateurs/enums/utilisateur.enum';
+import { UserRole } from '../users/enums/user.enum';
 
 @ApiTags('Support')
 @ApiBearerAuth('JWT-auth')
@@ -28,7 +28,7 @@ export class SupportTicketsController {
   ) {}
 
   @Post()
-  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
+  @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Créer un ticket de support' })
   create(@Body() createSupportTicketDto: CreateSupportTicketDto) {
@@ -41,11 +41,11 @@ export class SupportTicketsController {
     return this.supportTicketsService.findAll();
   }
 
-  @Get('statut/:statut')
+  @Get('status/:status')
   @ApiOperation({ summary: 'Récupérer les tickets par statut' })
-  @ApiParam({ name: 'statut', description: 'Statut du ticket (ouvert, en_cours, fermé)' })
-  findByStatut(@Param('statut') statut: StatutSupportTicket) {
-    return this.supportTicketsService.findByStatut(statut);
+  @ApiParam({ name: 'status', description: 'Statut du ticket (open, in_progress, closed)' })
+  findByStatut(@Param('status') status: SupportTicketStatus) {
+    return this.supportTicketsService.findByStatut(status);
   }
 
   @Get(':id')
@@ -55,11 +55,11 @@ export class SupportTicketsController {
     return this.supportTicketsService.findOne(id);
   }
 
-  @Get('utilisateur/:utilisateurId')
+  @Get('user/:userId')
   @ApiOperation({ summary: 'Récupérer les tickets d\'un utilisateur' })
-  @ApiParam({ name: 'utilisateurId', description: 'ID de l\'utilisateur' })
-  findByUtilisateur(@Param('utilisateurId') utilisateurId: string) {
-    return this.supportTicketsService.findByUtilisateur(utilisateurId);
+  @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur' })
+  findByUser(@Param('userId') userId: string) {
+    return this.supportTicketsService.findByUser(userId);
   }
 
   @Put(':id')
@@ -80,7 +80,7 @@ export class SupportTicketsController {
 
   // Messages
   @Post(':ticketId/messages')
-  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
+  @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Ajouter un message au ticket' })
   @ApiParam({ name: 'ticketId', description: 'ID du ticket' })
@@ -111,7 +111,7 @@ export class NotificationsController {
   }
 
   @Get()
-  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
+  @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer toutes les notifications' })
   @ApiGetManyResponse(Object)
   findAll() {
@@ -119,7 +119,7 @@ export class NotificationsController {
   }
 
   @Get(':id')
-  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
+  @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer une notification' })
   @ApiParam({ name: 'id', description: 'ID de la notification' })
   @ApiGetOneResponse(Object)
@@ -127,26 +127,26 @@ export class NotificationsController {
     return this.notificationsService.findOne(id);
   }
 
-  @Get('utilisateur/:utilisateurId')
-  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
+  @Get('user/:userId')
+  @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer les notifications d\'un utilisateur' })
-  @ApiParam({ name: 'utilisateurId', description: 'ID de l\'utilisateur' })
+  @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur' })
   @ApiGetManyResponse(Object)
-  findByUtilisateur(@Param('utilisateurId') utilisateurId: string) {
-    return this.notificationsService.findByUtilisateur(utilisateurId);
+  findByUser(@Param('userId') userId: string) {
+    return this.notificationsService.findByUser(userId);
   }
 
-  @Get('utilisateur/:utilisateurId/non-lues')
-  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
+  @Get('user/:userId/non-lues')
+  @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer les notifications non lues' })
-  @ApiParam({ name: 'utilisateurId', description: 'ID de l\'utilisateur' })
+  @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur' })
   @ApiGetManyResponse(Object)
-  findNonLues(@Param('utilisateurId') utilisateurId: string) {
-    return this.notificationsService.findNonLues(utilisateurId);
+  findNonLues(@Param('userId') userId: string) {
+    return this.notificationsService.findNonLues(userId);
   }
 
   @Patch(':id/marquer-lue')
-  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
+  @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Marquer une notification comme lue' })
   @ApiParam({ name: 'id', description: 'ID de la notification' })
   @ApiUpdateResponse(Object)

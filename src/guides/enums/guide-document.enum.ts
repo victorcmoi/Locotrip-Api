@@ -1,11 +1,11 @@
 export enum VerificationStatus {
-    EN_ATTENTE = "en_attente",
-    AUTHENTIFIE = "authentifié",
-    REJETE = "rejeté",
+    PENDING = "pending",
+    VERIFIED = "verified",
+    REJECTED = "rejected",
 }
 
-export enum TypeDocument {
+export enum DocumentType {
     CV = "CV",
-    DIPLOME = "diplôme",
-    JUSTIFICATIF_DOMICILE = "justificatif_de_domicile",
+    DIPLOMA = "diploma",
+    PROOF_OF_RESIDENCE = "proof_of_residence",
 }

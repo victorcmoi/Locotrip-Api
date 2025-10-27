@@ -19,5 +19,5 @@ export class LoginDto {
     @IsString()
     @IsNotEmpty()
     @MinLength(8)
-    mot_de_passe: string;
+    password: string;
 }

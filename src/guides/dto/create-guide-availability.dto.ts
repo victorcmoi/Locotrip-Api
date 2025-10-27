@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsUUID, IsNotEmpty, IsEnum, IsDateString } from 'class-validator';
-import { StatutDisponibilite } from '../enums/guide-availability.enum';
+import { AvailabilityStatus } from '../enums/guide-availability.enum';
 
 export class CreateGuideAvailabilityDto {
   @ApiProperty({
@@ -17,7 +17,7 @@ export class CreateGuideAvailabilityDto {
   })
   @IsDateString()
   @IsNotEmpty()
-  date_debut: Date;
+  start_date: Date;
 
   @ApiProperty({
     description: 'Date de fin de disponibilité',
@@ -25,14 +25,14 @@ export class CreateGuideAvailabilityDto {
   })
   @IsDateString()
   @IsNotEmpty()
-  date_fin: Date;
+  end_date: Date;
 
   @ApiProperty({
     description: 'Statut de disponibilité',
-    enum: StatutDisponibilite,
-    example: StatutDisponibilite.DISPONIBLE,
+    enum: AvailabilityStatus,
+    example: AvailabilityStatus.AVAILABLE,
   })
-  @IsEnum(StatutDisponibilite)
+  @IsEnum(AvailabilityStatus)
   @IsNotEmpty()
-  statut: StatutDisponibilite;
+  status: AvailabilityStatus;
 }

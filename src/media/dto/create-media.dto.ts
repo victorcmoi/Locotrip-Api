@@ -1,10 +1,10 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsUUID, IsOptional, IsEnum } from 'class-validator';
-import { TypeMedia } from '../enums/media.enum';
+import { MediaType } from '../enums/media.enum';
 
 export class CreateMediaDto {
   @ApiProperty({
-    description: 'Type d\'entité (experience, guide, utilisateur, reservation)',
+    description: 'Type d\'entité (experience, guide, utilisateur, réservation)',
     example: 'experience',
     maxLength: 50,
   })
@@ -31,12 +31,12 @@ export class CreateMediaDto {
 
   @ApiProperty({
     description: 'Type de média',
-    enum: TypeMedia,
-    example: TypeMedia.PHOTO,
+    enum: MediaType,
+    example: MediaType.PHOTO,
   })
-  @IsEnum(TypeMedia)
+  @IsEnum(MediaType)
   @IsNotEmpty()
-  type_media: TypeMedia;
+  media_type: MediaType;
 
   @ApiPropertyOptional({
     description: 'Description du média',

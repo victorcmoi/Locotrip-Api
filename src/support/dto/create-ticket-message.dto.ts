@@ -16,7 +16,7 @@ export class CreateTicketMessageDto {
   })
   @IsUUID()
   @IsNotEmpty()
-  auteur_id: string;
+  author_id: string;
 
   @ApiProperty({
     description: 'Contenu du message',
@@ -24,5 +24,5 @@ export class CreateTicketMessageDto {
   })
   @IsString()
   @IsNotEmpty()
-  contenu: string;
+  content: string;
 }

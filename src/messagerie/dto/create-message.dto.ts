@@ -16,7 +16,7 @@ export class CreateMessageDto {
   })
   @IsUUID()
   @IsNotEmpty()
-  auteur_id: string;
+  author_id: string;
 
   @ApiProperty({
     description: 'Contenu du message',
@@ -24,5 +24,5 @@ export class CreateMessageDto {
   })
   @IsString()
   @IsNotEmpty()
-  contenu: string;
+  content: string;
 }

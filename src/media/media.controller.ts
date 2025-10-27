@@ -10,9 +10,9 @@ import {
   ApiUpdateResponse,
   ApiDeleteResponse,
 } from '../common/decorators/api-standard-responses.decorator';
-import { TypeMedia } from '@prisma/client';
+import { MediaType } from '@prisma/client';
 import { Roles } from '../common/decorators/role.decorator';
-import { RoleUtilisateur } from '../utilisateurs/enums/utilisateur.enum';
+import { UserRole } from '../users/enums/user.enum';
 
 @ApiTags('Médias')
 @ApiBearerAuth('JWT-auth')
@@ -21,7 +21,7 @@ export class MediaController {
   constructor(private readonly mediaService: MediaService) {}
 
   @Post()
-  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
+  @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Ajouter un média' })
   create(@Body() createMediaDto: CreateMediaDto) {
@@ -31,7 +31,7 @@ export class MediaController {
   @Get()
   @ApiOperation({ summary: 'Récupérer tous les médias' })
   @ApiQuery({ name: 'type', required: false, description: 'Filtrer par type de média' })
-  findAll(@Query('type') type?: TypeMedia) {
+  findAll(@Query('type') type?: MediaType) {
     if (type) {
       return this.mediaService.findByType(type);
     }
@@ -39,7 +39,7 @@ export class MediaController {
   }
 
   @Get(':id')
-  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
+  @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer un média' })
   @ApiParam({ name: 'id', description: 'ID du média' })
   findOne(@Param('id') id: string) {
@@ -47,7 +47,7 @@ export class MediaController {
   }
 
   @Get('entity/:entityType/:entityId')
-  @Roles(RoleUtilisateur.CLIENT)
+  @Roles(UserRole.CLIENT)
   @ApiOperation({ summary: 'Récupérer les médias d\'une entité' })
   @ApiParam({ name: 'entityType', description: 'Type d\'entité (experience, guide, etc.)' })
   @ApiParam({ name: 'entityId', description: 'ID de l\'entité' })
@@ -59,7 +59,7 @@ export class MediaController {
   }
 
   @Put(':id')
-  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
+  @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Mettre à jour un média' })
   @ApiParam({ name: 'id', description: 'ID du média' })
   update(@Param('id') id: string, @Body() updateMediaDto: UpdateMediaDto) {
@@ -67,7 +67,7 @@ export class MediaController {
   }
 
   @Delete(':id')
-  @Roles(RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE)
+  @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Supprimer un média' })
   @ApiParam({ name: 'id', description: 'ID du média' })

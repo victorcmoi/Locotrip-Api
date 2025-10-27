@@ -9,7 +9,7 @@ export class CreateExperienceDto {
   })
   @IsString()
   @IsNotEmpty()
-  titre: string;
+  title: string;
 
   @ApiPropertyOptional({
     description: 'Description détaillée de l\'expérience',
@@ -25,7 +25,7 @@ export class CreateExperienceDto {
   })
   @IsDecimal()
   @IsNotEmpty()
-  prix: number;
+  price: number;
 
   @ApiProperty({
     description: 'Durée de l\'expérience en minutes',
@@ -35,7 +35,7 @@ export class CreateExperienceDto {
   @IsInt()
   @Min(1)
   @IsNotEmpty()
-  duree: number;
+  duration: number;
 
   @ApiProperty({
     description: 'ID de la ville où se déroule l\'expérience',
@@ -43,7 +43,7 @@ export class CreateExperienceDto {
   })
   @IsUUID()
   @IsNotEmpty()
-  ville_id: string;
+  city_id: string;
 
   @ApiProperty({
     description: 'ID du guide qui propose l\'expérience',
@@ -61,5 +61,5 @@ export class CreateExperienceDto {
   @IsInt()
   @Min(1)
   @IsOptional()
-  capacite_max?: number;
+  max_capacity?: number;
 }

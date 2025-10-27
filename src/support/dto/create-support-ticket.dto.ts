@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsUUID, IsNotEmpty, IsString, IsEnum } from 'class-validator';
-import { StatutSupportTicket } from '../enums/ticket-message.enum';
+import { SupportTicketStatus } from '../enums/ticket-message.enum';
 
 export class CreateSupportTicketDto {
   @ApiProperty({
@@ -9,23 +9,23 @@ export class CreateSupportTicketDto {
   })
   @IsUUID()
   @IsNotEmpty()
-  utilisateur_id: string;
+  user_id: string;
 
   @ApiProperty({
     description: 'Sujet du ticket',
-    example: 'Problème de paiement',
+    example: 'Problème de payment',
     maxLength: 150,
   })
   @IsString()
   @IsNotEmpty()
-  sujet: string;
+  subject: string;
 
   @ApiProperty({
     description: 'Statut du ticket',
-    enum: StatutSupportTicket,
-    example: StatutSupportTicket.OUVERT,
+    enum: SupportTicketStatus,
+    example: SupportTicketStatus.OUVERT,
   })
-  @IsEnum(StatutSupportTicket)
+  @IsEnum(SupportTicketStatus)
   @IsNotEmpty()
-  statut: StatutSupportTicket;
+  status: SupportTicketStatus;
 }

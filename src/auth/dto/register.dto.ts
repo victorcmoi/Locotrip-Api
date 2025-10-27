@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEmail, IsEnum, IsNotEmpty, IsString, MinLength } from "class-validator";
-import { RoleUtilisateur } from "../../utilisateurs/enums/utilisateur.enum";
+import { UserRole } from "../../users/enums/user.enum";
 
 export class RegisterDto {
       @ApiProperty({
@@ -10,7 +10,7 @@ export class RegisterDto {
       })
       @IsString()
       @IsNotEmpty()
-      nom: string;
+      last_name: string;
     
       @ApiProperty({
         description: 'Prénom de l\'utilisateur',
@@ -19,7 +19,7 @@ export class RegisterDto {
       })
       @IsString()
       @IsNotEmpty()
-      prenom: string;
+      first_name: string;
     
       @ApiProperty({
         description: 'Adresse email de l\'utilisateur',
@@ -38,16 +38,16 @@ export class RegisterDto {
       @IsString()
       @IsNotEmpty()
       @MinLength(8)
-      mot_de_passe: string;
+      password: string;
 
       @ApiProperty({
         description: 'Rôle de l\'utilisateur : CLIENT (voyageur) ou GUIDE (guide touristique)',
-        enum: [RoleUtilisateur.CLIENT, RoleUtilisateur.GUIDE],
-        example: RoleUtilisateur.CLIENT,
+        enum: [UserRole.CLIENT, UserRole.GUIDE],
+        example: UserRole.CLIENT,
       })
-      @IsEnum(RoleUtilisateur, {
+      @IsEnum(UserRole, {
         message: 'Le rôle doit être CLIENT ou GUIDE',
       })
       @IsNotEmpty()
-      role: RoleUtilisateur.CLIENT | RoleUtilisateur.GUIDE;
+      role: UserRole.CLIENT | UserRole.GUIDE;
 }

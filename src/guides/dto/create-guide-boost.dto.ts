@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsUUID, IsNotEmpty, IsDateString, IsEnum } from 'class-validator';
-import { StatutBoost } from '../enums/guide-boost.enum';
+import { BoostStatus } from '../enums/guide-boost.enum';
 
 export class CreateGuideBoostDto {
   @ApiProperty({
@@ -25,14 +25,14 @@ export class CreateGuideBoostDto {
   })
   @IsDateString()
   @IsNotEmpty()
-  date_expiration: Date;
+  expiration_date: Date;
 
   @ApiProperty({
     description: 'Statut du boost',
-    enum: StatutBoost,
-    example: StatutBoost.ACTIVE,
+    enum: BoostStatus,
+    example: BoostStatus.ACTIVE,
   })
-  @IsEnum(StatutBoost)
+  @IsEnum(BoostStatus)
   @IsNotEmpty()
-  statut: StatutBoost;
+  status: BoostStatus;
 }

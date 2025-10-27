@@ -39,13 +39,13 @@ async function bootstrap() {
     .addTag('Avis', 'Système d\'évaluations et commentaires')
     .addTag('Abonnements', 'Gestion des abonnements premium')
     .addTag('Offres de Boost', 'Gestion des offres de boost pour les guides')
-    
+
     .addTag('Messagerie', 'Gestion des conversations entre utilisateurs')
     .addTag('Messages', 'Gestion des messages utilisateurs')
     .addTag('Notifications', 'Gestion des notifications')
     
     .addTag('Support', 'Service client et support')
-    .addTag('Litiges', 'Gestion des litiges entre utilisateurs')
+    .addTag('Litiges', 'Gestion des disputes entre utilisateurs')
     .addTag('Médias', 'Gestion des fichiers médias')
     .build();
 

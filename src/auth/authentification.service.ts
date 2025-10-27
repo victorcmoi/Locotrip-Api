@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { UtilisateursService } from "../utilisateurs/utilisateurs.service";
+import { UsersService } from "../users/user.service";
 import { ChangePasswordDto } from "./dto/change-password.dto";
 import { LoginDto } from "./dto/login.dto";
 import { JwtService } from "@nestjs/jwt";
@@ -7,17 +7,17 @@ import { RegisterDto } from "./dto/register.dto";
 
 @Injectable()
 export class AuthentificationService {
-    constructor(private utilisateursService: UtilisateursService, private jwtService: JwtService) {}
+    constructor(private usersService: UsersService, private jwtService: JwtService) {}
     
     async login(loginDto: LoginDto): Promise<{ token: string }> {
-        const utilisateur = await this.utilisateursService.findByEmail(loginDto.email);
-        if (!utilisateur || !(await this.utilisateursService.validatePassword(loginDto.mot_de_passe, utilisateur.mot_de_passe))) {
+        const user = await this.usersService.findByEmail(loginDto.email);
+        if (!user || !(await this.usersService.validatePassword(loginDto.password, user.password))) {
             throw new NotFoundException(`Email ou mot de passe incorrect`);
         }
         const payload = { 
-            sub: utilisateur.id, 
-            email: utilisateur.email,
-            role: utilisateur.role
+            sub: user.id, 
+            email: user.email,
+            role: user.role
         };
         return {
             token: await this.jwtService.signAsync(payload),
@@ -25,24 +25,24 @@ export class AuthentificationService {
     }
 
     async changePassword(changePasswordDto: ChangePasswordDto) {
-        const utilisateur = await this.utilisateursService.findByEmail(changePasswordDto.email);
-        if (!utilisateur) {
+        const user = await this.usersService.findByEmail(changePasswordDto.email);
+        if (!user) {
         throw new NotFoundException(`Utilisateur avec l'email ${changePasswordDto.email} introuvable`);
         }
-        return this.utilisateursService.update(utilisateur.id, { mot_de_passe: changePasswordDto.mot_de_passe });
+        return this.usersService.update(user.id, { password: changePasswordDto.password });
     }
 
-    async register(registerDto: RegisterDto): Promise<{ utilisateur: any; token: string }> {
-        const utilisateur = await this.utilisateursService.create(registerDto);
+    async register(registerDto: RegisterDto): Promise<{ user: any; token: string }> {
+        const user = await this.usersService.create(registerDto);
         
         const payload = { 
-            sub: utilisateur.id, 
-            email: utilisateur.email,
-            role: utilisateur.role
+            sub: user.id, 
+            email: user.email,
+            role: user.role
         };
         
         return {
-            utilisateur,
+            user,
             token: await this.jwtService.signAsync(payload),
         };
     }

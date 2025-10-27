@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateSupportTicketDto } from './dto/create-support-ticket.dto';
-import { StatutSupportTicket } from '@prisma/client';
+import { SupportTicketStatus } from '@prisma/client';
 
 @Injectable()
 export class SupportTicketsService {
@@ -10,10 +10,10 @@ export class SupportTicketsService {
   async create(createSupportTicketDto: CreateSupportTicketDto) {
     return this.prisma.support_ticket.create({
       data: {
-        sujet: createSupportTicketDto.sujet,
-        statut: createSupportTicketDto.statut,
-        utilisateur: {
-          connect: { id: createSupportTicketDto.utilisateur_id },
+        subject: createSupportTicketDto.subject,
+        status: createSupportTicketDto.status,
+        user: {
+          connect: { id: createSupportTicketDto.user_id },
         },
       },
     });
@@ -22,7 +22,7 @@ export class SupportTicketsService {
   async findAll() {
     return this.prisma.support_ticket.findMany({
       include: {
-        utilisateur: true,
+        user: true,
         messages: true,
       },
     });
@@ -32,12 +32,12 @@ export class SupportTicketsService {
     const ticket = await this.prisma.support_ticket.findUnique({
       where: { id },
       include: {
-        utilisateur: true,
+        user: true,
         messages: {
           include: {
-            auteur: true,
+            author: true,
           },
-          orderBy: { date_envoi: 'asc' },
+          orderBy: { sent_at: 'asc' },
         },
       },
     });
@@ -49,23 +49,23 @@ export class SupportTicketsService {
     return ticket;
   }
 
-  async findByUtilisateur(utilisateurId: string) {
+  async findByUser(userId: string) {
     return this.prisma.support_ticket.findMany({
-      where: { utilisateur_id: utilisateurId },
+      where: { user_id: userId },
       include: {
         messages: true,
       },
-      orderBy: { date_creation: 'desc' },
+      orderBy: { created_at: 'desc' },
     });
   }
 
-  async findByStatut(statut: StatutSupportTicket) {
+  async findByStatut(status: SupportTicketStatus) {
     return this.prisma.support_ticket.findMany({
-      where: { statut },
+      where: { status },
       include: {
-        utilisateur: true,
+        user: true,
       },
-      orderBy: { date_creation: 'desc' },
+      orderBy: { created_at: 'desc' },
     });
   }
 
@@ -74,9 +74,9 @@ export class SupportTicketsService {
       const data: any = { ...updateData };
       
       // Transformer l'ID en relation si présent
-      if (updateData.utilisateur_id) {
-        data.utilisateur = { connect: { id: updateData.utilisateur_id } };
-        delete data.utilisateur_id;
+      if (updateData.user_id) {
+        data.user = { connect: { id: updateData.user_id } };
+        delete data.user_id;
       }
       
       return await this.prisma.support_ticket.update({
