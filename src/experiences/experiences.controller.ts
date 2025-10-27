@@ -107,10 +107,10 @@ export class ExperiencesController {
     return this.experiencesService.findByVille(cityId);
   }
 
-  @Get('GUIDE/:guideId')
+  @Get('guide/:guideId')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
-  @ApiOperation({ summary: 'Récupérer les expériences d\'un GUIDE' })
-  @ApiParam({ name: 'guideId', description: 'ID du GUIDE' })
+  @ApiOperation({ summary: 'Récupérer les expériences d\'un guide' })
+  @ApiParam({ name: 'guideId', description: 'ID du guide' })
   @ApiGetManyResponse(ExperienceEntity)
   findByGuide(@Param('guideId') guideId: string) {
     return this.experiencesService.findByGuide(guideId);
