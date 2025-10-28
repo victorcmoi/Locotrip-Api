@@ -11,6 +11,7 @@ import { MediaModule } from './media/media.module';
 import { CurrenciesModule } from './currencies/currencies.module';
 import { AuthentificationModule } from './auth/authentification.module';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    MailModule,
     UsersModule,
     GuidesModule,
     ExperiencesModule,
