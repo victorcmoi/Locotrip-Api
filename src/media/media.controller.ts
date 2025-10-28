@@ -13,6 +13,7 @@ import {
 import { MediaType } from '@prisma/client';
 import { Roles } from '../common/decorators/role.decorator';
 import { UserRole } from '../users/enums/user.enum';
+import { Public } from '../common/decorators/authentification-decorator';
 
 @ApiTags('Médias')
 @ApiBearerAuth('JWT-auth')
@@ -24,6 +25,7 @@ export class MediaController {
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Ajouter un média' })
+  @ApiCreateResponse(Object)
   create(@Body() createMediaDto: CreateMediaDto) {
     return this.mediaService.create(createMediaDto);
   }
@@ -31,6 +33,7 @@ export class MediaController {
   @Get()
   @ApiOperation({ summary: 'Récupérer tous les médias' })
   @ApiQuery({ name: 'type', required: false, description: 'Filtrer par type de média' })
+  @ApiGetManyResponse(Object)
   findAll(@Query('type') type?: MediaType) {
     if (type) {
       return this.mediaService.findByType(type);
@@ -42,15 +45,17 @@ export class MediaController {
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer un média' })
   @ApiParam({ name: 'id', description: 'ID du média' })
+  @ApiGetOneResponse(Object)
   findOne(@Param('id') id: string) {
     return this.mediaService.findOne(id);
   }
 
   @Get('entity/:entityType/:entityId')
-  @Roles(UserRole.CLIENT)
+  @Public()
   @ApiOperation({ summary: 'Récupérer les médias d\'une entité' })
   @ApiParam({ name: 'entityType', description: 'Type d\'entité (experience, guide, etc.)' })
   @ApiParam({ name: 'entityId', description: 'ID de l\'entité' })
+  @ApiGetManyResponse(Object)
   findByEntity(
     @Param('entityType') entityType: string,
     @Param('entityId') entityId: string,
@@ -62,6 +67,7 @@ export class MediaController {
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Mettre à jour un média' })
   @ApiParam({ name: 'id', description: 'ID du média' })
+  @ApiUpdateResponse(Object)
   update(@Param('id') id: string, @Body() updateMediaDto: UpdateMediaDto) {
     return this.mediaService.update(id, updateMediaDto);
   }

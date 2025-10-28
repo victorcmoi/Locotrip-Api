@@ -90,6 +90,7 @@ export class BookingsController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Ajouter un payment' })
   @ApiParam({ name: 'bookingId', description: 'ID de la réservation' })
+  @ApiCreateResponse(Object)
   createPaiement(@Body() createPaymentDto: CreatePaymentDto) {
     return this.paymentsService.create(createPaymentDto);
   }
@@ -98,6 +99,7 @@ export class BookingsController {
   @Roles(UserRole.CLIENT)
   @ApiOperation({ summary: 'Récupérer les payments d\'une réservation' })
   @ApiParam({ name: 'bookingId', description: 'ID de la réservation' })
+  @ApiGetManyResponse(Object)
   findPaiementsByBooking(@Param('bookingId') bookingId: string) {
     return this.paymentsService.findByBooking(bookingId);
   }
@@ -108,6 +110,7 @@ export class BookingsController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Créer un litige' })
   @ApiParam({ name: 'bookingId', description: 'ID de la réservation' })
+  @ApiCreateResponse(Object)
   createDispute(@Body() createDisputeDto: CreateDisputeDto) {
     return this.DisputesService.create(createDisputeDto);
   }
