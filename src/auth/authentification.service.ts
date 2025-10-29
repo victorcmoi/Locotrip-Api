@@ -5,13 +5,15 @@ import { LoginDto } from "./dto/login.dto";
 import { JwtService } from "@nestjs/jwt";
 import { RegisterDto } from "./dto/register.dto";
 import { ConfigService } from "@nestjs/config";
+import { MailService } from "../mail/mail.service";
 
 @Injectable()
 export class AuthentificationService {
     constructor(
         private usersService: UsersService, 
         private jwtService: JwtService,
-        private configService: ConfigService
+        private configService: ConfigService,
+        private mailService: MailService
     ) {}
     
     async login(loginDto: LoginDto): Promise<{ accessToken: string; refreshToken: string }> {
@@ -40,6 +42,10 @@ export class AuthentificationService {
             refresh_token: tokens.refreshToken 
         });
         
+        // Envoyer l'email de bienvenue
+        this.mailService.sendWelcomeEmail(user.email, `${user.first_name} ${user.last_name}`)
+            .catch(error => console.error('Erreur lors de l\'envoi de l\'email de bienvenue:', error));
+        
         return {
             user,
             ...tokens
@@ -53,7 +59,6 @@ export class AuthentificationService {
                 secret: this.configService.get<string>('JWT_REFRESH_SECRET')
             });
             
-            // Récupérer l'utilisateur
             const user = await this.usersService.findOne(payload.sub);
             
             if (!user || user.refresh_token !== refreshToken) {
