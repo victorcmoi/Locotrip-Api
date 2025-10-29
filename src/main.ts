@@ -34,6 +34,7 @@ async function bootstrap() {
     
     .addTag('Réservations', 'Gestion des réservations')
     .addTag('Paiements', 'Gestion des transactions financières')
+    .addTag('Stripe', 'Intégration avec la plateforme de paiement Stripe')
     .addTag('Prix des expériences', 'Gestion des tarifs et promotions')
     .addTag('Devises', 'Gestion des devises et taux de change')
     

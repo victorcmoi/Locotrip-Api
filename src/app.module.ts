@@ -10,6 +10,7 @@ import { SupportModule } from './support/support.module';
 import { MediaModule } from './media/media.module';
 import { CurrenciesModule } from './currencies/currencies.module';
 import { AuthentificationModule } from './auth/authentification.module';
+import { StripeModule } from './stripe/stripe.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { MailModule } from './mail/mail.module';
 
@@ -30,6 +31,7 @@ import { MailModule } from './mail/mail.module';
     MediaModule,
     CurrenciesModule,
     AuthentificationModule,
+    StripeModule,
     ThrottlerModule.forRoot([
       {
         name: 'short',

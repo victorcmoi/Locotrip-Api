@@ -211,9 +211,16 @@ async function main() {
     data: {
       booking_id: booking1.id,
       amount: 99.98,
+      currency: 'eur',
       method: 'carte_bancaire',
       status: 'completed',
-      stripe_id: 'pi_test_123456789',
+      stripe_payment_intent_id: 'pi_test_123456789',
+      stripe_charge_id: 'ch_test_123456789',
+      stripe_customer_id: 'cus_test_123456789',
+      metadata: {
+        booking_reference: 'BOOK-001',
+        payment_method: 'visa',
+      },
     },
   });
 

@@ -66,8 +66,12 @@ enum MediaType {
 
 enum PaymentStatus {
   pending
+  processing
   completed
+  failed
   refunded
+  partially_refunded
+  cancelled
 }
 
 enum DisputeStatus {
@@ -295,17 +299,35 @@ model booking {
 }
 
 model payment {
-  id              String      @id @default(uuid()) @db.Uuid
-  booking_id      String      @db.Uuid
-  amount          Decimal     @db.Decimal(10, 2)
-  payment_date    DateTime    @default(now()) @db.Timestamp(6)
-  method          String      @db.VarChar(50)
-  status          PaymentStatus
-  stripe_id       String?     @db.VarChar(100)
+  id                        String        @id @default(uuid()) @db.Uuid
+  booking_id                String        @db.Uuid
+  amount                    Decimal       @db.Decimal(10, 2)
+  currency                  String        @default("eur") @db.VarChar(3)
+  payment_date              DateTime      @default(now()) @db.Timestamp(6)
+  method                    String        @db.VarChar(50)
+  status                    PaymentStatus
   
-  booking         booking @relation(fields: [booking_id], references: [id])
+  // Stripe identifiers
+  stripe_payment_intent_id  String?       @unique @db.VarChar(255)
+  stripe_charge_id          String?       @db.VarChar(255)
+  stripe_customer_id        String?       @db.VarChar(255)
+  
+  // Payment metadata
+  failure_reason            String?       @db.Text
+  refunded_amount           Decimal?      @db.Decimal(10, 2)
+  refunded_at               DateTime?     @db.Timestamp(6)
+  metadata                  Json?
+  
+  // Audit trail
+  created_at                DateTime      @default(now()) @db.Timestamp(6)
+  updated_at                DateTime      @default(now()) @updatedAt @db.Timestamp(6)
+  
+  booking                   booking @relation(fields: [booking_id], references: [id])
   
   @@index([booking_id])
+  @@index([stripe_payment_intent_id])
+  @@index([stripe_customer_id])
+  @@index([status])
   @@map("payment")
 }
 
