@@ -5,10 +5,10 @@ export class CreatePaymentIntentDto {
   @ApiProperty({
     description: 'Montant du paiement en centimes (ex: 1000 = 10.00 EUR)',
     example: 5000,
-    minimum: 1,
+    minimum: 50,
   })
   @IsNumber()
-  @Min(1, { message: 'Le montant doit être supérieur à 0' })
+  @Min(50, { message: 'Le montant doit être supérieur à 50 centimes' })
   amount: number;
 
   @ApiProperty({

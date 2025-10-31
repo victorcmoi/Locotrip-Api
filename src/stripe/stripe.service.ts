@@ -1,5 +1,11 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import Stripe from 'stripe';
+import { Prisma } from '@prisma/client';
+
+// Type pour un utilisateur avec son adresse incluse
+type UserWithAddress = Prisma.userGetPayload<{
+  include: { address: true };
+}>;
 
 @Injectable()
 export class StripeService {
@@ -80,6 +86,43 @@ export class StripeService {
     } catch (error) {
       throw new BadRequestException(
         `Erreur lors de l'annulation du paiement: ${error.message}`,
+      );
+    }
+  }
+
+  /**
+   * Créer un client Stripe
+   * @param user Utilisateur pour lequel créer le client 
+   */
+  async createCustomer(user: UserWithAddress) {
+    try {
+      const customerData: Stripe.CustomerCreateParams = {
+        email: user.email,
+        name: `${user.first_name} ${user.last_name}`,
+        metadata: {
+          userId: user.id,
+          role: user.role,
+        },
+      };
+
+      if (user.phone) {
+        customerData.phone = user.phone;
+      }
+
+      if (user.address) {
+        customerData.address = {
+          line1: user.address.street,
+          city: user.address.city,
+          state: user.address.state || undefined,
+          postal_code: user.address.postal_code,
+          country: user.address.country,
+        };
+      }
+
+      return await this.stripe.customers.create(customerData);
+    } catch (error) {
+      throw new BadRequestException(
+        `Erreur lors de la création du client: ${error.message}`,
       );
     }
   }

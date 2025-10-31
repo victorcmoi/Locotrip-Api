@@ -27,6 +27,13 @@ export class ExperiencesService {
 
   async findAll() {
     return this.prisma.experience.findMany({
+      where: {
+        is_active: true,
+        is_published: true,
+        guide: {
+          is_active: true,
+        },
+      },
       include: {
         city: true,
         guide: {
@@ -73,12 +80,23 @@ export class ExperiencesService {
       throw new NotFoundException(`Expérience avec l'ID ${id} introuvable`);
     }
 
+    if (!experience.is_active || !experience.is_published) {
+      throw new NotFoundException(`Expérience avec l'ID ${id} n'est plus disponible`);
+    }
+
     return experience;
   }
 
   async findByVille(villeId: string) {
     return this.prisma.experience.findMany({
-      where: { city_id: villeId },
+      where: { 
+        city_id: villeId,
+        is_active: true,
+        is_published: true,
+        guide: {
+          is_active: true,
+        },
+      },
       include: {
         guide: {
           include: {
@@ -96,7 +114,10 @@ export class ExperiencesService {
 
   async findByGuide(guideId: string) {
     return this.prisma.experience.findMany({
-      where: { guide_id: guideId },
+      where: { 
+        guide_id: guideId,
+        is_active: true,
+      },
       include: {
         city: true,
         reviews: true,
@@ -135,5 +156,102 @@ export class ExperiencesService {
     } catch (error) {
       throw new NotFoundException(`Expérience avec l'ID ${id} introuvable`);
     }
+  }
+
+  async softDelete(id: string) {
+    try {
+      return await this.prisma.experience.update({
+        where: { id },
+        data: {
+          is_active: false,
+          deleted_at: new Date(),
+        },
+      });
+    } catch (error) {
+      throw new NotFoundException(`Expérience avec l'ID ${id} introuvable`);
+    }
+  }
+
+  async restore(id: string) {
+    try {
+      return await this.prisma.experience.update({
+        where: { id },
+        data: {
+          is_active: true,
+          deleted_at: null,
+        },
+      });
+    } catch (error) {
+      throw new NotFoundException(`Expérience avec l'ID ${id} introuvable`);
+    }
+  }
+
+  async publish(id: string) {
+    try {
+      return await this.prisma.experience.update({
+        where: { id },
+        data: {
+          is_published: true,
+        },
+      });
+    } catch (error) {
+      throw new NotFoundException(`Expérience avec l'ID ${id} introuvable`);
+    }
+  }
+
+  async unpublish(id: string) {
+    try {
+      return await this.prisma.experience.update({
+        where: { id },
+        data: {
+          is_published: false,
+        },
+      });
+    } catch (error) {
+      throw new NotFoundException(`Expérience avec l'ID ${id} introuvable`);
+    }
+  }
+
+  async findAllIncludingDeleted() {
+    return this.prisma.experience.findMany({
+      include: {
+        city: true,
+        guide: {
+          include: {
+            user: true,
+          },
+        },
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+        reviews: true,
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
+    });
+  }
+
+  async findDraftsByGuide(guideId: string) {
+    return this.prisma.experience.findMany({
+      where: {
+        guide_id: guideId,
+        is_active: true,
+        is_published: false,
+      },
+      include: {
+        city: true,
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+      },
+      orderBy: {
+        updated_at: 'desc',
+      },
+    });
   }
 }
