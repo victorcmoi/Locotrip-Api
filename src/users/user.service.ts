@@ -22,6 +22,9 @@ export class UsersService {
 
   async findAll() {
     return this.prisma.user.findMany({
+      where: {
+        is_active: true,
+      },
       include: {
         guides: true,
         bookings: true,
@@ -33,7 +36,10 @@ export class UsersService {
 
   async findOne(id: string) {
     const user = await this.prisma.user.findUnique({
-      where: { id },
+      where: { 
+        id,
+        is_active: true,
+      },
       include: {
         guides: true,
         bookings: true,
@@ -86,5 +92,62 @@ export class UsersService {
     } catch (error) {
       throw new NotFoundException(`Utilisateur avec l'ID ${id} introuvable`);
     }
+  }
+
+  async softDelete(id: string, reason?: string) {
+    try {
+      return await this.prisma.user.update({
+        where: { id },
+        data: {
+          is_active: false,
+          deleted_at: new Date(),
+          deleted_reason: reason || 'Compte désactivé',
+        },
+      });
+    } catch (error) {
+      throw new NotFoundException(`Utilisateur avec l'ID ${id} introuvable`);
+    }
+  }
+
+  async restore(id: string) {
+    try {
+      return await this.prisma.user.update({
+        where: { id },
+        data: {
+          is_active: true,
+          deleted_at: null,
+          deleted_reason: null,
+        },
+      });
+    } catch (error) {
+      throw new NotFoundException(`Utilisateur avec l'ID ${id} introuvable`);
+    }
+  }
+
+  async verifyEmail(id: string) {
+    try {
+      return await this.prisma.user.update({
+        where: { id },
+        data: {
+          is_verified: true,
+        },
+      });
+    } catch (error) {
+      throw new NotFoundException(`Utilisateur avec l'ID ${id} introuvable`);
+    }
+  }
+
+  async findAllIncludingDeleted() {
+    return this.prisma.user.findMany({
+      include: {
+        guides: true,
+        bookings: true,
+        reviews: true,
+        subscriptions: true,
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
+    });
   }
 }

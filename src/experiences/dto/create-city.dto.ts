@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsNumber, IsBoolean } from 'class-validator';
 
 export class CreateCityDto {
   @ApiProperty({
@@ -20,6 +20,15 @@ export class CreateCityDto {
   @IsNotEmpty()
   country: string;
 
+  @ApiProperty({
+    description: 'Slug de la ville',
+    example: 'paris-france',
+    maxLength: 150,
+  })
+  @IsString()
+  @IsNotEmpty()
+  slug: string;
+
   @ApiPropertyOptional({
     description: 'Description de la ville',
     example: 'La capitale française, connue pour sa tour Eiffel',
@@ -27,4 +36,37 @@ export class CreateCityDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @ApiPropertyOptional({
+    description: 'Latitude du centre-ville',
+    example: 48.8566,
+  })
+  @IsNumber()
+  @IsOptional()
+  latitude?: number;
+
+  @ApiPropertyOptional({
+    description: 'Longitude du centre-ville',
+    example: 2.3522,
+  })
+  @IsNumber()
+  @IsOptional()
+  longitude?: number;
+
+  @ApiPropertyOptional({
+    description: 'URL de l\'image de la ville',
+    example: 'https://example.com/paris.jpg',
+  })
+  @IsString()
+  @IsOptional()
+  image_url?: string;
+
+  @ApiPropertyOptional({
+    description: 'Ville active ou non',
+    example: true,
+    default: true,
+  })
+  @IsBoolean()
+  @IsOptional()
+  is_active?: boolean;
 }

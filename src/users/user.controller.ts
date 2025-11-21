@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus, UseGuards, Patch } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { UsersService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { SoftDeleteUserDto } from './dto/soft-delete-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { 
   ApiCreateResponse, 
@@ -68,5 +69,42 @@ export class UsersController {
   @ApiDeleteResponse()
   delete(@Param('id') id: string) {
     return this.usersService.delete(id);
+  }
+
+  @Delete(':id/soft')
+  @Roles(UserRole.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Désactiver un utilisateur (soft delete)' })
+  @ApiParam({ name: 'id', description: 'ID de l\'utilisateur (UUID)' })
+  @ApiBody({ type: SoftDeleteUserDto })
+  @ApiUpdateResponse(UserEntity)
+  softDelete(@Param('id') id: string, @Body() softDeleteDto: SoftDeleteUserDto) {
+    return this.usersService.softDelete(id, softDeleteDto.reason);
+  }
+
+  @Patch(':id/restore')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Réactiver un utilisateur désactivé' })
+  @ApiParam({ name: 'id', description: 'ID de l\'utilisateur (UUID)' })
+  @ApiUpdateResponse(UserEntity)
+  restore(@Param('id') id: string) {
+    return this.usersService.restore(id);
+  }
+
+  @Patch(':id/verify-email')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Vérifier l\'email d\'un utilisateur' })
+  @ApiParam({ name: 'id', description: 'ID de l\'utilisateur (UUID)' })
+  @ApiUpdateResponse(UserEntity)
+  verifyEmail(@Param('id') id: string) {
+    return this.usersService.verifyEmail(id);
+  }
+
+  @Get('all/including-deleted')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Récupérer tous les utilisateurs (actifs et inactifs) - Admin uniquement' })
+  @ApiGetManyResponse(UserEntity)
+  findAllIncludingDeleted() {
+    return this.usersService.findAllIncludingDeleted();
   }
 }

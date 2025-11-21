@@ -36,8 +36,12 @@ async function main() {
       last_name: 'Dupont',
       first_name: 'Jean',
       email: 'jean.dupont@example.com',
+      phone: '+33612345678',
+      birth_date: new Date('1990-05-15'),
       password: '$2a$10$abcdefghijklmnopqrstuv', // Hash fictif
       role: 'client',
+      is_active: true,
+      is_verified: true,
     },
   });
 
@@ -46,8 +50,12 @@ async function main() {
       last_name: 'Martin',
       first_name: 'Sophie',
       email: 'sophie.martin@example.com',
+      phone: '+33687654321',
+      birth_date: new Date('1988-03-20'),
       password: '$2a$10$abcdefghijklmnopqrstuv',
       role: 'guide',
+      is_active: true,
+      is_verified: true,
     },
   });
 
@@ -58,10 +66,58 @@ async function main() {
       email: 'admin@locotrip.com',
       password: '$2a$10$abcdefghijklmnopqrstuv',
       role: 'admin',
+      is_active: true,
+      is_verified: true,
     },
   });
 
-  console.log(`✅ Utilisateurs créés: ${client1.email}, ${guideUser.email}, ${admin.email}`);
+  // Créer un utilisateur inactif pour tester le soft delete
+  const inactiveUser = await prisma.user.create({
+    data: {
+      last_name: 'Inactive',
+      first_name: 'Test',
+      email: 'inactive@example.com',
+      password: '$2a$10$abcdefghijklmnopqrstuv',
+      role: 'client',
+      is_active: false,
+      is_verified: false,
+      deleted_at: new Date(),
+      deleted_reason: 'Test de soft delete',
+    },
+  });
+
+  console.log(`✅ Utilisateurs créés: ${client1.email}, ${guideUser.email}, ${admin.email}, ${inactiveUser.email}`);
+
+  // Créer des adresses
+  console.log('📍 Création des adresses...');
+  await prisma.address.create({
+    data: {
+      user_id: client1.id,
+      street: '123 Rue de la Paix',
+      city: 'Paris',
+      state: 'Île-de-France',
+      postal_code: '75002',
+      country: 'France',
+      longitude: 2.3522,
+      latitude: 48.8566,
+    },
+  });
+
+  await prisma.address.create({
+    data: {
+      user_id: guideUser.id,
+      street: '45 Avenue des Champs-Élysées',
+      city: 'Paris',
+      state: 'Île-de-France',
+      postal_code: '75008',
+      country: 'France',
+      longitude: 2.3077,
+      latitude: 48.8698,
+    },
+  });
+
+  console.log('✅ Adresses créées');
+
 
   // Créer un guide
   console.log('🎯 Création du profil guide...');
@@ -85,7 +141,12 @@ async function main() {
     data: {
       name: 'Paris',
       country: 'France',
+      slug: 'paris-france',
       description: 'La ville lumière, capitale de la France',
+      latitude: 48.8566,
+      longitude: 2.3522,
+      image_url: 'https://example.com/images/paris.jpg',
+      is_active: true,
     },
   });
 
@@ -93,7 +154,12 @@ async function main() {
     data: {
       name: 'Lyon',
       country: 'France',
+      slug: 'lyon-france',
       description: 'Capitale de la gastronomie française',
+      latitude: 45.7640,
+      longitude: 4.8357,
+      image_url: 'https://example.com/images/lyon.jpg',
+      is_active: true,
     },
   });
 
@@ -132,6 +198,11 @@ async function main() {
       city_id: paris.id,
       guide_id: guide1.id,
       max_capacity: 15,
+      meeting_point: 'Devant la Pyramide du Louvre',
+      meeting_latitude: 48.8606,
+      meeting_longitude: 2.3376,
+      is_active: true,
+      is_published: true,
     },
   });
 
@@ -144,10 +215,30 @@ async function main() {
       city_id: lyon.id,
       guide_id: guide1.id,
       max_capacity: 10,
+      meeting_point: 'Place Bellecour',
+      meeting_latitude: 45.7578,
+      meeting_longitude: 4.8320,
+      is_active: true,
+      is_published: true,
     },
   });
 
-  console.log(`✅ Expériences créées: ${exp1.title}, ${exp2.title}`);
+  // Créer une expérience brouillon pour tester
+  const exp3 = await prisma.experience.create({
+    data: {
+      title: 'Visite des catacombes (Brouillon)',
+      description: 'Explorez les souterrains mystérieux de Paris',
+      price: 35.00,
+      duration: 120,
+      city_id: paris.id,
+      guide_id: guide1.id,
+      max_capacity: 20,
+      is_active: true,
+      is_published: false, // Brouillon
+    },
+  });
+
+  console.log(`✅ Expériences créées: ${exp1.title}, ${exp2.title}, ${exp3.title}`);
 
   // Lier les expériences aux catégories
   await prisma.experience_category.create({
@@ -211,9 +302,16 @@ async function main() {
     data: {
       booking_id: booking1.id,
       amount: 99.98,
+      currency: 'eur',
       method: 'carte_bancaire',
       status: 'completed',
-      stripe_id: 'pi_test_123456789',
+      stripe_payment_intent_id: 'pi_test_123456789',
+      stripe_charge_id: 'ch_test_123456789',
+      stripe_customer_id: 'cus_test_123456789',
+      metadata: {
+        booking_reference: 'BOOK-001',
+        payment_method: 'visa',
+      },
     },
   });
 

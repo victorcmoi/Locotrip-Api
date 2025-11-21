@@ -26,6 +26,9 @@ export class GuidesService {
 
   async findAll() {
     return this.prisma.guide.findMany({
+      where: {
+        is_active: true,
+      },
       include: {
         user: true,
         documents: true,
@@ -38,7 +41,9 @@ export class GuidesService {
 
   async findOne(id: string) {
     const guide = await this.prisma.guide.findUnique({
-      where: { id },
+      where: { 
+        id,
+      },
       include: {
         user: true,
         documents: true,
@@ -56,12 +61,19 @@ export class GuidesService {
       throw new NotFoundException(`Guide avec l'ID ${id} introuvable`);
     }
 
+    if (!guide.is_active) {
+      throw new NotFoundException(`Guide avec l'ID ${id} n'est plus actif`);
+    }
+
     return guide;
   }
 
   async findByUser(userId: string) {
     return this.prisma.guide.findMany({
-      where: { user_id: userId },
+      where: { 
+        user_id: userId,
+        is_active: true,
+      },
       include: {
         documents: true,
         availabilities: true,
@@ -97,5 +109,53 @@ export class GuidesService {
     } catch (error) {
       throw new NotFoundException(`Guide avec l'ID ${id} introuvable`);
     }
+  }
+
+  async softDelete(id: string, reason?: string) {
+    try {
+      return await this.prisma.guide.update({
+        where: { id },
+        data: {
+          is_active: false,
+          suspended_at: new Date(),
+          suspension_reason: reason || 'Guide suspendu',
+        },
+      });
+    } catch (error) {
+      throw new NotFoundException(`Guide avec l'ID ${id} introuvable`);
+    }
+  }
+  
+  async restore(id: string) {
+    try {
+      return await this.prisma.guide.update({
+        where: { id },
+        data: {
+          is_active: true,
+          suspended_at: null,
+          suspension_reason: null,
+        },
+      });
+    } catch (error) {
+      throw new NotFoundException(`Guide avec l'ID ${id} introuvable`);
+    }
+  }
+
+  /**
+   * Récupère tous les guides (actifs et inactifs)
+   */
+  async findAllIncludingDeleted() {
+    return this.prisma.guide.findMany({
+      include: {
+        user: true,
+        documents: true,
+        availabilities: true,
+        boosts: true,
+        experiences: true,
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
+    });
   }
 }

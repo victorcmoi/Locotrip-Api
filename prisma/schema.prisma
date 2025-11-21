@@ -65,8 +65,12 @@ enum MediaType {
 
 enum PaymentStatus {
   pending
+  processing
   completed
+  failed
   refunded
+  partially_refunded
+  cancelled
 }
 
 enum DisputeStatus {
@@ -102,10 +106,27 @@ model user {
   last_name       String    @db.VarChar(100)
   first_name      String    @db.VarChar(50)
   email           String    @unique @db.VarChar(100)
+  phone           String?   @db.VarChar(20)
+  address         address?
+  birth_date      DateTime? @db.Date
   password        String    @db.VarChar(255)
   role            UserRole
   refresh_token   String?   @db.Text
+  
+  is_active       Boolean   @default(true)
+  is_verified     Boolean   @default(false)
+  deleted_at      DateTime? @db.Timestamp(6)
+  deleted_reason  String?   @db.Text
+  
+  // RGPD - Consentements
+  marketing_consent         Boolean   @default(false)
+  marketing_consent_date    DateTime? @db.Timestamp(6)
+  data_processing_consent   Boolean   @default(true)
+  data_processing_consent_date DateTime @default(now()) @db.Timestamp(6)
+  
   created_at      DateTime  @default(now()) @db.Timestamp(6)
+  updated_at      DateTime  @updatedAt @db.Timestamp(6)
+  
   guides          guide[]
   bookings        booking[]
   opened_disputes dispute[]  @relation("DisputeUser")
@@ -117,7 +138,32 @@ model user {
   ticket_messages ticket_message[]
   notifications   notification[]
   
+  @@index([is_active])
+  @@index([email, is_active])
   @@map("user")
+}
+
+// ============================================
+// ADDRESS
+// ============================================
+
+model address {
+  id          String    @id @default(uuid()) @db.Uuid
+  user_id     String    @unique @db.Uuid
+  street      String    @db.VarChar(150)
+  city        String    @db.VarChar(100)
+  state       String?   @db.VarChar(100)
+  postal_code String    @db.VarChar(20)
+  country     String    @db.VarChar(50)
+  longitude   Float
+  latitude    Float
+  created_at  DateTime  @default(now()) @db.Timestamp(6)
+  updated_at  DateTime  @updatedAt @db.Timestamp(6)
+  
+  user        user      @relation(fields: [user_id], references: [id])
+  
+  @@index([user_id])
+  @@map("address")
 }
 
 // ============================================
@@ -136,6 +182,11 @@ model guide {
   card_request_date         DateTime?           @db.Timestamp(6)
   card_verification_date    DateTime?           @db.Timestamp(6)
   internal_comment          String?             @db.Text
+  
+  is_active                 Boolean             @default(true)
+  suspended_at              DateTime?           @db.Timestamp(6)
+  suspension_reason         String?             @db.Text
+  
   created_at                DateTime            @default(now()) @db.Timestamp(6)
   updated_at                DateTime            @updatedAt @db.Timestamp(6)
   user                      user                @relation(fields: [user_id], references: [id])
@@ -146,6 +197,7 @@ model guide {
   experiences               experience[]
   
   @@index([user_id])
+  @@index([is_active])
   @@map("guide")
 }
 
@@ -218,10 +270,19 @@ model city {
   id          String       @id @default(uuid()) @db.Uuid
   name        String       @db.VarChar(100)
   country     String       @db.VarChar(50)
+  slug        String       @unique @db.VarChar(150)
   description String?      @db.Text
+  latitude    Float?
+  longitude   Float?
+  image_url   String?      @db.VarChar(255)
+  is_active   Boolean      @default(true)
+  
+  created_at  DateTime     @default(now()) @db.Timestamp(6)
   
   experiences experience[]
   
+  @@index([slug])
+  @@index([is_active])
   @@map("city")
 }
 
@@ -234,16 +295,28 @@ model experience {
   city_id         String                  @db.Uuid
   guide_id        String                  @db.Uuid
   max_capacity    Int?
+  meeting_point   String?                 @db.VarChar(255)
+  meeting_latitude Float?
+  meeting_longitude Float?
+  
+  is_active       Boolean                 @default(true)
+  is_published    Boolean                 @default(false)
+  deleted_at      DateTime?               @db.Timestamp(6)
+  
+  created_at      DateTime                @default(now()) @db.Timestamp(6)
+  updated_at      DateTime                @updatedAt @db.Timestamp(6)
   
   city            city                    @relation(fields: [city_id], references: [id])
   guide           guide                   @relation(fields: [guide_id], references: [id])
-  bookings        booking[] // bookings
+  bookings        booking[]
   reviews         review[]
   categories      experience_category[]
   currency_prices experience_price[]
   
   @@index([city_id])
   @@index([guide_id])
+  @@index([is_active])
+  @@index([is_published])
   @@map("experience")
 }
 
@@ -294,17 +367,35 @@ model booking {
 }
 
 model payment {
-  id              String      @id @default(uuid()) @db.Uuid
-  booking_id      String      @db.Uuid
-  amount          Decimal     @db.Decimal(10, 2)
-  payment_date    DateTime    @default(now()) @db.Timestamp(6)
-  method          String      @db.VarChar(50)
-  status          PaymentStatus
-  stripe_id       String?     @db.VarChar(100)
+  id                        String        @id @default(uuid()) @db.Uuid
+  booking_id                String        @db.Uuid
+  amount                    Decimal       @db.Decimal(10, 2)
+  currency                  String        @default("eur") @db.VarChar(3)
+  payment_date              DateTime      @default(now()) @db.Timestamp(6)
+  method                    String        @db.VarChar(50)
+  status                    PaymentStatus
   
-  booking         booking @relation(fields: [booking_id], references: [id])
+  // Stripe identifiers
+  stripe_payment_intent_id  String?       @unique @db.VarChar(255)
+  stripe_charge_id          String?       @db.VarChar(255)
+  stripe_customer_id        String?       @db.VarChar(255)
+  
+  // Payment metadata
+  failure_reason            String?       @db.Text
+  refunded_amount           Decimal?      @db.Decimal(10, 2)
+  refunded_at               DateTime?     @db.Timestamp(6)
+  metadata                  Json?
+  
+  // Audit trail
+  created_at                DateTime      @default(now()) @db.Timestamp(6)
+  updated_at                DateTime      @default(now()) @updatedAt @db.Timestamp(6)
+  
+  booking                   booking @relation(fields: [booking_id], references: [id])
   
   @@index([booking_id])
+  @@index([stripe_payment_intent_id])
+  @@index([stripe_customer_id])
+  @@index([status])
   @@map("payment")
 }
 
@@ -348,7 +439,7 @@ model review {
   @@map("review")
 }
 
-model subscription { // subscription
+model subscription {
   id                String      @id @default(uuid()) @db.Uuid
   user_id           String      @db.Uuid
   subscription_type SubscriptionType
@@ -460,6 +551,27 @@ model notification {
   
   @@index([user_id])
   @@map("notification")
+}
+
+// ============================================
+// RGPD & DATA PROTECTION (RGPD & PROTECTION DES DONNÉES)
+// ============================================
+
+model data_access_log {
+  id              String      @id @default(uuid()) @db.Uuid
+  user_id         String?     @db.Uuid
+  accessed_by     String      @db.Uuid
+  entity_type     String      @db.VarChar(50)
+  entity_id       String      @db.Uuid
+  action          String      @db.VarChar(50)
+  ip_address      String?     @db.VarChar(45)
+  reason          String?     @db.Text
+  access_date     DateTime    @default(now()) @db.Timestamp(6)
+  
+  @@index([user_id])
+  @@index([accessed_by])
+  @@index([access_date])
+  @@map("data_access_log")
 }
 
 // ============================================
