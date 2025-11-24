@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus, Patch } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { CitiesService } from './cities.service';
 import { ExperiencesService } from './experiences.service';
@@ -138,6 +138,60 @@ export class ExperiencesController {
   @ApiDeleteResponse()
   delete(@Param('id') id: string) {
     return this.experiencesService.delete(id);
+  }
+
+  @Delete(':id/soft')
+  @Roles(UserRole.GUIDE, UserRole.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Désactiver une expérience (soft delete)' })
+  @ApiParam({ name: 'id', description: 'ID de l\'expérience (UUID)' })
+  @ApiUpdateResponse(ExperienceEntity)
+  softDelete(@Param('id') id: string) {
+    return this.experiencesService.softDelete(id);
+  }
+
+  @Patch(':id/restore')
+  @Roles(UserRole.GUIDE, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Réactiver une expérience désactivée' })
+  @ApiParam({ name: 'id', description: 'ID de l\'expérience (UUID)' })
+  @ApiUpdateResponse(ExperienceEntity)
+  restore(@Param('id') id: string) {
+    return this.experiencesService.restore(id);
+  }
+
+  @Patch(':id/publish')
+  @Roles(UserRole.GUIDE)
+  @ApiOperation({ summary: 'Publier une expérience (la rendre visible publiquement)' })
+  @ApiParam({ name: 'id', description: 'ID de l\'expérience (UUID)' })
+  @ApiUpdateResponse(ExperienceEntity)
+  publish(@Param('id') id: string) {
+    return this.experiencesService.publish(id);
+  }
+
+  @Patch(':id/unpublish')
+  @Roles(UserRole.GUIDE)
+  @ApiOperation({ summary: 'Dépublier une expérience (brouillon)' })
+  @ApiParam({ name: 'id', description: 'ID de l\'expérience (UUID)' })
+  @ApiUpdateResponse(ExperienceEntity)
+  unpublish(@Param('id') id: string) {
+    return this.experiencesService.unpublish(id);
+  }
+
+  @Get('all/including-deleted')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Récupérer toutes les expériences (actives et inactives) - Admin uniquement' })
+  @ApiGetManyResponse(ExperienceEntity)
+  findAllIncludingDeleted() {
+    return this.experiencesService.findAllIncludingDeleted();
+  }
+
+  @Get('guide/:guideId/drafts')
+  @Roles(UserRole.GUIDE)
+  @ApiOperation({ summary: 'Récupérer les expériences brouillons d\'un guide' })
+  @ApiParam({ name: 'guideId', description: 'ID du guide (UUID)' })
+  @ApiGetManyResponse(ExperienceEntity)
+  findDraftsByGuide(@Param('guideId') guideId: string) {
+    return this.experiencesService.findDraftsByGuide(guideId);
   }
 }
 

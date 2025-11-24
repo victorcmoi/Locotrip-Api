@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus, Patch } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { GuidesService } from './guides.service';
 import { GuideDocumentsService } from './guide-documents.service';
 import { GuideAvailabilityService } from './guide-availability.service';
@@ -7,6 +7,7 @@ import { BoostOffersService } from './boost-offers.service';
 import { GuideBoostsService } from './guide-boosts.service';
 import { CreateGuideDto } from './dto/create-guide.dto';
 import { UpdateGuideDto } from './dto/update-guide.dto';
+import { SoftDeleteGuideDto } from './dto/soft-delete-guide.dto';
 import { CreateGuideDocumentDto } from './dto/create-guide-document.dto';
 import { CreateGuideAvailabilityDto } from './dto/create-guide-availability.dto';
 import { CreateGuideBoostDto } from './dto/create-guide-boost.dto';
@@ -89,6 +90,34 @@ export class GuidesController {
   @ApiDeleteResponse()
   delete(@Param('id') id: string) {
     return this.guidesService.delete(id);
+  }
+
+  @Delete(':id/soft')
+  @Roles(UserRole.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Suspendre un guide (soft delete)' })
+  @ApiParam({ name: 'id', description: 'ID du guide (UUID)' })
+  @ApiBody({ type: SoftDeleteGuideDto })
+  @ApiUpdateResponse(GuideEntity)
+  softDelete(@Param('id') id: string, @Body() softDeleteDto: SoftDeleteGuideDto) {
+    return this.guidesService.softDelete(id, softDeleteDto.reason);
+  }
+
+  @Patch(':id/restore')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Réactiver un guide suspendu' })
+  @ApiParam({ name: 'id', description: 'ID du guide (UUID)' })
+  @ApiUpdateResponse(GuideEntity)
+  restore(@Param('id') id: string) {
+    return this.guidesService.restore(id);
+  }
+
+  @Get('all/including-deleted')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Récupérer tous les guides (actifs et inactifs) - Admin uniquement' })
+  @ApiGetManyResponse(GuideEntity)
+  findAllIncludingDeleted() {
+    return this.guidesService.findAllIncludingDeleted();
   }
 
   // === DOCUMENTS ===

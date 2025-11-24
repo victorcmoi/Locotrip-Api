@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { PrismaService } from './prisma.service';
@@ -34,6 +35,7 @@ async function bootstrap() {
     
     .addTag('Réservations', 'Gestion des réservations')
     .addTag('Paiements', 'Gestion des transactions financières')
+    .addTag('Stripe', 'Intégration avec la plateforme de paiement Stripe')
     .addTag('Prix des expériences', 'Gestion des tarifs et promotions')
     .addTag('Devises', 'Gestion des devises et taux de change')
     
@@ -86,6 +88,6 @@ async function bootstrap() {
   const prismaService = app.get(PrismaService);
   await prismaService.enableShutdownHooks(app);
   
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.API_PORT ?? 3000);
 }
 bootstrap();

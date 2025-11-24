@@ -4,8 +4,10 @@ import { BookingsService } from './bookings.service';
 import { PaymentsService } from './payments.service';
 import { DisputesService } from './disputes.service';
 import { PrismaService } from '../prisma.service';
+import { StripeModule } from '../stripe/stripe.module';
 
 @Module({
+  imports: [StripeModule],
   controllers: [BookingsController, PaiementsController, DisputesController],
   providers: [
     BookingsService,

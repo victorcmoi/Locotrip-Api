@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsNumber, IsEnum, IsOptional } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsNumber,
+  IsEnum,
+  IsOptional,
+  IsObject,
+} from 'class-validator';
 import { PaymentStatus } from '../enums/payment.enum';
 
 export class CreatePaymentDto {
@@ -13,11 +20,21 @@ export class CreatePaymentDto {
 
   @ApiProperty({
     description: 'Montant du paiement',
-    example: 150.50,
+    example: 150.5,
   })
   @IsNotEmpty()
   @IsNumber()
   amount: number;
+
+  @ApiProperty({
+    description: 'Code de la devise',
+    example: 'eur',
+    default: 'eur',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  currency?: string;
 
   @ApiProperty({
     description: 'Méthode de paiement',
@@ -38,11 +55,39 @@ export class CreatePaymentDto {
   status: PaymentStatus;
 
   @ApiProperty({
-    description: 'ID Stripe du paiement (optionnel)',
+    description: 'ID Stripe Payment Intent (optionnel)',
     example: 'pi_1ABC23def456GHI',
     required: false,
   })
   @IsOptional()
   @IsString()
-  stripe_id?: string;
+  stripe_payment_intent_id?: string;
+
+  @ApiProperty({
+    description: 'ID Stripe Charge (optionnel)',
+    example: 'ch_1ABC23def456GHI',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  stripe_charge_id?: string;
+
+  @ApiProperty({
+    description: 'ID Stripe Customer (optionnel)',
+    example: 'cus_ABC123def456',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  stripe_customer_id?: string;
+
+  @ApiProperty({
+    description: 'Métadonnées additionnelles (optionnel)',
+    example: { order_id: '12345', notes: 'Paiement expérience Paris' },
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  metadata?: any;
 }
+
