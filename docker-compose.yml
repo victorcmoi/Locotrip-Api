@@ -1,7 +1,9 @@
 services:
+  # Base de données PostgreSQL
   postgres:
-    image: postgres
-    restart: always
+    image: postgres:16
+    container_name: locotrip-postgres
+    restart: unless-stopped
     ports:
       - "5432:5432"
     environment:
@@ -10,6 +12,33 @@ services:
       POSTGRES_DB: locotrip_db
     volumes:
       - postgres:/var/lib/postgresql/data
-  
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U locotrip -d locotrip_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API NestJS
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    container_name: locotrip-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: "postgresql://locotrip:locotrip@postgres:5432/locotrip_db?schema=public"
+    ports:
+      - "${API_PORT:-3333}:3333"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: sh -c "npx prisma generate && npm run start:dev"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   postgres:

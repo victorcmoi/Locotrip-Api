@@ -11,12 +11,17 @@ help: ## Afficher l'aide
 	@echo "Developpement local:"
 	@echo "  make dev           - Lancer l'API"
 	@echo "  make migrate       - Appliquer les migrations"
+	@echo "  make generate      - Generer le client Prisma"
+	@echo "  make seed          - Peupler la base de donnees"
 	@echo "  make studio        - Ouvrir Prisma Studio"
 	@echo ""
 	@echo "Docker:"
-	@echo "  make docker-dev    - Lancer en mode dev (API + Prisma Studio)"
+	@echo "  make docker-up     - Lancer tous les services en arriere-plan"
+	@echo "  make docker-dev    - Lancer en mode dev avec logs"
 	@echo "  make docker-down   - Arreter les conteneurs"
 	@echo "  make docker-logs   - Voir les logs"
+	@echo "  make docker-restart - Redemarrer les conteneurs"
+	@echo "  make docker-clean  - Arreter et supprimer les volumes"
 	@echo ""
 
 # === Installation ===
@@ -33,24 +38,33 @@ dev: ## Lancer l'API en mode dev
 	npm run start:dev
 
 migrate: ## Appliquer les migrations
-	npx prisma migrate dev
+	npx prisma migrate dev --config ./prisma/prisma.config.ts
 
 studio: ## Ouvrir Prisma Studio
-	npx prisma studio
+	npx prisma studio --config ./prisma/prisma.config.ts --port 5555
 
 generate: ## Generer le client Prisma
-	npx prisma generate
+	npx prisma generate --config ./prisma/prisma.config.ts
 
 seed: ## Peupler la base
-	npm run prisma:seed
+	npx tsx prisma/seed.ts
 
 # === Docker ===
 
-docker-dev: ## Lancer en mode developpement
-	docker-compose --env-file .env -f docker/docker-compose.dev.yml up
+docker-up: ## Lancer tous les services (API + BDD + Prisma Studio)
+	docker-compose up -d
+
+docker-dev: ## Lancer en mode developpement avec logs
+	docker-compose up
 
 docker-down: ## Arreter les conteneurs
-	docker-compose --env-file .env -f docker/docker-compose.dev.yml down
+	docker-compose down
 
 docker-logs: ## Voir les logs
-	docker-compose --env-file .env -f docker/docker-compose.dev.yml logs -f
+	docker-compose logs -f
+
+docker-restart: ## Redemarrer les conteneurs
+	docker-compose restart
+
+docker-clean: ## Arreter et supprimer les volumes
+	docker-compose down -v
