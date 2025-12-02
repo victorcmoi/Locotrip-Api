@@ -50,7 +50,7 @@ seed: ## Peupler la base
 	npx prisma db seed --config prisma/prisma.config.ts
 
 reset: ## Reinitialiser la base de donnees
-	npx prisma migrate reset
+	npx prisma migrate reset --config prisma/prisma.config.ts
 
 # === Docker ===
 
