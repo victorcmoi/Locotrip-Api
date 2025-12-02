@@ -38,16 +38,19 @@ dev: ## Lancer l'API en mode dev
 	npm run start:dev
 
 migrate: ## Appliquer les migrations
-	npx prisma migrate dev --config ./prisma/prisma.config.ts
+	npx prisma migrate dev
 
 studio: ## Ouvrir Prisma Studio
-	npx prisma studio --config ./prisma/prisma.config.ts --port 5555
+	npx prisma studio --config prisma/prisma.config.ts --port 5555
 
 generate: ## Generer le client Prisma
-	npx prisma generate --config ./prisma/prisma.config.ts
+	npx prisma generate
 
 seed: ## Peupler la base
-	npx tsx prisma/seed.ts
+	npx prisma db seed --config prisma/prisma.config.ts
+
+reset: ## Reinitialiser la base de donnees
+	npx prisma migrate reset
 
 # === Docker ===
 
