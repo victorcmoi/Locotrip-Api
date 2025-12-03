@@ -1,36 +1,44 @@
-import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
-import { UsersService } from "../users/user.service";
-import { ChangePasswordDto } from "./dto/change-password.dto";
-import { LoginDto } from "./dto/login.dto";
-import { JwtService } from "@nestjs/jwt";
-import { RegisterDto } from "./dto/register.dto";
-import { ConfigService } from "@nestjs/config";
-import { MailService } from "../mail/mail.service";
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { UsersService } from '../users/user.service';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { LoginDto } from './dto/login.dto';
+import { JwtService } from '@nestjs/jwt';
+import { RegisterDto } from './dto/register.dto';
+import { ConfigService } from '@nestjs/config';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class AuthentificationService {
-    constructor(
-        private usersService: UsersService, 
-        private jwtService: JwtService,
-        private configService: ConfigService,
-        private mailService: MailService
-    ) {}
-    
-    async login(loginDto: LoginDto): Promise<{ accessToken: string; refreshToken: string }> {
-        const user = await this.usersService.findByEmail(loginDto.email);
-        if (!user || !(await this.usersService.validatePassword(loginDto.password, user.password))) {
-            throw new NotFoundException(`Email ou mot de passe incorrect`);
-        }
-        
-        const tokens = await this.generateTokens(user.id, user.email, user.role);
-        
-        // Sauvegarder le refresh token dans la base de données
-        await this.usersService.update(user.id, { 
-            refresh_token: tokens.refreshToken 
-        });
-        
-        return tokens;
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService,
+    private configService: ConfigService,
+    private mailService: MailService,
+  ) {}
+
+  async login(loginDto: LoginDto) {
+    const user = await this.usersService.findByEmail(loginDto.email);
+
+    if (
+      !user ||
+      !(await this.usersService.validatePassword(
+        loginDto.password,
+        user.password,
+      ))
+    ) {
+      throw new NotFoundException(`Email ou mot de passe incorrect`);
     }
+
+    const payload = { userId: user.id };
+
+    return {
+      token: await this.jwtService.signAsync(payload),
+    };
+  }
 
     async register(registerDto: RegisterDto): Promise<{ user: any; accessToken: string; refreshToken: string }> {
         const user = await this.usersService.create(registerDto);
