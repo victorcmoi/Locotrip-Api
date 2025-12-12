@@ -13,13 +13,15 @@ export class StripeService {
 
   constructor() {
     const apiKey = process.env.STRIPE_PRIVATE_KEY;
-    
+
     if (!apiKey) {
-      throw new Error('STRIPE_PRIVATE_KEY must be defined in environment variables');
+      throw new Error(
+        'STRIPE_PRIVATE_KEY must be defined in environment variables',
+      );
     }
 
     this.stripe = new Stripe(apiKey, {
-      apiVersion: '2025-09-30.clover',
+      apiVersion: '2025-10-29.clover',
     });
   }
 

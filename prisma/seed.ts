@@ -1,8 +1,9 @@
+import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '../src/generated/client';
+import 'dotenv/config';
 
-const adapter = new PrismaPg({ 
-  connectionString: process.env.DATABASE_URL 
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL,
 });
 const prisma = new PrismaClient({ adapter });
 
@@ -90,7 +91,9 @@ async function main() {
     },
   });
 
-  console.log(`✅ Utilisateurs créés: ${client1.email}, ${guideUser.email}, ${admin.email}, ${inactiveUser.email}`);
+  console.log(
+    `✅ Utilisateurs créés: ${client1.email}, ${guideUser.email}, ${admin.email}, ${inactiveUser.email}`,
+  );
 
   // Créer des adresses
   console.log('📍 Création des adresses...');
@@ -122,13 +125,12 @@ async function main() {
 
   console.log('✅ Adresses créées');
 
-
   // Créer un guide
   console.log('🎯 Création du profil guide...');
   const guide1 = await prisma.guide.create({
     data: {
       user_id: guideUser.id,
-      bio: 'Guide passionnée avec 5 ans d\'expérience à Paris',
+      bio: "Guide passionnée avec 5 ans d'expérience à Paris",
       languages: 'Français, Anglais, Espagnol',
       years_of_experience: 5,
       guide_status: 'pro',
@@ -160,7 +162,7 @@ async function main() {
       country: 'France',
       slug: 'lyon-france',
       description: 'Capitale de la gastronomie française',
-      latitude: 45.7640,
+      latitude: 45.764,
       longitude: 4.8357,
       image_url: 'https://example.com/images/lyon.jpg',
       is_active: true,
@@ -189,14 +191,16 @@ async function main() {
     },
   });
 
-  console.log(`✅ Catégories créées: ${culture.name}, ${gastronomie.name}, ${aventure.name}`);
+  console.log(
+    `✅ Catégories créées: ${culture.name}, ${gastronomie.name}, ${aventure.name}`,
+  );
 
   // Créer des expériences
   console.log('🎨 Création des expériences...');
   const exp1 = await prisma.experience.create({
     data: {
       title: 'Visite guidée du Louvre',
-      description: 'Découvrez les chefs-d\'œuvre du plus grand musée du monde',
+      description: "Découvrez les chefs-d'œuvre du plus grand musée du monde",
       price: 49.99,
       duration: 180, // 3 heures
       city_id: paris.id,
@@ -213,7 +217,8 @@ async function main() {
   const exp2 = await prisma.experience.create({
     data: {
       title: 'Tour gastronomique de Lyon',
-      description: 'Dégustez les spécialités lyonnaises dans les meilleurs bouchons',
+      description:
+        'Dégustez les spécialités lyonnaises dans les meilleurs bouchons',
       price: 79.99,
       duration: 240, // 4 heures
       city_id: lyon.id,
@@ -221,7 +226,7 @@ async function main() {
       max_capacity: 10,
       meeting_point: 'Place Bellecour',
       meeting_latitude: 45.7578,
-      meeting_longitude: 4.8320,
+      meeting_longitude: 4.832,
       is_active: true,
       is_published: true,
     },
@@ -232,7 +237,7 @@ async function main() {
     data: {
       title: 'Visite des catacombes (Brouillon)',
       description: 'Explorez les souterrains mystérieux de Paris',
-      price: 35.00,
+      price: 35.0,
       duration: 120,
       city_id: paris.id,
       guide_id: guide1.id,
@@ -242,7 +247,9 @@ async function main() {
     },
   });
 
-  console.log(`✅ Expériences créées: ${exp1.title}, ${exp2.title}, ${exp3.title}`);
+  console.log(
+    `✅ Expériences créées: ${exp1.title}, ${exp2.title}, ${exp3.title}`,
+  );
 
   // Lier les expériences aux catégories
   await prisma.experience_category.create({
@@ -286,7 +293,7 @@ async function main() {
   });
 
   // Créer une réservation
-  console.log('📅 Création d\'une réservation...');
+  console.log("📅 Création d'une réservation...");
   const booking1 = await prisma.booking.create({
     data: {
       user_id: client1.id,
@@ -301,7 +308,7 @@ async function main() {
   console.log(`✅ Réservation créée pour ${client1.first_name}`);
 
   // Créer un payment
-  console.log('💳 Création d\'un payment...');
+  console.log("💳 Création d'un payment...");
   await prisma.payment.create({
     data: {
       booking_id: booking1.id,
@@ -320,7 +327,7 @@ async function main() {
   });
 
   // Créer un review
-  console.log('⭐ Création d\'un avis...');
+  console.log("⭐ Création d'un avis...");
   await prisma.review.create({
     data: {
       user_id: client1.id,
@@ -331,7 +338,7 @@ async function main() {
   });
 
   // Créer un subscription
-  console.log('🎫 Création d\'un subscription...');
+  console.log("🎫 Création d'un subscription...");
   await prisma.subscription.create({
     data: {
       user_id: client1.id,
@@ -343,7 +350,7 @@ async function main() {
   });
 
   // Créer une conversation
-  console.log('💬 Création d\'une conversation...');
+  console.log("💬 Création d'une conversation...");
   const conversation = await prisma.conversation.create({
     data: {
       booking_id: booking1.id,
@@ -355,7 +362,7 @@ async function main() {
     data: {
       conversation_id: conversation.id,
       author_id: client1.id,
-      content: 'Bonjour, j\'ai une question sur le point de rendez-vous.',
+      content: "Bonjour, j'ai une question sur le point de rendez-vous.",
     },
   });
 
@@ -363,7 +370,8 @@ async function main() {
     data: {
       conversation_id: conversation.id,
       author_id: guideUser.id,
-      content: 'Bonjour ! Le point de rendez-vous est devant la pyramide du Louvre.',
+      content:
+        'Bonjour ! Le point de rendez-vous est devant la pyramide du Louvre.',
     },
   });
 
@@ -392,12 +400,13 @@ async function main() {
     data: {
       ticket_id: ticket.id,
       author_id: client1.id,
-      content: 'Bonjour, j\'aimerais savoir comment fonctionne la politique de remboursement.',
+      content:
+        "Bonjour, j'aimerais savoir comment fonctionne la politique de remboursement.",
     },
   });
 
   // Créer des offres de boost
-  console.log('🚀 Création d\'offres de boost...');
+  console.log("🚀 Création d'offres de boost...");
   const boostBasic = await prisma.boost_offer.create({
     data: {
       name: 'Boost Basic',
@@ -418,7 +427,9 @@ async function main() {
     },
   });
 
-  console.log(`✅ Offres de boost créées: ${boostBasic.name}, ${boostPremium.name}`);
+  console.log(
+    `✅ Offres de boost créées: ${boostBasic.name}, ${boostPremium.name}`,
+  );
 
   // Créer un boost actif pour le guide
   await prisma.guide_boost.create({
