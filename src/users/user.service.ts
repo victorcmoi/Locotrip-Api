@@ -11,8 +11,8 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto) {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    
-    return this.prisma.user.create({ 
+
+    return this.prisma.user.create({
       data: {
         ...createUserDto,
         password: hashedPassword,
@@ -36,7 +36,7 @@ export class UsersService {
 
   async findOne(id: string) {
     const user = await this.prisma.user.findUnique({
-      where: { 
+      where: {
         id,
         is_active: true,
       },
@@ -63,18 +63,21 @@ export class UsersService {
     });
   }
 
-  async validatePassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
+  async validatePassword(
+    plainPassword: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
     return bcrypt.compare(plainPassword, hashedPassword);
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     try {
       const data = { ...updateUserDto };
-      
+
       if (updateUserDto.password) {
         data.password = await bcrypt.hash(updateUserDto.password, 10);
       }
-      
+
       return await this.prisma.user.update({
         where: { id },
         data,

@@ -1,5 +1,19 @@
-import { Controller, Get, Post, Delete, Body, Param, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Body,
+  Param,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiParam,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { ConversationsService } from './conversations.service';
 import { MessagesService } from './messages.service';
 import { CreateConversationDto } from './dto/create-conversation.dto';
@@ -49,7 +63,7 @@ export class ConversationsController {
 
   @Get('booking/:bookingId')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
-  @ApiOperation({ summary: 'Récupérer la conversation d\'une réservation' })
+  @ApiOperation({ summary: "Récupérer la conversation d'une réservation" })
   @ApiParam({ name: 'bookingId', description: 'ID de la réservation' })
   @ApiGetOneResponse(Object)
   findByBooking(@Param('bookingId') bookingId: string) {
@@ -79,7 +93,7 @@ export class ConversationsController {
 
   @Get(':conversationId/messages')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
-  @ApiOperation({ summary: 'Récupérer les messages d\'une conversation' })
+  @ApiOperation({ summary: "Récupérer les messages d'une conversation" })
   @ApiParam({ name: 'conversationId', description: 'ID de la conversation' })
   @ApiGetManyResponse(Object)
   findMessagesByConversation(@Param('conversationId') conversationId: string) {

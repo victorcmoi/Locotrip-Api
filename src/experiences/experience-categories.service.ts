@@ -1,13 +1,35 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ExperienceCategoriesService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.experience_categoryCreateInput) {
-    return this.prisma.experience_category.create({ data });
+  async create(experienceId: string, categoryId: string) {
+    return this.prisma.experience_category.create({
+      data: {
+        experience_id: experienceId,
+        category_id: categoryId,
+      },
+    });
+  }
+
+  async update(
+    experienceId: string,
+    oldCategoryId: string,
+    newCategoryId: string,
+  ) {
+    return this.prisma.experience_category.update({
+      where: {
+        experience_id_category_id: {
+          experience_id: experienceId,
+          category_id: oldCategoryId,
+        },
+      },
+      data: {
+        category_id: newCategoryId,
+      },
+    });
   }
 
   async findAll() {

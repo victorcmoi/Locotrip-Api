@@ -1,4 +1,4 @@
 export enum GuideStatus {
-    LOCAL = "local",
-    PRO = "pro",
+  LOCAL = 'local',
+  PRO = 'pro',
 }

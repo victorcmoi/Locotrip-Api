@@ -74,13 +74,13 @@ export class NotificationsService {
   async update(id: string, updateNotificationDto: UpdateNotificationDto) {
     try {
       const data: any = { ...updateNotificationDto };
-      
+
       // Transformer l'ID en relation si présent
       if (updateNotificationDto.user_id) {
         data.user = { connect: { id: updateNotificationDto.user_id } };
         delete data.user_id;
       }
-      
+
       return await this.prisma.notification.update({
         where: { id },
         data,

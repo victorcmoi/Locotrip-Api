@@ -1,5 +1,8 @@
 import { Module } from '@nestjs/common';
-import { CurrenciesController, ExperiencePrixController } from './currencies.controller';
+import {
+  CurrenciesController,
+  ExperiencePrixController,
+} from './currencies.controller';
 import { CurrenciesService } from './currencies.service';
 import { experiencePriceService } from './experience-price.service';
 import { PrismaService } from '../prisma.service';

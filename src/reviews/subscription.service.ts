@@ -66,13 +66,13 @@ export class SubscriptionService {
   async update(id: string, updateSubscriptionDto: UpdateSubscriptionDto) {
     try {
       const data: any = { ...updateSubscriptionDto };
-      
+
       // Transformer l'ID en relation si présent
       if (updateSubscriptionDto.user_id) {
         data.user = { connect: { id: updateSubscriptionDto.user_id } };
         delete data.user_id;
       }
-      
+
       return await this.prisma.subscription.update({
         where: { id },
         data,

@@ -1,5 +1,8 @@
 import { Module } from '@nestjs/common';
-import { ConversationsController, MessagesController } from './messagerie.controller';
+import {
+  ConversationsController,
+  MessagesController,
+} from './messagerie.controller';
 import { ConversationsService } from './conversations.service';
 import { MessagesService } from './messages.service';
 import { PrismaService } from '../prisma.service';

@@ -1,5 +1,21 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus, Patch } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  HttpCode,
+  HttpStatus,
+  Patch,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiParam,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { SupportTicketsService } from './support-tickets.service';
 import { TicketMessagesService } from './ticket-messages.service';
 import { NotificationsService } from './notifications.service';
@@ -14,7 +30,7 @@ import {
   ApiUpdateResponse,
   ApiDeleteResponse,
 } from '../common/decorators/api-standard-responses.decorator';
-import { SupportTicketStatus } from '@prisma/client';
+import { SupportTicketStatus } from './enums/ticket-message.enum';
 import { Roles } from '../common/decorators/role.decorator';
 import { UserRole } from '../users/enums/user.enum';
 
@@ -45,7 +61,10 @@ export class SupportTicketsController {
 
   @Get('status/:status')
   @ApiOperation({ summary: 'Récupérer les tickets par statut' })
-  @ApiParam({ name: 'status', description: 'Statut du ticket (open, in_progress, closed)' })
+  @ApiParam({
+    name: 'status',
+    description: 'Statut du ticket (open, in_progress, closed)',
+  })
   @ApiGetManyResponse(Object)
   findByStatut(@Param('status') status: SupportTicketStatus) {
     return this.supportTicketsService.findByStatut(status);
@@ -60,8 +79,8 @@ export class SupportTicketsController {
   }
 
   @Get('user/:userId')
-  @ApiOperation({ summary: 'Récupérer les tickets d\'un utilisateur' })
-  @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur' })
+  @ApiOperation({ summary: "Récupérer les tickets d'un utilisateur" })
+  @ApiParam({ name: 'userId', description: "ID de l'utilisateur" })
   @ApiGetManyResponse(Object)
   findByUser(@Param('userId') userId: string) {
     return this.supportTicketsService.findByUser(userId);
@@ -96,7 +115,7 @@ export class SupportTicketsController {
   }
 
   @Get(':ticketId/messages')
-  @ApiOperation({ summary: 'Récupérer les messages d\'un ticket' })
+  @ApiOperation({ summary: "Récupérer les messages d'un ticket" })
   @ApiParam({ name: 'ticketId', description: 'ID du ticket' })
   @ApiGetManyResponse(Object)
   findMessagesByTicket(@Param('ticketId') ticketId: string) {
@@ -137,8 +156,8 @@ export class NotificationsController {
 
   @Get('user/:userId')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
-  @ApiOperation({ summary: 'Récupérer les notifications d\'un utilisateur' })
-  @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur' })
+  @ApiOperation({ summary: "Récupérer les notifications d'un utilisateur" })
+  @ApiParam({ name: 'userId', description: "ID de l'utilisateur" })
   @ApiGetManyResponse(Object)
   findByUser(@Param('userId') userId: string) {
     return this.notificationsService.findByUser(userId);
@@ -147,7 +166,7 @@ export class NotificationsController {
   @Get('user/:userId/non-lues')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer les notifications non lues' })
-  @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur' })
+  @ApiParam({ name: 'userId', description: "ID de l'utilisateur" })
   @ApiGetManyResponse(Object)
   findNonLues(@Param('userId') userId: string) {
     return this.notificationsService.findNonLues(userId);
@@ -166,7 +185,10 @@ export class NotificationsController {
   @ApiOperation({ summary: 'Mettre à jour une notification' })
   @ApiParam({ name: 'id', description: 'ID de la notification' })
   @ApiUpdateResponse(Object)
-  update(@Param('id') id: string, @Body() updateNotificationDto: UpdateNotificationDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateNotificationDto: UpdateNotificationDto,
+  ) {
     return this.notificationsService.update(id, updateNotificationDto);
   }
 

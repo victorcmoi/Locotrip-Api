@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateSupportTicketDto } from './dto/create-support-ticket.dto';
-import { SupportTicketStatus } from '@prisma/client';
+import { SupportTicketStatus } from './enums/ticket-message.enum';
 
 @Injectable()
 export class SupportTicketsService {
@@ -72,13 +72,13 @@ export class SupportTicketsService {
   async update(id: string, updateData: Partial<CreateSupportTicketDto>) {
     try {
       const data: any = { ...updateData };
-      
+
       // Transformer l'ID en relation si présent
       if (updateData.user_id) {
         data.user = { connect: { id: updateData.user_id } };
         delete data.user_id;
       }
-      
+
       return await this.prisma.support_ticket.update({
         where: { id },
         data,

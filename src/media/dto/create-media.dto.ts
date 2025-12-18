@@ -1,10 +1,16 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsUUID, IsOptional, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsUUID,
+  IsOptional,
+  IsEnum,
+} from 'class-validator';
 import { MediaType } from '../enums/media.enum';
 
 export class CreateMediaDto {
   @ApiProperty({
-    description: 'Type d\'entité (experience, guide, utilisateur, réservation)',
+    description: "Type d'entité (experience, guide, utilisateur, réservation)",
     example: 'experience',
     maxLength: 50,
   })
@@ -13,7 +19,7 @@ export class CreateMediaDto {
   entity_type: string;
 
   @ApiProperty({
-    description: 'ID de l\'entité associée',
+    description: "ID de l'entité associée",
     example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @IsUUID()

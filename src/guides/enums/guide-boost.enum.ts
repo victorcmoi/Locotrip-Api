@@ -1,4 +1,4 @@
 export enum BoostStatus {
-    ACTIVE = "active",
-    EXPIRED = "expired",
+  ACTIVE = 'active',
+  EXPIRED = 'expired',
 }

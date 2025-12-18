@@ -18,7 +18,14 @@ export class PaymentConfirmationResponseDto {
   @ApiProperty({
     description: 'Statut du paiement',
     example: 'succeeded',
-    enum: ['requires_payment_method', 'requires_confirmation', 'requires_action', 'processing', 'succeeded', 'canceled'],
+    enum: [
+      'requires_payment_method',
+      'requires_confirmation',
+      'requires_action',
+      'processing',
+      'succeeded',
+      'canceled',
+    ],
   })
   status: string;
 

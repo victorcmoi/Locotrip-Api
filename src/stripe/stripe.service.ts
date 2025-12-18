@@ -1,11 +1,32 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import Stripe from 'stripe';
-import { Prisma } from '@prisma/client';
+import { UserRole } from '../users/enums/user.enum';
+
+// Helper pour extraire le message d'erreur de manière type-safe
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return String(error);
+}
+
+// Type pour une adresse
+interface Address {
+  street: string;
+  city: string;
+  state?: string | null;
+  postal_code: string;
+  country: string;
+}
 
 // Type pour un utilisateur avec son adresse incluse
-type UserWithAddress = Prisma.userGetPayload<{
-  include: { address: true };
-}>;
+interface UserWithAddress {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  phone?: string | null;
+  role: UserRole;
+  address?: Address | null;
+}
 
 @Injectable()
 export class StripeService {
@@ -21,7 +42,8 @@ export class StripeService {
     }
 
     this.stripe = new Stripe(apiKey, {
-      apiVersion: '2025-10-29.clover',
+      // @ts-ignore
+      apiVersion: '2025-09-30.clover',
     });
   }
 
@@ -45,7 +67,7 @@ export class StripeService {
       });
     } catch (error) {
       throw new BadRequestException(
-        `Erreur lors de la création du paiement: ${error.message}`,
+        `Erreur lors de la création du paiement: ${getErrorMessage(error)}`,
       );
     }
   }
@@ -59,7 +81,7 @@ export class StripeService {
       return await this.stripe.paymentIntents.confirm(paymentIntentId);
     } catch (error) {
       throw new BadRequestException(
-        `Erreur lors de la confirmation du paiement: ${error.message}`,
+        `Erreur lors de la confirmation du paiement: ${getErrorMessage(error)}`,
       );
     }
   }
@@ -73,7 +95,7 @@ export class StripeService {
       return await this.stripe.paymentIntents.retrieve(paymentIntentId);
     } catch (error) {
       throw new BadRequestException(
-        `Erreur lors de la récupération du paiement: ${error.message}`,
+        `Erreur lors de la récupération du paiement: ${getErrorMessage(error)}`,
       );
     }
   }
@@ -87,14 +109,14 @@ export class StripeService {
       return await this.stripe.paymentIntents.cancel(paymentIntentId);
     } catch (error) {
       throw new BadRequestException(
-        `Erreur lors de l'annulation du paiement: ${error.message}`,
+        `Erreur lors de l'annulation du paiement: ${getErrorMessage(error)}`,
       );
     }
   }
 
   /**
    * Créer un client Stripe
-   * @param user Utilisateur pour lequel créer le client 
+   * @param user Utilisateur pour lequel créer le client
    */
   async createCustomer(user: UserWithAddress) {
     try {
@@ -124,7 +146,7 @@ export class StripeService {
       return await this.stripe.customers.create(customerData);
     } catch (error) {
       throw new BadRequestException(
-        `Erreur lors de la création du client: ${error.message}`,
+        `Erreur lors de la création du client: ${getErrorMessage(error)}`,
       );
     }
   }

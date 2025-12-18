@@ -1,5 +1,21 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus, Patch } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  HttpCode,
+  HttpStatus,
+  Patch,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiParam,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { CitiesService } from './cities.service';
 import { ExperiencesService } from './experiences.service';
 import { CategoriesService } from './categories.service';
@@ -97,7 +113,7 @@ export class ExperiencesController {
   @Get(':id')
   @Public()
   @ApiOperation({ summary: 'Récupérer une expérience' })
-  @ApiParam({ name: 'id', description: 'ID de l\'expérience' })
+  @ApiParam({ name: 'id', description: "ID de l'expérience" })
   @ApiGetOneResponse(ExperienceEntity)
   findOne(@Param('id') id: string) {
     return this.experiencesService.findOne(id);
@@ -105,7 +121,7 @@ export class ExperiencesController {
 
   @Get('city/:cityId')
   @Public()
-  @ApiOperation({ summary: 'Récupérer les expériences d\'une ville' })
+  @ApiOperation({ summary: "Récupérer les expériences d'une ville" })
   @ApiParam({ name: 'cityId', description: 'ID de la ville' })
   @ApiGetManyResponse(ExperienceEntity)
   findByVille(@Param('cityId') cityId: string) {
@@ -114,7 +130,7 @@ export class ExperiencesController {
 
   @Get('guide/:guideId')
   @Public()
-  @ApiOperation({ summary: 'Récupérer les expériences d\'un guide' })
+  @ApiOperation({ summary: "Récupérer les expériences d'un guide" })
   @ApiParam({ name: 'guideId', description: 'ID du guide' })
   @ApiGetManyResponse(ExperienceEntity)
   findByGuide(@Param('guideId') guideId: string) {
@@ -124,9 +140,12 @@ export class ExperiencesController {
   @Put(':id')
   @Roles(UserRole.GUIDE)
   @ApiOperation({ summary: 'Mettre à jour une expérience' })
-  @ApiParam({ name: 'id', description: 'ID de l\'expérience' })
+  @ApiParam({ name: 'id', description: "ID de l'expérience" })
   @ApiUpdateResponse(ExperienceEntity)
-  update(@Param('id') id: string, @Body() updateExperienceDto: UpdateExperienceDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateExperienceDto: UpdateExperienceDto,
+  ) {
     return this.experiencesService.update(id, updateExperienceDto);
   }
 
@@ -134,7 +153,7 @@ export class ExperiencesController {
   @Roles(UserRole.GUIDE)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Supprimer une expérience' })
-  @ApiParam({ name: 'id', description: 'ID de l\'expérience' })
+  @ApiParam({ name: 'id', description: "ID de l'expérience" })
   @ApiDeleteResponse()
   delete(@Param('id') id: string) {
     return this.experiencesService.delete(id);
@@ -144,7 +163,7 @@ export class ExperiencesController {
   @Roles(UserRole.GUIDE, UserRole.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Désactiver une expérience (soft delete)' })
-  @ApiParam({ name: 'id', description: 'ID de l\'expérience (UUID)' })
+  @ApiParam({ name: 'id', description: "ID de l'expérience (UUID)" })
   @ApiUpdateResponse(ExperienceEntity)
   softDelete(@Param('id') id: string) {
     return this.experiencesService.softDelete(id);
@@ -153,7 +172,7 @@ export class ExperiencesController {
   @Patch(':id/restore')
   @Roles(UserRole.GUIDE, UserRole.ADMIN)
   @ApiOperation({ summary: 'Réactiver une expérience désactivée' })
-  @ApiParam({ name: 'id', description: 'ID de l\'expérience (UUID)' })
+  @ApiParam({ name: 'id', description: "ID de l'expérience (UUID)" })
   @ApiUpdateResponse(ExperienceEntity)
   restore(@Param('id') id: string) {
     return this.experiencesService.restore(id);
@@ -161,8 +180,10 @@ export class ExperiencesController {
 
   @Patch(':id/publish')
   @Roles(UserRole.GUIDE)
-  @ApiOperation({ summary: 'Publier une expérience (la rendre visible publiquement)' })
-  @ApiParam({ name: 'id', description: 'ID de l\'expérience (UUID)' })
+  @ApiOperation({
+    summary: 'Publier une expérience (la rendre visible publiquement)',
+  })
+  @ApiParam({ name: 'id', description: "ID de l'expérience (UUID)" })
   @ApiUpdateResponse(ExperienceEntity)
   publish(@Param('id') id: string) {
     return this.experiencesService.publish(id);
@@ -171,7 +192,7 @@ export class ExperiencesController {
   @Patch(':id/unpublish')
   @Roles(UserRole.GUIDE)
   @ApiOperation({ summary: 'Dépublier une expérience (brouillon)' })
-  @ApiParam({ name: 'id', description: 'ID de l\'expérience (UUID)' })
+  @ApiParam({ name: 'id', description: "ID de l'expérience (UUID)" })
   @ApiUpdateResponse(ExperienceEntity)
   unpublish(@Param('id') id: string) {
     return this.experiencesService.unpublish(id);
@@ -179,7 +200,10 @@ export class ExperiencesController {
 
   @Get('all/including-deleted')
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Récupérer toutes les expériences (actives et inactives) - Admin uniquement' })
+  @ApiOperation({
+    summary:
+      'Récupérer toutes les expériences (actives et inactives) - Admin uniquement',
+  })
   @ApiGetManyResponse(ExperienceEntity)
   findAllIncludingDeleted() {
     return this.experiencesService.findAllIncludingDeleted();
@@ -187,7 +211,7 @@ export class ExperiencesController {
 
   @Get('guide/:guideId/drafts')
   @Roles(UserRole.GUIDE)
-  @ApiOperation({ summary: 'Récupérer les expériences brouillons d\'un guide' })
+  @ApiOperation({ summary: "Récupérer les expériences brouillons d'un guide" })
   @ApiParam({ name: 'guideId', description: 'ID du guide (UUID)' })
   @ApiGetManyResponse(ExperienceEntity)
   findDraftsByGuide(@Param('guideId') guideId: string) {
@@ -230,7 +254,10 @@ export class CategoriesController {
   @ApiOperation({ summary: 'Mettre à jour une catégorie' })
   @ApiParam({ name: 'id', description: 'ID de la catégorie' })
   @ApiUpdateResponse(Object)
-  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateCategoryDto: UpdateCategoryDto,
+  ) {
     return this.categoriesService.update(id, updateCategoryDto);
   }
 

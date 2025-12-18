@@ -1,13 +1,14 @@
+import { UpdateCurrencyDto } from './dto/update-currency.dto';
+import { CreateCurrencyDto } from './dto/create-currency.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class CurrenciesService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.currencyCreateInput) {
-    return this.prisma.currency.create({ data });
+  async create(createCurrencyDto: CreateCurrencyDto) {
+    return this.prisma.currency.create({ data: createCurrencyDto });
   }
 
   async findAll() {
@@ -26,11 +27,11 @@ export class CurrenciesService {
     return currency;
   }
 
-  async update(code: string, data: Prisma.currencyUpdateInput) {
+  async update(code: string, updateCurrencyDto: UpdateCurrencyDto) {
     try {
       return await this.prisma.currency.update({
         where: { code },
-        data,
+        data: updateCurrencyDto,
       });
     } catch (error) {
       throw new NotFoundException(`Devise avec le code ${code} introuvable`);
