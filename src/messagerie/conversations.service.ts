@@ -82,7 +82,7 @@ export class ConversationsService {
       return await this.prisma.conversation.delete({
         where: { id },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Conversation avec l'ID ${id} introuvable`);
     }
   }

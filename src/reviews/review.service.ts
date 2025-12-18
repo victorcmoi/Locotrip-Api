@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
+import { reviewUncheckedUpdateInput } from '../generated/prisma/models/review';
 
 @Injectable()
 export class ReviewService {
@@ -68,24 +69,13 @@ export class ReviewService {
 
   async update(id: string, UpdateReviewDto: UpdateReviewDto) {
     try {
-      const data: any = { ...UpdateReviewDto };
-
-      // Transformer les IDs en relations si présents
-      if (UpdateReviewDto.user_id) {
-        data.user = { connect: { id: UpdateReviewDto.user_id } };
-        delete data.user_id;
-      }
-
-      if (UpdateReviewDto.experience_id) {
-        data.experience = { connect: { id: UpdateReviewDto.experience_id } };
-        delete data.experience_id;
-      }
+      const data: reviewUncheckedUpdateInput = { ...UpdateReviewDto };
 
       return await this.prisma.review.update({
         where: { id },
         data,
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Avis avec l'ID ${id} introuvable`);
     }
   }
@@ -95,7 +85,7 @@ export class ReviewService {
       return await this.prisma.review.delete({
         where: { id },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Avis avec l'ID ${id} introuvable`);
     }
   }

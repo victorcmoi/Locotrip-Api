@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
+import { paymentUncheckedUpdateInput } from '../generated/prisma/models/payment';
 
 @Injectable()
 export class PaymentsService {
@@ -97,19 +98,13 @@ export class PaymentsService {
 
   async update(id: string, updatePaymentDto: UpdatePaymentDto) {
     try {
-      const data: any = { ...updatePaymentDto };
-
-      // Transformer l'ID en relation si présent
-      if (updatePaymentDto.booking_id) {
-        data.booking = { connect: { id: updatePaymentDto.booking_id } };
-        delete data.booking_id;
-      }
+      const data: paymentUncheckedUpdateInput = { ...updatePaymentDto };
 
       return await this.prisma.payment.update({
         where: { id },
         data,
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Paiement avec l'ID ${id} introuvable`);
     }
   }
@@ -123,7 +118,7 @@ export class PaymentsService {
         where: { stripe_payment_intent_id: stripePaymentIntentId },
         data: updatePaymentDto,
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(
         `Paiement avec Stripe Payment Intent ${stripePaymentIntentId} introuvable`,
       );
@@ -170,7 +165,7 @@ export class PaymentsService {
       return await this.prisma.payment.delete({
         where: { id },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Paiement avec l'ID ${id} introuvable`);
     }
   }

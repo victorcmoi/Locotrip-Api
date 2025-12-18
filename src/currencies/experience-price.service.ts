@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateExperiencePriceDto } from './dto/create-experience-price.dto';
 import { UpdateExperiencePriceDto } from './dto/update-experience-price.dto';
+import { experience_priceUpdateInput } from '../generated/prisma/models/experience_price';
 
 @Injectable()
 export class experiencePriceService {
@@ -53,7 +54,9 @@ export class experiencePriceService {
     currencyCode: string,
     updateExperiencePrixDto: UpdateExperiencePriceDto,
   ) {
-    const data: any = { price: updateExperiencePrixDto.price };
+    const data: experience_priceUpdateInput = {
+      price: updateExperiencePrixDto.price,
+    };
 
     // Transformer les IDs en relations si présents
     if (updateExperiencePrixDto.experience_id) {

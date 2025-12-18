@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
+import { subscriptionUncheckedUpdateInput } from '../generated/prisma/models/subscription';
 
 @Injectable()
 export class SubscriptionService {
@@ -65,19 +66,15 @@ export class SubscriptionService {
 
   async update(id: string, updateSubscriptionDto: UpdateSubscriptionDto) {
     try {
-      const data: any = { ...updateSubscriptionDto };
-
-      // Transformer l'ID en relation si présent
-      if (updateSubscriptionDto.user_id) {
-        data.user = { connect: { id: updateSubscriptionDto.user_id } };
-        delete data.user_id;
-      }
+      const data: subscriptionUncheckedUpdateInput = {
+        ...updateSubscriptionDto,
+      };
 
       return await this.prisma.subscription.update({
         where: { id },
         data,
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Abonnement avec l'ID ${id} introuvable`);
     }
   }
@@ -87,7 +84,7 @@ export class SubscriptionService {
       return await this.prisma.subscription.delete({
         where: { id },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Abonnement avec l'ID ${id} introuvable`);
     }
   }

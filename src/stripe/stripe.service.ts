@@ -42,7 +42,7 @@ export class StripeService {
     }
 
     this.stripe = new Stripe(apiKey, {
-      // @ts-ignore
+      // @ts-expect-error Pas d'erreur, bien que le type de Stripe ne le reconnaisse pas encore
       apiVersion: '2025-09-30.clover',
     });
   }

@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateSupportTicketDto } from './dto/create-support-ticket.dto';
 import { SupportTicketStatus } from './enums/ticket-message.enum';
+import { support_ticketUncheckedUpdateInput } from '../generated/prisma/models/support_ticket';
 
 @Injectable()
 export class SupportTicketsService {
@@ -71,19 +72,13 @@ export class SupportTicketsService {
 
   async update(id: string, updateData: Partial<CreateSupportTicketDto>) {
     try {
-      const data: any = { ...updateData };
-
-      // Transformer l'ID en relation si présent
-      if (updateData.user_id) {
-        data.user = { connect: { id: updateData.user_id } };
-        delete data.user_id;
-      }
+      const data: support_ticketUncheckedUpdateInput = { ...updateData };
 
       return await this.prisma.support_ticket.update({
         where: { id },
         data,
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Ticket avec l'ID ${id} introuvable`);
     }
   }
@@ -93,7 +88,7 @@ export class SupportTicketsService {
       return await this.prisma.support_ticket.delete({
         where: { id },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Ticket avec l'ID ${id} introuvable`);
     }
   }

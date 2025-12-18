@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './dto/register.dto';
 import { ConfigService } from '@nestjs/config';
 import { MailService } from '../mail/mail.service';
+import { userModel } from '../generated/prisma/models/user';
 
 @Injectable()
 export class AuthentificationService {
@@ -42,7 +43,7 @@ export class AuthentificationService {
 
   async register(
     registerDto: RegisterDto,
-  ): Promise<{ user: any; accessToken: string; refreshToken: string }> {
+  ): Promise<{ user: userModel; accessToken: string; refreshToken: string }> {
     const user = await this.usersService.create(registerDto);
 
     const tokens = await this.generateTokens(user.id, user.email, user.role);
@@ -70,9 +71,12 @@ export class AuthentificationService {
   ): Promise<{ accessToken: string; refreshToken: string }> {
     try {
       // Vérifier le refresh token
-      const payload = await this.jwtService.verifyAsync(refreshToken, {
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-      });
+      const payload = await this.jwtService.verifyAsync<{ sub: string }>(
+        refreshToken,
+        {
+          secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+        },
+      );
 
       const user = await this.usersService.findOne(payload.sub);
 
@@ -89,7 +93,7 @@ export class AuthentificationService {
       });
 
       return tokens;
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException('Refresh token invalide ou expiré');
     }
   }

@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateGuideDocumentDto } from './dto/create-guide-document.dto';
+import { guide_documentUncheckedUpdateInput } from '../generated/prisma/models/guide_document';
 
 @Injectable()
 export class GuideDocumentsService {
@@ -51,19 +52,13 @@ export class GuideDocumentsService {
 
   async update(id: string, updateData: Partial<CreateGuideDocumentDto>) {
     try {
-      const data: any = { ...updateData };
-
-      // Transformer l'ID en relation si présent
-      if (updateData.guide_id) {
-        data.guide = { connect: { id: updateData.guide_id } };
-        delete data.guide_id;
-      }
+      const data: guide_documentUncheckedUpdateInput = { ...updateData };
 
       return await this.prisma.guide_document.update({
         where: { id },
         data,
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Document avec l'ID ${id} introuvable`);
     }
   }
@@ -73,7 +68,7 @@ export class GuideDocumentsService {
       return await this.prisma.guide_document.delete({
         where: { id },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Document avec l'ID ${id} introuvable`);
     }
   }

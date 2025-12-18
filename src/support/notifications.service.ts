@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
+import { notificationUncheckedUpdateInput } from '../generated/prisma/models/notification';
 
 @Injectable()
 export class NotificationsService {
@@ -66,26 +67,22 @@ export class NotificationsService {
         where: { id },
         data: { read: true },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Notification avec l'ID ${id} introuvable`);
     }
   }
 
   async update(id: string, updateNotificationDto: UpdateNotificationDto) {
     try {
-      const data: any = { ...updateNotificationDto };
-
-      // Transformer l'ID en relation si présent
-      if (updateNotificationDto.user_id) {
-        data.user = { connect: { id: updateNotificationDto.user_id } };
-        delete data.user_id;
-      }
+      const data: notificationUncheckedUpdateInput = {
+        ...updateNotificationDto,
+      };
 
       return await this.prisma.notification.update({
         where: { id },
         data,
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Notification avec l'ID ${id} introuvable`);
     }
   }
@@ -95,7 +92,7 @@ export class NotificationsService {
       return await this.prisma.notification.delete({
         where: { id },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Notification avec l'ID ${id} introuvable`);
     }
   }

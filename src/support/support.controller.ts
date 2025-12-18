@@ -90,7 +90,10 @@ export class SupportTicketsController {
   @ApiOperation({ summary: 'Mettre à jour un ticket' })
   @ApiParam({ name: 'id', description: 'ID du ticket' })
   @ApiUpdateResponse(Object)
-  update(@Param('id') id: string, @Body() data: any) {
+  update(
+    @Param('id') id: string,
+    @Body() data: Partial<CreateSupportTicketDto>,
+  ) {
     return this.supportTicketsService.update(id, data);
   }
 

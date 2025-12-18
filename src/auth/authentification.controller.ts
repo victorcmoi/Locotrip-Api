@@ -67,7 +67,7 @@ export class AuthentificationController {
     description: "Révoque le refresh token de l'utilisateur",
   })
   @ApiGetOneResponse(Object)
-  logout(@Request() req) {
+  logout(@Request() req: { user: { sub: string } }) {
     return this.authentificationService.logout(req.user.sub);
   }
 

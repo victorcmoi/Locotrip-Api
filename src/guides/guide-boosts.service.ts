@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateGuideBoostDto } from './dto/create-guide-boost.dto';
+import { guide_boostUncheckedUpdateInput } from '../generated/prisma/models/guide_boost';
 
 @Injectable()
 export class GuideBoostsService {
@@ -70,24 +71,13 @@ export class GuideBoostsService {
 
   async update(id: string, updateData: Partial<CreateGuideBoostDto>) {
     try {
-      const data: any = { ...updateData };
-
-      // Transformer les IDs en relations si présents
-      if (updateData.guide_id) {
-        data.guide = { connect: { id: updateData.guide_id } };
-        delete data.guide_id;
-      }
-
-      if (updateData.boost_offer_id) {
-        data.boost_offer = { connect: { id: updateData.boost_offer_id } };
-        delete data.boost_offer_id;
-      }
+      const data: guide_boostUncheckedUpdateInput = { ...updateData };
 
       return await this.prisma.guide_boost.update({
         where: { id },
         data,
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Boost avec l'ID ${id} introuvable`);
     }
   }
@@ -97,7 +87,7 @@ export class GuideBoostsService {
       return await this.prisma.guide_boost.delete({
         where: { id },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Boost avec l'ID ${id} introuvable`);
     }
   }

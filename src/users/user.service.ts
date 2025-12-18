@@ -1,4 +1,3 @@
-import { ChangePasswordDto } from '../auth/dto/change-password.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -82,7 +81,7 @@ export class UsersService {
         where: { id },
         data,
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Utilisateur avec l'ID ${id} introuvable`);
     }
   }
@@ -92,7 +91,7 @@ export class UsersService {
       return await this.prisma.user.delete({
         where: { id },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Utilisateur avec l'ID ${id} introuvable`);
     }
   }
@@ -107,7 +106,7 @@ export class UsersService {
           deleted_reason: reason || 'Compte désactivé',
         },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Utilisateur avec l'ID ${id} introuvable`);
     }
   }
@@ -122,7 +121,7 @@ export class UsersService {
           deleted_reason: null,
         },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Utilisateur avec l'ID ${id} introuvable`);
     }
   }
@@ -135,7 +134,7 @@ export class UsersService {
           is_verified: true,
         },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Utilisateur avec l'ID ${id} introuvable`);
     }
   }
