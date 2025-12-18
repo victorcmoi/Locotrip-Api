@@ -1,5 +1,22 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus, Patch } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  HttpCode,
+  HttpStatus,
+  Patch,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiParam,
+  ApiBearerAuth,
+  ApiBody,
+} from '@nestjs/swagger';
 import { GuidesService } from './guides.service';
 import { GuideDocumentsService } from './guide-documents.service';
 import { GuideAvailabilityService } from './guide-availability.service';
@@ -67,7 +84,7 @@ export class GuidesController {
   @Get('user/:userId')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer le guide associé à un utilisateur' })
-  @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur' })
+  @ApiParam({ name: 'userId', description: "ID de l'utilisateur" })
   @ApiGetOneResponse(GuideEntity)
   findByUser(@Param('userId') userId: string) {
     return this.guidesService.findByUser(userId);
@@ -99,7 +116,10 @@ export class GuidesController {
   @ApiParam({ name: 'id', description: 'ID du guide (UUID)' })
   @ApiBody({ type: SoftDeleteGuideDto })
   @ApiUpdateResponse(GuideEntity)
-  softDelete(@Param('id') id: string, @Body() softDeleteDto: SoftDeleteGuideDto) {
+  softDelete(
+    @Param('id') id: string,
+    @Body() softDeleteDto: SoftDeleteGuideDto,
+  ) {
     return this.guidesService.softDelete(id, softDeleteDto.reason);
   }
 
@@ -114,7 +134,10 @@ export class GuidesController {
 
   @Get('all/including-deleted')
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Récupérer tous les guides (actifs et inactifs) - Admin uniquement' })
+  @ApiOperation({
+    summary:
+      'Récupérer tous les guides (actifs et inactifs) - Admin uniquement',
+  })
   @ApiGetManyResponse(GuideEntity)
   findAllIncludingDeleted() {
     return this.guidesService.findAllIncludingDeleted();
@@ -133,7 +156,7 @@ export class GuidesController {
 
   @Get(':guideId/documents')
   @Public()
-  @ApiOperation({ summary: 'Récupérer les documents d\'un guide' })
+  @ApiOperation({ summary: "Récupérer les documents d'un guide" })
   @ApiParam({ name: 'guideId', description: 'ID du guide' })
   @ApiGetManyResponse(Object)
   findDocumentsByGuide(@Param('guideId') guideId: string) {
@@ -146,13 +169,15 @@ export class GuidesController {
   @ApiOperation({ summary: 'Ajouter une disponibilité' })
   @ApiParam({ name: 'guideId', description: 'ID du guide' })
   @ApiCreateResponse(Object)
-  createAvailability(@Body() createAvailabilityDto: CreateGuideAvailabilityDto) {
+  createAvailability(
+    @Body() createAvailabilityDto: CreateGuideAvailabilityDto,
+  ) {
     return this.guideAvailabilityService.create(createAvailabilityDto);
   }
 
   @Get(':guideId/availability')
   @Public()
-  @ApiOperation({ summary: 'Récupérer les disponibilités d\'un guide' })
+  @ApiOperation({ summary: "Récupérer les disponibilités d'un guide" })
   @ApiParam({ name: 'guideId', description: 'ID du guide' })
   @ApiGetManyResponse(Object)
   findAvailabilityByGuide(@Param('guideId') guideId: string) {
@@ -172,7 +197,7 @@ export class GuidesController {
 
   @Get(':guideId/boosts')
   @Roles(UserRole.GUIDE, UserRole.CLIENT)
-  @ApiOperation({ summary: 'Récupérer les boosts d\'un guide' })
+  @ApiOperation({ summary: "Récupérer les boosts d'un guide" })
   @ApiParam({ name: 'guideId', description: 'ID du guide' })
   @ApiGetManyResponse(Object)
   findBoostsByGuide(@Param('guideId') guideId: string) {
@@ -205,7 +230,7 @@ export class BoostOffersController {
   @Get(':id')
   @Roles(UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer une offre de boost' })
-  @ApiParam({ name: 'id', description: 'ID de l\'offre' })
+  @ApiParam({ name: 'id', description: "ID de l'offre" })
   @ApiGetOneResponse(Object)
   findOne(@Param('id') id: string) {
     return this.boostOffersService.findOne(id);
@@ -213,16 +238,19 @@ export class BoostOffersController {
 
   @Put(':id')
   @ApiOperation({ summary: 'Mettre à jour une offre de boost' })
-  @ApiParam({ name: 'id', description: 'ID de l\'offre' })
+  @ApiParam({ name: 'id', description: "ID de l'offre" })
   @ApiUpdateResponse(Object)
-  update(@Param('id') id: string, @Body() updateBoostOfferDto: UpdateBoostOfferDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateBoostOfferDto: UpdateBoostOfferDto,
+  ) {
     return this.boostOffersService.update(id, updateBoostOfferDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Supprimer une offre de boost' })
-  @ApiParam({ name: 'id', description: 'ID de l\'offre' })
+  @ApiParam({ name: 'id', description: "ID de l'offre" })
   @ApiDeleteResponse()
   delete(@Param('id') id: string) {
     return this.boostOffersService.delete(id);

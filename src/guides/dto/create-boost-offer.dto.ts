@@ -1,9 +1,16 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsInt, IsDecimal, Min, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsInt,
+  IsDecimal,
+  Min,
+  IsOptional,
+} from 'class-validator';
 
 export class CreateBoostOfferDto {
   @ApiProperty({
-    description: 'Nom de l\'offre de boost',
+    description: "Nom de l'offre de boost",
     example: 'Boost Premium 30 jours',
     maxLength: 100,
   })
@@ -12,7 +19,7 @@ export class CreateBoostOfferDto {
   name: string;
 
   @ApiPropertyOptional({
-    description: 'Description de l\'offre',
+    description: "Description de l'offre",
     example: 'Augmentez votre visibilité pendant 30 jours',
   })
   @IsString()
@@ -41,7 +48,7 @@ export class CreateBoostOfferDto {
   discount_percentage: number;
 
   @ApiProperty({
-    description: 'Prix de l\'offre',
+    description: "Prix de l'offre",
     example: 49.99,
   })
   @IsDecimal()

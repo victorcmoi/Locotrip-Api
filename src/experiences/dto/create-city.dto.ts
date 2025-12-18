@@ -1,5 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsOptional, IsNumber, IsBoolean } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsNumber,
+  IsBoolean,
+} from 'class-validator';
 
 export class CreateCityDto {
   @ApiProperty({
@@ -54,7 +60,7 @@ export class CreateCityDto {
   longitude?: number;
 
   @ApiPropertyOptional({
-    description: 'URL de l\'image de la ville',
+    description: "URL de l'image de la ville",
     example: 'https://example.com/paris.jpg',
   })
   @IsString()

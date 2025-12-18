@@ -13,7 +13,9 @@ import {
  */
 export function ApiAuthResponses() {
   return applyDecorators(
-    ApiUnauthorizedResponse({ description: 'Non verified - Token manquant ou invalide' }),
+    ApiUnauthorizedResponse({
+      description: 'Non verified - Token manquant ou invalide',
+    }),
     ApiForbiddenResponse({ description: 'Accès interdit - Rôle insuffisant' }),
   );
 }
@@ -24,7 +26,9 @@ export function ApiAuthResponses() {
 export function ApiStandardErrors() {
   return applyDecorators(
     ApiNotFoundResponse({ description: 'Ressource non trouvée' }),
-    ApiBadRequestResponse({ description: 'Données invalides ou requête malformée' }),
+    ApiBadRequestResponse({
+      description: 'Données invalides ou requête malformée',
+    }),
   );
 }
 
@@ -44,8 +48,8 @@ export function ApiGetOneResponse(type: Type<any>) {
  */
 export function ApiGetManyResponse(type: Type<any>) {
   return applyDecorators(
-    ApiOkResponse({ 
-      type: [type], 
+    ApiOkResponse({
+      type: [type],
       description: 'Liste des ressources récupérée avec succès',
     }),
     ApiAuthResponses(),
@@ -58,7 +62,9 @@ export function ApiGetManyResponse(type: Type<any>) {
 export function ApiCreateResponse(type: Type<any>) {
   return applyDecorators(
     ApiCreatedResponse({ type, description: 'Ressource créée avec succès' }),
-    ApiBadRequestResponse({ description: 'Données invalides - Compte existant' }),
+    ApiBadRequestResponse({
+      description: 'Données invalides - Compte existant',
+    }),
     ApiAuthResponses(),
   );
 }

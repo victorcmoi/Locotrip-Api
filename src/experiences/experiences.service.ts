@@ -81,7 +81,9 @@ export class ExperiencesService {
     }
 
     if (!experience.is_active || !experience.is_published) {
-      throw new NotFoundException(`Expérience avec l'ID ${id} n'est plus disponible`);
+      throw new NotFoundException(
+        `Expérience avec l'ID ${id} n'est plus disponible`,
+      );
     }
 
     return experience;
@@ -89,7 +91,7 @@ export class ExperiencesService {
 
   async findByVille(villeId: string) {
     return this.prisma.experience.findMany({
-      where: { 
+      where: {
         city_id: villeId,
         is_active: true,
         is_published: true,
@@ -114,7 +116,7 @@ export class ExperiencesService {
 
   async findByGuide(guideId: string) {
     return this.prisma.experience.findMany({
-      where: { 
+      where: {
         guide_id: guideId,
         is_active: true,
       },
@@ -128,17 +130,17 @@ export class ExperiencesService {
   async update(id: string, updateExperienceDto: UpdateExperienceDto) {
     try {
       const data: any = { ...updateExperienceDto };
-      
+
       if (updateExperienceDto.city_id) {
         data.city = { connect: { id: updateExperienceDto.city_id } };
         delete data.city_id;
       }
-      
+
       if (updateExperienceDto.guide_id) {
         data.guide = { connect: { id: updateExperienceDto.guide_id } };
         delete data.guide_id;
       }
-      
+
       return await this.prisma.experience.update({
         where: { id },
         data,

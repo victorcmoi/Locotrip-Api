@@ -69,18 +69,18 @@ export class ReviewService {
   async update(id: string, UpdateReviewDto: UpdateReviewDto) {
     try {
       const data: any = { ...UpdateReviewDto };
-      
+
       // Transformer les IDs en relations si présents
       if (UpdateReviewDto.user_id) {
         data.user = { connect: { id: UpdateReviewDto.user_id } };
         delete data.user_id;
       }
-      
+
       if (UpdateReviewDto.experience_id) {
         data.experience = { connect: { id: UpdateReviewDto.experience_id } };
         delete data.experience_id;
       }
-      
+
       return await this.prisma.review.update({
         where: { id },
         data,

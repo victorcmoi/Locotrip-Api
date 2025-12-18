@@ -41,7 +41,7 @@ export class GuidesService {
 
   async findOne(id: string) {
     const guide = await this.prisma.guide.findUnique({
-      where: { 
+      where: {
         id,
       },
       include: {
@@ -70,7 +70,7 @@ export class GuidesService {
 
   async findByUser(userId: string) {
     return this.prisma.guide.findMany({
-      where: { 
+      where: {
         user_id: userId,
         is_active: true,
       },
@@ -85,13 +85,13 @@ export class GuidesService {
   async update(id: string, updateGuideDto: UpdateGuideDto) {
     try {
       const data: any = { ...updateGuideDto };
-      
+
       // Transformer l'ID en relation si présent
       if (updateGuideDto.user_id) {
         data.user = { connect: { id: updateGuideDto.user_id } };
         delete data.user_id;
       }
-      
+
       return await this.prisma.guide.update({
         where: { id },
         data,
@@ -125,7 +125,7 @@ export class GuidesService {
       throw new NotFoundException(`Guide avec l'ID ${id} introuvable`);
     }
   }
-  
+
   async restore(id: string) {
     try {
       return await this.prisma.guide.update({

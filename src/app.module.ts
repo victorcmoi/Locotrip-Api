@@ -41,13 +41,13 @@ import { MailModule } from './mail/mail.module';
       {
         name: 'medium',
         ttl: 10000,
-        limit: 25
+        limit: 25,
       },
       {
         name: 'long',
         ttl: 60000,
-        limit: 150
-      }
+        limit: 150,
+      },
     ]),
   ],
 })

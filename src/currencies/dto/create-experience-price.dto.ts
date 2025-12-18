@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
 
 export class CreateExperiencePriceDto {
   @ApiProperty({
-    description: 'ID de l\'expérience',
+    description: "ID de l'expérience",
     example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @IsNotEmpty()

@@ -12,7 +12,7 @@ export class CreateDisputeDto {
   booking_id: string;
 
   @ApiProperty({
-    description: 'ID de l\'utilisateur créant le litige',
+    description: "ID de l'utilisateur créant le litige",
     example: '550e8400-e29b-41d4-a716-446655440001',
   })
   @IsNotEmpty()
@@ -21,7 +21,7 @@ export class CreateDisputeDto {
 
   @ApiProperty({
     description: 'Motif du litige',
-    example: 'Le guide n\'est pas venu au rendez-vous',
+    example: "Le guide n'est pas venu au rendez-vous",
   })
   @IsNotEmpty()
   @IsString()
@@ -37,7 +37,7 @@ export class CreateDisputeDto {
   status: DisputeStatus;
 
   @ApiProperty({
-    description: 'ID de l\'admin traitant le litige (optionnel)',
+    description: "ID de l'admin traitant le litige (optionnel)",
     example: '550e8400-e29b-41d4-a716-446655440002',
     required: false,
   })

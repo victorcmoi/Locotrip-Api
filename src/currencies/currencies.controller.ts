@@ -1,5 +1,20 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiParam,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { CurrenciesService } from './currencies.service';
 import { experiencePriceService } from './experience-price.service';
 import { CreateCurrencyDto } from './dto/create-currency.dto';
@@ -55,7 +70,10 @@ export class CurrenciesController {
   @ApiOperation({ summary: 'Mettre à jour une devise' })
   @ApiParam({ name: 'code', description: 'Code de la devise' })
   @ApiUpdateResponse(CreateCurrencyDto)
-  update(@Param('code') code: string, @Body() updateCurrencyDto: UpdateCurrencyDto) {
+  update(
+    @Param('code') code: string,
+    @Body() updateCurrencyDto: UpdateCurrencyDto,
+  ) {
     return this.currenciesService.update(code, updateCurrencyDto);
   }
 
@@ -73,7 +91,9 @@ export class CurrenciesController {
 @ApiBearerAuth('JWT-auth')
 @Controller('experience-price')
 export class ExperiencePrixController {
-  constructor(private readonly experiencePriceService: experiencePriceService) {}
+  constructor(
+    private readonly experiencePriceService: experiencePriceService,
+  ) {}
 
   @Post()
   @Roles(UserRole.GUIDE)
@@ -94,8 +114,8 @@ export class ExperiencePrixController {
 
   @Get('experience/:experienceId')
   @Public()
-  @ApiOperation({ summary: 'Récupérer les prix d\'une expérience' })
-  @ApiParam({ name: 'experienceId', description: 'ID de l\'expérience' })
+  @ApiOperation({ summary: "Récupérer les prix d'une expérience" })
+  @ApiParam({ name: 'experienceId', description: "ID de l'expérience" })
   @ApiGetManyResponse(Object)
   findByExperience(@Param('experienceId') experienceId: string) {
     return this.experiencePriceService.findByExperience(experienceId);
@@ -113,7 +133,7 @@ export class ExperiencePrixController {
   @Put(':experienceId/:currencyCode')
   @Roles(UserRole.GUIDE)
   @ApiOperation({ summary: 'Mettre à jour un prix' })
-  @ApiParam({ name: 'experienceId', description: 'ID de l\'expérience' })
+  @ApiParam({ name: 'experienceId', description: "ID de l'expérience" })
   @ApiParam({ name: 'currencyCode', description: 'Code de la devise' })
   @ApiUpdateResponse(Object)
   update(
@@ -121,14 +141,18 @@ export class ExperiencePrixController {
     @Param('currencyCode') currencyCode: string,
     @Body() updateExperiencePrixDto: UpdateExperiencePriceDto,
   ) {
-    return this.experiencePriceService.update(experienceId, currencyCode, updateExperiencePrixDto);
+    return this.experiencePriceService.update(
+      experienceId,
+      currencyCode,
+      updateExperiencePrixDto,
+    );
   }
 
   @Delete(':experienceId/:currencyCode')
   @Roles(UserRole.GUIDE)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Supprimer un prix' })
-  @ApiParam({ name: 'experienceId', description: 'ID de l\'expérience' })
+  @ApiParam({ name: 'experienceId', description: "ID de l'expérience" })
   @ApiParam({ name: 'currencyCode', description: 'Code de la devise' })
   @ApiDeleteResponse()
   delete(

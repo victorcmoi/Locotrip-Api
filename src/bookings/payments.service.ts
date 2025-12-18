@@ -98,13 +98,13 @@ export class PaymentsService {
   async update(id: string, updatePaymentDto: UpdatePaymentDto) {
     try {
       const data: any = { ...updatePaymentDto };
-      
+
       // Transformer l'ID en relation si présent
       if (updatePaymentDto.booking_id) {
         data.booking = { connect: { id: updatePaymentDto.booking_id } };
         delete data.booking_id;
       }
-      
+
       return await this.prisma.payment.update({
         where: { id },
         data,

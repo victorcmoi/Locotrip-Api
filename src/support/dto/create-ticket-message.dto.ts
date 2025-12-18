@@ -11,7 +11,7 @@ export class CreateTicketMessageDto {
   ticket_id: string;
 
   @ApiProperty({
-    description: 'ID de l\'auteur du message',
+    description: "ID de l'auteur du message",
     example: '660e8400-e29b-41d4-a716-446655440001',
   })
   @IsUUID()
@@ -20,7 +20,7 @@ export class CreateTicketMessageDto {
 
   @ApiProperty({
     description: 'Contenu du message',
-    example: 'Bonjour, j\'ai besoin d\'aide concernant ma réservation.',
+    example: "Bonjour, j'ai besoin d'aide concernant ma réservation.",
   })
   @IsString()
   @IsNotEmpty()

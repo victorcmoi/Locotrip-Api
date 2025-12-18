@@ -90,4 +90,3 @@ export class CreatePaymentDto {
   @IsObject()
   metadata?: any;
 }
-

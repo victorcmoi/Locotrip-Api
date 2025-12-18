@@ -1,9 +1,17 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsUUID, IsNotEmpty, IsInt, IsString, IsOptional, Min, Max } from 'class-validator';
+import {
+  IsUUID,
+  IsNotEmpty,
+  IsInt,
+  IsString,
+  IsOptional,
+  Min,
+  Max,
+} from 'class-validator';
 
 export class CreateReviewDto {
   @ApiProperty({
-    description: 'ID de l\'utilisateur qui donne l\'avis',
+    description: "ID de l'utilisateur qui donne l'avis",
     example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @IsUUID()
@@ -11,7 +19,7 @@ export class CreateReviewDto {
   user_id: string;
 
   @ApiProperty({
-    description: 'ID de l\'expérience évaluée',
+    description: "ID de l'expérience évaluée",
     example: '660e8400-e29b-41d4-a716-446655440001',
   })
   @IsUUID()
@@ -31,7 +39,7 @@ export class CreateReviewDto {
   rating: number;
 
   @ApiPropertyOptional({
-    description: 'Commentaire de l\'utilisateur',
+    description: "Commentaire de l'utilisateur",
     example: 'Excellente expérience, guide très professionnel !',
   })
   @IsString()

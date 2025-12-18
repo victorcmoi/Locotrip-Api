@@ -48,18 +48,26 @@ export class experiencePriceService {
     });
   }
 
-  async update(experienceId: string, currencyCode: string, updateExperiencePrixDto: UpdateExperiencePriceDto) {
+  async update(
+    experienceId: string,
+    currencyCode: string,
+    updateExperiencePrixDto: UpdateExperiencePriceDto,
+  ) {
     const data: any = { price: updateExperiencePrixDto.price };
-    
+
     // Transformer les IDs en relations si présents
     if (updateExperiencePrixDto.experience_id) {
-      data.experience = { connect: { id: updateExperiencePrixDto.experience_id } };
+      data.experience = {
+        connect: { id: updateExperiencePrixDto.experience_id },
+      };
     }
-    
+
     if (updateExperiencePrixDto.currency_code) {
-      data.currency = { connect: { code: updateExperiencePrixDto.currency_code } };
+      data.currency = {
+        connect: { code: updateExperiencePrixDto.currency_code },
+      };
     }
-    
+
     return this.prisma.experience_price.update({
       where: {
         experience_id_currency_code: {

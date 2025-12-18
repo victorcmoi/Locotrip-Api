@@ -1,16 +1,34 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus, UseGuards, Patch } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  HttpCode,
+  HttpStatus,
+  UseGuards,
+  Patch,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiParam,
+  ApiBearerAuth,
+  ApiBody,
+} from '@nestjs/swagger';
 import { UsersService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { SoftDeleteUserDto } from './dto/soft-delete-user.dto';
 import { UserEntity } from './entities/user.entity';
-import { 
-  ApiCreateResponse, 
-  ApiGetManyResponse, 
-  ApiGetOneResponse, 
-  ApiUpdateResponse, 
-  ApiDeleteResponse 
+import {
+  ApiCreateResponse,
+  ApiGetManyResponse,
+  ApiGetOneResponse,
+  ApiUpdateResponse,
+  ApiDeleteResponse,
 } from '../common/decorators/api-standard-responses.decorator';
 import { Roles } from '../common/decorators/role.decorator';
 import { UserRole } from './enums/user.enum';
@@ -38,7 +56,7 @@ export class UsersController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Récupérer un utilisateur par son ID' })
-  @ApiParam({ name: 'id', description: 'ID de l\'utilisateur (UUID)' })
+  @ApiParam({ name: 'id', description: "ID de l'utilisateur (UUID)" })
   @ApiGetOneResponse(UserEntity)
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
@@ -46,7 +64,7 @@ export class UsersController {
 
   @Get('email/:email')
   @ApiOperation({ summary: 'Récupérer un utilisateur par son email' })
-  @ApiParam({ name: 'email', description: 'Email de l\'utilisateur' })
+  @ApiParam({ name: 'email', description: "Email de l'utilisateur" })
   @ApiGetOneResponse(UserEntity)
   findByEmail(@Param('email') email: string) {
     return this.usersService.findByEmail(email);
@@ -55,7 +73,7 @@ export class UsersController {
   @Put(':id')
   @Roles(UserRole.CLIENT)
   @ApiOperation({ summary: 'Mettre à jour un utilisateur' })
-  @ApiParam({ name: 'id', description: 'ID de l\'utilisateur (UUID)' })
+  @ApiParam({ name: 'id', description: "ID de l'utilisateur (UUID)" })
   @ApiUpdateResponse(UserEntity)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
@@ -65,7 +83,7 @@ export class UsersController {
   @Roles(UserRole.CLIENT)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Supprimer un utilisateur' })
-  @ApiParam({ name: 'id', description: 'ID de l\'utilisateur (UUID)' })
+  @ApiParam({ name: 'id', description: "ID de l'utilisateur (UUID)" })
   @ApiDeleteResponse()
   delete(@Param('id') id: string) {
     return this.usersService.delete(id);
@@ -75,17 +93,20 @@ export class UsersController {
   @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Désactiver un utilisateur (soft delete)' })
-  @ApiParam({ name: 'id', description: 'ID de l\'utilisateur (UUID)' })
+  @ApiParam({ name: 'id', description: "ID de l'utilisateur (UUID)" })
   @ApiBody({ type: SoftDeleteUserDto })
   @ApiUpdateResponse(UserEntity)
-  softDelete(@Param('id') id: string, @Body() softDeleteDto: SoftDeleteUserDto) {
+  softDelete(
+    @Param('id') id: string,
+    @Body() softDeleteDto: SoftDeleteUserDto,
+  ) {
     return this.usersService.softDelete(id, softDeleteDto.reason);
   }
 
   @Patch(':id/restore')
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Réactiver un utilisateur désactivé' })
-  @ApiParam({ name: 'id', description: 'ID de l\'utilisateur (UUID)' })
+  @ApiParam({ name: 'id', description: "ID de l'utilisateur (UUID)" })
   @ApiUpdateResponse(UserEntity)
   restore(@Param('id') id: string) {
     return this.usersService.restore(id);
@@ -93,8 +114,8 @@ export class UsersController {
 
   @Patch(':id/verify-email')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Vérifier l\'email d\'un utilisateur' })
-  @ApiParam({ name: 'id', description: 'ID de l\'utilisateur (UUID)' })
+  @ApiOperation({ summary: "Vérifier l'email d'un utilisateur" })
+  @ApiParam({ name: 'id', description: "ID de l'utilisateur (UUID)" })
   @ApiUpdateResponse(UserEntity)
   verifyEmail(@Param('id') id: string) {
     return this.usersService.verifyEmail(id);
@@ -102,7 +123,10 @@ export class UsersController {
 
   @Get('all/including-deleted')
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Récupérer tous les utilisateurs (actifs et inactifs) - Admin uniquement' })
+  @ApiOperation({
+    summary:
+      'Récupérer tous les utilisateurs (actifs et inactifs) - Admin uniquement',
+  })
   @ApiGetManyResponse(UserEntity)
   findAllIncludingDeleted() {
     return this.usersService.findAllIncludingDeleted();

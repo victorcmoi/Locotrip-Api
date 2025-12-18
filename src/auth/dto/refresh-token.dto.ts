@@ -4,7 +4,7 @@ import { IsString, IsNotEmpty } from 'class-validator';
 export class RefreshTokenDto {
   @ApiProperty({
     description: 'Refresh token pour obtenir un nouveau access token',
-    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
   })
   @IsString()
   @IsNotEmpty()

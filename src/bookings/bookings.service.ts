@@ -109,18 +109,18 @@ export class BookingsService {
   async update(id: string, updateBookingDto: UpdateBookingDto) {
     try {
       const data: any = { ...updateBookingDto };
-      
+
       // Transformer les IDs en relations si présents
       if (updateBookingDto.user_id) {
         data.user = { connect: { id: updateBookingDto.user_id } };
         delete data.user_id;
       }
-      
+
       if (updateBookingDto.experience_id) {
         data.experience = { connect: { id: updateBookingDto.experience_id } };
         delete data.experience_id;
       }
-      
+
       return await this.prisma.booking.update({
         where: { id },
         data,

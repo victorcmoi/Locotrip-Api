@@ -1,5 +1,22 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { MediaService } from './media.service';
 import { CreateMediaDto } from './dto/create-media.dto';
 import { UpdateMediaDto } from './dto/update-media.dto';
@@ -10,7 +27,7 @@ import {
   ApiUpdateResponse,
   ApiDeleteResponse,
 } from '../common/decorators/api-standard-responses.decorator';
-import { MediaType } from '@prisma/client';
+import { MediaType } from './enums/media.enum';
 import { Roles } from '../common/decorators/role.decorator';
 import { UserRole } from '../users/enums/user.enum';
 import { Public } from '../common/decorators/authentification-decorator';
@@ -32,7 +49,11 @@ export class MediaController {
 
   @Get()
   @ApiOperation({ summary: 'Récupérer tous les médias' })
-  @ApiQuery({ name: 'type', required: false, description: 'Filtrer par type de média' })
+  @ApiQuery({
+    name: 'type',
+    required: false,
+    description: 'Filtrer par type de média',
+  })
   @ApiGetManyResponse(Object)
   findAll(@Query('type') type?: MediaType) {
     if (type) {
@@ -52,9 +73,12 @@ export class MediaController {
 
   @Get('entity/:entityType/:entityId')
   @Public()
-  @ApiOperation({ summary: 'Récupérer les médias d\'une entité' })
-  @ApiParam({ name: 'entityType', description: 'Type d\'entité (experience, guide, etc.)' })
-  @ApiParam({ name: 'entityId', description: 'ID de l\'entité' })
+  @ApiOperation({ summary: "Récupérer les médias d'une entité" })
+  @ApiParam({
+    name: 'entityType',
+    description: "Type d'entité (experience, guide, etc.)",
+  })
+  @ApiParam({ name: 'entityId', description: "ID de l'entité" })
   @ApiGetManyResponse(Object)
   findByEntity(
     @Param('entityType') entityType: string,

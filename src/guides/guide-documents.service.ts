@@ -10,7 +10,8 @@ export class GuideDocumentsService {
     return this.prisma.guide_document.create({
       data: {
         document_type: createGuideDocumentDto.document_type,
-        verification_status: createGuideDocumentDto.verification_status || 'pending',
+        verification_status:
+          createGuideDocumentDto.verification_status || 'pending',
         verification_comment: createGuideDocumentDto.verification_comment,
         guide: {
           connect: { id: createGuideDocumentDto.guide_id },
@@ -51,13 +52,13 @@ export class GuideDocumentsService {
   async update(id: string, updateData: Partial<CreateGuideDocumentDto>) {
     try {
       const data: any = { ...updateData };
-      
+
       // Transformer l'ID en relation si présent
       if (updateData.guide_id) {
         data.guide = { connect: { id: updateData.guide_id } };
         delete data.guide_id;
       }
-      
+
       return await this.prisma.guide_document.update({
         where: { id },
         data,

@@ -1,5 +1,20 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiParam,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { ReviewService } from './review.service';
 import { SubscriptionService } from './subscription.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -25,7 +40,6 @@ export class ReviewsController {
   constructor(private readonly reviewService: ReviewService) {}
 
   @Post()
-
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Créer un avis' })
   @ApiCreateResponse(ReviewEntity)
@@ -44,7 +58,7 @@ export class ReviewsController {
   @Get(':id')
   @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer un avis par son ID' })
-  @ApiParam({ name: 'id', description: 'ID de l\'avis' })
+  @ApiParam({ name: 'id', description: "ID de l'avis" })
   @ApiGetOneResponse(ReviewEntity)
   findOne(@Param('id') id: string) {
     return this.reviewService.findOne(id);
@@ -52,8 +66,8 @@ export class ReviewsController {
 
   @Get('experience/:experienceId')
   @Public()
-  @ApiOperation({ summary: 'Récupérer les avis d\'une expérience' })
-  @ApiParam({ name: 'experienceId', description: 'ID de l\'expérience' })
+  @ApiOperation({ summary: "Récupérer les avis d'une expérience" })
+  @ApiParam({ name: 'experienceId', description: "ID de l'expérience" })
   @ApiGetManyResponse(ReviewEntity)
   findByExperience(@Param('experienceId') experienceId: string) {
     return this.reviewService.findByExperience(experienceId);
@@ -61,8 +75,8 @@ export class ReviewsController {
 
   @Get('user/:userId')
   @Public()
-  @ApiOperation({ summary: 'Récupérer les avis d\'un utilisateur' })
-  @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur' })
+  @ApiOperation({ summary: "Récupérer les avis d'un utilisateur" })
+  @ApiParam({ name: 'userId', description: "ID de l'utilisateur" })
   @ApiGetManyResponse(ReviewEntity)
   findByUser(@Param('userId') userId: string) {
     return this.reviewService.findByUser(userId);
@@ -71,7 +85,7 @@ export class ReviewsController {
   @Put(':id')
   @Roles(UserRole.CLIENT)
   @ApiOperation({ summary: 'Mettre à jour un avis' })
-  @ApiParam({ name: 'id', description: 'ID de l\'avis' })
+  @ApiParam({ name: 'id', description: "ID de l'avis" })
   @ApiUpdateResponse(ReviewEntity)
   update(@Param('id') id: string, @Body() UpdateReviewDto: UpdateReviewDto) {
     return this.reviewService.update(id, UpdateReviewDto);
@@ -81,7 +95,7 @@ export class ReviewsController {
   @Roles(UserRole.CLIENT)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Supprimer un avis' })
-  @ApiParam({ name: 'id', description: 'ID de l\'avis' })
+  @ApiParam({ name: 'id', description: "ID de l'avis" })
   @ApiDeleteResponse()
   delete(@Param('id') id: string) {
     return this.reviewService.delete(id);
@@ -121,7 +135,7 @@ export class AbonnementsController {
   @Get(':id')
   @Roles(UserRole.GUIDE)
   @ApiOperation({ summary: 'Récupérer un abonnement' })
-  @ApiParam({ name: 'id', description: 'ID de l\'abonnement' })
+  @ApiParam({ name: 'id', description: "ID de l'abonnement" })
   @ApiGetOneResponse(Object)
   findOne(@Param('id') id: string) {
     return this.abonnementsService.findOne(id);
@@ -129,8 +143,8 @@ export class AbonnementsController {
 
   @Get('user/:userId')
   @Roles(UserRole.GUIDE)
-  @ApiOperation({ summary: 'Récupérer les abonnements d\'un utilisateur' })
-  @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur' })
+  @ApiOperation({ summary: "Récupérer les abonnements d'un utilisateur" })
+  @ApiParam({ name: 'userId', description: "ID de l'utilisateur" })
   @ApiGetManyResponse(Object)
   findByUser(@Param('userId') userId: string) {
     return this.abonnementsService.findByUser(userId);
@@ -138,16 +152,19 @@ export class AbonnementsController {
 
   @Put(':id')
   @ApiOperation({ summary: 'Mettre à jour un abonnement' })
-  @ApiParam({ name: 'id', description: 'ID de l\'abonnement' })
+  @ApiParam({ name: 'id', description: "ID de l'abonnement" })
   @ApiUpdateResponse(Object)
-  update(@Param('id') id: string, @Body() updateSubscriptionDto: UpdateSubscriptionDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateSubscriptionDto: UpdateSubscriptionDto,
+  ) {
     return this.abonnementsService.update(id, updateSubscriptionDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Supprimer un abonnement' })
-  @ApiParam({ name: 'id', description: 'ID de l\'abonnement' })
+  @ApiParam({ name: 'id', description: "ID de l'abonnement" })
   @ApiDeleteResponse()
   delete(@Param('id') id: string) {
     return this.abonnementsService.delete(id);

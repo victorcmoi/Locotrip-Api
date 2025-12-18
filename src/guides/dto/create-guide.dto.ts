@@ -1,10 +1,19 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsInt, IsBoolean, IsOptional, IsNotEmpty, IsUUID, IsEnum, Min } from 'class-validator';
+import {
+  IsString,
+  IsInt,
+  IsBoolean,
+  IsOptional,
+  IsNotEmpty,
+  IsUUID,
+  IsEnum,
+  Min,
+} from 'class-validator';
 import { GuideStatus } from '../enums/guide.enum';
 
 export class CreateGuideDto {
   @ApiProperty({
-    description: 'ID de l\'utilisateur associé au guide',
+    description: "ID de l'utilisateur associé au guide",
     example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @IsUUID()
@@ -13,7 +22,7 @@ export class CreateGuideDto {
 
   @ApiPropertyOptional({
     description: 'Biographie du guide',
-    example: 'Guide passionné avec 10 ans d\'expérience à Paris',
+    example: "Guide passionné avec 10 ans d'expérience à Paris",
   })
   @IsString()
   @IsOptional()
@@ -29,7 +38,7 @@ export class CreateGuideDto {
   languages?: string;
 
   @ApiPropertyOptional({
-    description: 'Années d\'expérience en tant que guide',
+    description: "Années d'expérience en tant que guide",
     example: 5,
     minimum: 0,
   })

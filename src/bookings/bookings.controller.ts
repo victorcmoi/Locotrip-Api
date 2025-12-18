@@ -1,5 +1,20 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiParam,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { BookingsService } from './bookings.service';
 import { PaymentsService } from './payments.service';
 import { DisputesService } from './disputes.service';
@@ -17,7 +32,7 @@ import {
   ApiUpdateResponse,
   ApiDeleteResponse,
 } from '../common/decorators/api-standard-responses.decorator';
-import { DisputeStatus } from '@prisma/client';
+import { DisputeStatus } from './enums/dispute.enum';
 import { Roles } from '../common/decorators/role.decorator';
 import { UserRole } from '../users/enums/user.enum';
 
@@ -58,8 +73,8 @@ export class BookingsController {
   }
 
   @Get('user/:userId')
-  @ApiOperation({ summary: 'Récupérer les réservations d\'un utilisateur' })
-  @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur' })
+  @ApiOperation({ summary: "Récupérer les réservations d'un utilisateur" })
+  @ApiParam({ name: 'userId', description: "ID de l'utilisateur" })
   @ApiGetManyResponse(BookingEntity)
   findByUser(@Param('userId') userId: string) {
     return this.bookingsService.findByUser(userId);
@@ -97,7 +112,7 @@ export class BookingsController {
 
   @Get(':bookingId/payments')
   @Roles(UserRole.CLIENT)
-  @ApiOperation({ summary: 'Récupérer les payments d\'une réservation' })
+  @ApiOperation({ summary: "Récupérer les payments d'une réservation" })
   @ApiParam({ name: 'bookingId', description: 'ID de la réservation' })
   @ApiGetManyResponse(Object)
   findPaiementsByBooking(@Param('bookingId') bookingId: string) {

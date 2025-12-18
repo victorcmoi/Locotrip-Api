@@ -57,7 +57,7 @@ export class GuideBoostsService {
 
   async findActive() {
     return this.prisma.guide_boost.findMany({
-      where: { 
+      where: {
         status: 'active',
         expiration_date: { gte: new Date() },
       },
@@ -71,18 +71,18 @@ export class GuideBoostsService {
   async update(id: string, updateData: Partial<CreateGuideBoostDto>) {
     try {
       const data: any = { ...updateData };
-      
+
       // Transformer les IDs en relations si présents
       if (updateData.guide_id) {
         data.guide = { connect: { id: updateData.guide_id } };
         delete data.guide_id;
       }
-      
+
       if (updateData.boost_offer_id) {
         data.boost_offer = { connect: { id: updateData.boost_offer_id } };
         delete data.boost_offer_id;
       }
-      
+
       return await this.prisma.guide_boost.update({
         where: { id },
         data,

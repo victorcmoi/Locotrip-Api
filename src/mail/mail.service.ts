@@ -9,7 +9,8 @@ export class MailService {
 
   constructor(private readonly mailgunService: MailgunService) {
     this.fromEmail = process.env.FROM_EMAIL || 'noreply@loco-trip.com';
-    this.domain = process.env.MAILGUN_DOMAIN || process.env.MAILGUN_SANDBOX_DOMAIN || '';
+    this.domain =
+      process.env.MAILGUN_DOMAIN || process.env.MAILGUN_SANDBOX_DOMAIN || '';
   }
 
   /**
@@ -73,13 +74,16 @@ export class MailService {
   /**
    * Envoie un email de confirmation de réservation
    */
-  async sendBookingConfirmationEmail(to: string, bookingDetails: {
-    userName: string;
-    experienceName: string;
-    date: string;
-    price: string;
-    bookingId: string;
-  }) {
+  async sendBookingConfirmationEmail(
+    to: string,
+    bookingDetails: {
+      userName: string;
+      experienceName: string;
+      date: string;
+      price: string;
+      bookingId: string;
+    },
+  ) {
     const subject = `Confirmation de réservation - ${bookingDetails.experienceName}`;
     const text = `Bonjour ${bookingDetails.userName},\n\nVotre réservation a été confirmée !\n\nDétails de la réservation :\n- Expérience : ${bookingDetails.experienceName}\n- Date : ${bookingDetails.date}\n- Prix : ${bookingDetails.price}\n- Numéro de réservation : ${bookingDetails.bookingId}\n\nCordialement,\nL'équipe Locotrip`;
     const html = `

@@ -1,13 +1,15 @@
+import { UpdateMediaDto } from './dto/update-media.dto';
+import { CreateMediaDto } from './dto/create-media.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { Prisma, MediaType } from '@prisma/client';
+import { MediaType } from './enums/media.enum';
 
 @Injectable()
 export class MediaService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.mediaCreateInput) {
-    return this.prisma.media.create({ data });
+  async create(createMediaDto: CreateMediaDto) {
+    return this.prisma.media.create({ data: createMediaDto });
   }
 
   async findAll() {
@@ -41,7 +43,7 @@ export class MediaService {
     });
   }
 
-  async update(id: string, data: Prisma.mediaUpdateInput) {
+  async update(id: string, data: UpdateMediaDto) {
     try {
       return await this.prisma.media.update({
         where: { id },

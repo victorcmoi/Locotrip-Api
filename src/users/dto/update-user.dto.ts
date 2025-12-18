@@ -5,7 +5,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
   @ApiPropertyOptional({
-    description: 'Refresh token pour l\'authentification',
+    description: "Refresh token pour l'authentification",
   })
   @IsOptional()
   @IsString()

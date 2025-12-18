@@ -12,7 +12,7 @@ export class CreateGuideBoostDto {
   guide_id: string;
 
   @ApiProperty({
-    description: 'ID de l\'offre de boost',
+    description: "ID de l'offre de boost",
     example: '660e8400-e29b-41d4-a716-446655440001',
   })
   @IsUUID()
@@ -20,7 +20,7 @@ export class CreateGuideBoostDto {
   boost_offer_id: string;
 
   @ApiProperty({
-    description: 'Date d\'expiration du boost',
+    description: "Date d'expiration du boost",
     example: '2025-03-01T23:59:59.000Z',
   })
   @IsDateString()
