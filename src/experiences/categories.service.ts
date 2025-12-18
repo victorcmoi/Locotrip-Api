@@ -47,7 +47,7 @@ export class CategoriesService {
         where: { id },
         data,
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Catégorie avec l'ID ${id} introuvable`);
     }
   }
@@ -57,7 +57,7 @@ export class CategoriesService {
       return await this.prisma.category.delete({
         where: { id },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Catégorie avec l'ID ${id} introuvable`);
     }
   }

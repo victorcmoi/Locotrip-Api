@@ -88,5 +88,5 @@ export class CreatePaymentDto {
   })
   @IsOptional()
   @IsObject()
-  metadata?: any;
+  metadata?: Record<string, any>;
 }

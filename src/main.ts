@@ -88,8 +88,8 @@ async function bootstrap() {
   // TO DO : add CRSF protection for form
 
   const prismaService = app.get(PrismaService);
-  await prismaService.enableShutdownHooks(app);
+  prismaService.enableShutdownHooks(app);
 
   await app.listen(process.env.API_PORT ?? 3000);
 }
-bootstrap();
+void bootstrap();

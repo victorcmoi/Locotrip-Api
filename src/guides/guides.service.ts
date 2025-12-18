@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateGuideDto } from './dto/create-guide.dto';
 import { UpdateGuideDto } from './dto/update-guide.dto';
+import { guideUncheckedUpdateInput } from '../generated/prisma/models/guide';
 
 @Injectable()
 export class GuidesService {
@@ -84,19 +85,13 @@ export class GuidesService {
 
   async update(id: string, updateGuideDto: UpdateGuideDto) {
     try {
-      const data: any = { ...updateGuideDto };
-
-      // Transformer l'ID en relation si présent
-      if (updateGuideDto.user_id) {
-        data.user = { connect: { id: updateGuideDto.user_id } };
-        delete data.user_id;
-      }
+      const data: guideUncheckedUpdateInput = { ...updateGuideDto };
 
       return await this.prisma.guide.update({
         where: { id },
         data,
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Guide avec l'ID ${id} introuvable`);
     }
   }
@@ -106,7 +101,7 @@ export class GuidesService {
       return await this.prisma.guide.delete({
         where: { id },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Guide avec l'ID ${id} introuvable`);
     }
   }
@@ -121,7 +116,7 @@ export class GuidesService {
           suspension_reason: reason || 'Guide suspendu',
         },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Guide avec l'ID ${id} introuvable`);
     }
   }
@@ -136,7 +131,7 @@ export class GuidesService {
           suspension_reason: null,
         },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Guide avec l'ID ${id} introuvable`);
     }
   }

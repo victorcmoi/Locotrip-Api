@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateExperienceDto } from './dto/create-experience.dto';
 import { UpdateExperienceDto } from './dto/update-experience.dto';
+import { experienceUncheckedUpdateInput } from '../generated/prisma/models/experience';
 
 @Injectable()
 export class ExperiencesService {
@@ -129,23 +130,13 @@ export class ExperiencesService {
 
   async update(id: string, updateExperienceDto: UpdateExperienceDto) {
     try {
-      const data: any = { ...updateExperienceDto };
-
-      if (updateExperienceDto.city_id) {
-        data.city = { connect: { id: updateExperienceDto.city_id } };
-        delete data.city_id;
-      }
-
-      if (updateExperienceDto.guide_id) {
-        data.guide = { connect: { id: updateExperienceDto.guide_id } };
-        delete data.guide_id;
-      }
+      const data: experienceUncheckedUpdateInput = { ...updateExperienceDto };
 
       return await this.prisma.experience.update({
         where: { id },
         data,
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Expérience avec l'ID ${id} introuvable`);
     }
   }
@@ -155,7 +146,7 @@ export class ExperiencesService {
       return await this.prisma.experience.delete({
         where: { id },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Expérience avec l'ID ${id} introuvable`);
     }
   }
@@ -169,7 +160,7 @@ export class ExperiencesService {
           deleted_at: new Date(),
         },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Expérience avec l'ID ${id} introuvable`);
     }
   }
@@ -183,7 +174,7 @@ export class ExperiencesService {
           deleted_at: null,
         },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Expérience avec l'ID ${id} introuvable`);
     }
   }
@@ -196,7 +187,7 @@ export class ExperiencesService {
           is_published: true,
         },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Expérience avec l'ID ${id} introuvable`);
     }
   }
@@ -209,7 +200,7 @@ export class ExperiencesService {
           is_published: false,
         },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Expérience avec l'ID ${id} introuvable`);
     }
   }

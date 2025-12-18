@@ -33,7 +33,7 @@ export class CurrenciesService {
         where: { code },
         data: updateCurrencyDto,
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Devise avec le code ${code} introuvable`);
     }
   }
@@ -43,7 +43,7 @@ export class CurrenciesService {
       return await this.prisma.currency.delete({
         where: { code },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Devise avec le code ${code} introuvable`);
     }
   }

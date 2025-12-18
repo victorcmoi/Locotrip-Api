@@ -49,7 +49,7 @@ export class MediaService {
         where: { id },
         data,
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Media avec l'ID ${id} introuvable`);
     }
   }
@@ -59,7 +59,7 @@ export class MediaService {
       return await this.prisma.media.delete({
         where: { id },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Media avec l'ID ${id} introuvable`);
     }
   }

@@ -35,7 +35,7 @@ export class BoostOffersService {
         where: { id },
         data: updateBoostOfferDto,
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Offre de boost avec l'ID ${id} introuvable`);
     }
   }
@@ -45,7 +45,7 @@ export class BoostOffersService {
       return await this.prisma.boost_offer.delete({
         where: { id },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Offre de boost avec l'ID ${id} introuvable`);
     }
   }

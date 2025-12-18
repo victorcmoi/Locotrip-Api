@@ -12,7 +12,7 @@ import { AppThrottlerGuard } from './guards/app-throttler.guard';
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: (process.env.JWT_EXPIRATION as any) ?? '15m' },
+      signOptions: { expiresIn: '15m' },
     }),
     UsersModule,
   ],

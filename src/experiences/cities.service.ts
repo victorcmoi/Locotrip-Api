@@ -42,7 +42,7 @@ export class CitiesService {
         where: { id },
         data: updateVilleDto,
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Ville avec l'ID ${id} introuvable`);
     }
   }
@@ -52,7 +52,7 @@ export class CitiesService {
       return await this.prisma.city.delete({
         where: { id },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Ville avec l'ID ${id} introuvable`);
     }
   }

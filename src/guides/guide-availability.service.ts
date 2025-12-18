@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateGuideAvailabilityDto } from './dto/create-guide-availability.dto';
+import { guide_availabilityUncheckedUpdateInput } from '../generated/prisma/models/guide_availability';
 
 @Injectable()
 export class GuideAvailabilityService {
@@ -51,19 +52,13 @@ export class GuideAvailabilityService {
 
   async update(id: string, updateData: Partial<CreateGuideAvailabilityDto>) {
     try {
-      const data: any = { ...updateData };
-
-      // Transformer l'ID en relation si présent
-      if (updateData.guide_id) {
-        data.guide = { connect: { id: updateData.guide_id } };
-        delete data.guide_id;
-      }
+      const data: guide_availabilityUncheckedUpdateInput = { ...updateData };
 
       return await this.prisma.guide_availability.update({
         where: { id },
         data,
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Disponibilité avec l'ID ${id} introuvable`);
     }
   }
@@ -73,7 +68,7 @@ export class GuideAvailabilityService {
       return await this.prisma.guide_availability.delete({
         where: { id },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Disponibilité avec l'ID ${id} introuvable`);
     }
   }

@@ -60,7 +60,7 @@ export class TicketMessagesService {
       return await this.prisma.ticket_message.delete({
         where: { id },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Message avec l'ID ${id} introuvable`);
     }
   }

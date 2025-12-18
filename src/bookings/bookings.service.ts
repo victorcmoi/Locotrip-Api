@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { BookingStatus } from './enums/booking.enum';
+import { bookingUncheckedUpdateInput } from '../generated/prisma/models/booking';
 
 @Injectable()
 export class BookingsService {
@@ -108,24 +109,13 @@ export class BookingsService {
 
   async update(id: string, updateBookingDto: UpdateBookingDto) {
     try {
-      const data: any = { ...updateBookingDto };
-
-      // Transformer les IDs en relations si présents
-      if (updateBookingDto.user_id) {
-        data.user = { connect: { id: updateBookingDto.user_id } };
-        delete data.user_id;
-      }
-
-      if (updateBookingDto.experience_id) {
-        data.experience = { connect: { id: updateBookingDto.experience_id } };
-        delete data.experience_id;
-      }
+      const data: bookingUncheckedUpdateInput = { ...updateBookingDto };
 
       return await this.prisma.booking.update({
         where: { id },
         data,
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Réservation avec l'ID ${id} introuvable`);
     }
   }
@@ -135,7 +125,7 @@ export class BookingsService {
       return await this.prisma.booking.delete({
         where: { id },
       });
-    } catch (error) {
+    } catch {
       throw new NotFoundException(`Réservation avec l'ID ${id} introuvable`);
     }
   }
