@@ -43,7 +43,7 @@ migrate: ## Appliquer les migrations
 studio: ## Ouvrir Prisma Studio
 	npx prisma studio --port 5555
 
-generate: ## Generer le client Prisma
+gen: ## Generer le client Prisma
 	npx prisma generate
 
 seed: ## Peupler la base
@@ -54,20 +54,20 @@ reset: ## Reinitialiser la base de donnees
 
 # === Docker ===
 
-docker-up: ## Lancer tous les services (API + BDD + Prisma Studio)
+dc-up: ## Lancer tous les services (API + BDD + Prisma Studio)
 	docker-compose up -d
 
-docker-dev: ## Lancer en mode developpement avec logs
+dc-dev: ## Lancer en mode developpement avec logs
 	docker-compose up
 
-docker-down: ## Arreter les conteneurs
+dc-down: ## Arreter les conteneurs
 	docker-compose down
 
-docker-logs: ## Voir les logs
+dc-logs: ## Voir les logs
 	docker-compose logs -f
 
-docker-restart: ## Redemarrer les conteneurs
+dc-restart: ## Redemarrer les conteneurs
 	docker-compose restart
 
-docker-clean: ## Arreter et supprimer les volumes
+dc-clean: ## Arreter et supprimer les volumes
 	docker-compose down -v
