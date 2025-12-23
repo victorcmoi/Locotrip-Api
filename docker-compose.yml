@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   # Base de données PostgreSQL
   postgres:
@@ -17,6 +19,28 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  # Stockage objet MinIO
+  minio:
+    image: ghcr.io/coollabsio/minio:RELEASE.2025-04-22T22-12-26Z
+    container_name: locotrip-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_SERVER_URL: ${MINIO_SERVER_URL}
+      MINIO_BROWSER_REDIRECT_URL: ${MINIO_BROWSER_REDIRECT_URL}
+      MINIO_ROOT_USER: ${SERVICE_USER_MINIO}
+      MINIO_ROOT_PASSWORD: ${SERVICE_PASSWORD_MINIO}
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 20s
+      retries: 10
 
   # API NestJS
   api:
@@ -42,3 +66,4 @@ services:
 
 volumes:
   postgres:
+  minio-data:
