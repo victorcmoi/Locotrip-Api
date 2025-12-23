@@ -78,4 +78,13 @@ export class AuthentificationController {
   changePassword(@Body() changePasswordDto: ChangePasswordDto) {
     return this.authentificationService.changePassword(changePasswordDto);
   }
+
+  @Post('me')
+  @Roles(UserRole.CLIENT, UserRole.GUIDE, UserRole.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Récupérer les informations de l\'utilisateur connecté' })
+  @ApiGetOneResponse(Object)
+  getProfile(@Request() req: { user: { sub: string } }) {
+    return this.authentificationService.getProfile(req.user.sub);
+  }
 }

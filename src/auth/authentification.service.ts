@@ -34,10 +34,23 @@ export class AuthentificationService {
       throw new NotFoundException(`Email ou mot de passe incorrect`);
     }
 
+    if (loginDto.requiredRole && user.role !== loginDto.requiredRole) {
+      throw new UnauthorizedException(
+        `Accès refusé. Ce compte n'a pas les permissions nécessaires pour accéder à cette interface.`,
+      );
+    }
+
     const payload = { userId: user.id };
 
     return {
       token: await this.jwtService.signAsync(payload),
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        role: user.role,
+      },
     };
   }
 
@@ -120,6 +133,21 @@ export class AuthentificationService {
     return this.usersService.update(user.id, {
       password: changePasswordDto.password,
     });
+  }
+
+  async getProfile(userId: string) {
+    const user = await this.usersService.findOne(userId);
+    if (!user) {
+      throw new NotFoundException(`Utilisateur introuvable`);
+    }
+
+    return {
+      id: user.id,
+      email: user.email,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      role: user.role,
+    };
   }
 
   // ========== MÉTHODES PRIVÉES ==========
