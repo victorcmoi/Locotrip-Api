@@ -8,6 +8,7 @@ import {
   Param,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -24,6 +25,7 @@ import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { CreateDisputeDto } from './dto/create-dispute.dto';
 import { UpdateDisputeDto } from './dto/update-dispute.dto';
+import { FindAllBookingsDto } from './dto/find-all-bookings.dto';
 import { BookingEntity } from './entities/booking.entity';
 import {
   ApiCreateResponse,
@@ -59,8 +61,8 @@ export class BookingsController {
   @Roles(UserRole.CLIENT)
   @ApiOperation({ summary: 'Récupérer toutes les réservations' })
   @ApiGetManyResponse(BookingEntity)
-  findAll() {
-    return this.bookingsService.findAll();
+  findAll(@Query() query: FindAllBookingsDto) {
+    return this.bookingsService.findAll(query);
   }
 
   @Get(':id')

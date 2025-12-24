@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   Patch,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -30,6 +31,7 @@ import { CreateGuideAvailabilityDto } from './dto/create-guide-availability.dto'
 import { CreateGuideBoostDto } from './dto/create-guide-boost.dto';
 import { CreateBoostOfferDto } from './dto/create-boost-offer.dto';
 import { UpdateBoostOfferDto } from './dto/update-boost-offer.dto';
+import { FindAllGuidesDto } from './dto/find-all-guides.dto';
 import { GuideEntity } from './entities/guide.entity';
 import {
   ApiCreateResponse,
@@ -68,8 +70,26 @@ export class GuidesController {
   @Public()
   @ApiOperation({ summary: 'Récupérer tous les guides' })
   @ApiGetManyResponse(GuideEntity)
-  findAll() {
-    return this.guidesService.findAll();
+  findAll(@Query() query: FindAllGuidesDto) {
+    return this.guidesService.findAll(query);
+  }
+
+  @Get('top-rated')
+  @Public()
+  @ApiOperation({
+    summary: 'Récupérer les guides les mieux notés',
+    description:
+      "Retourne les guides avec les meilleures notes pondérées par le nombre d'avis",
+  })
+  @ApiGetManyResponse(GuideEntity)
+  findTopRated(
+    @Query('limit') limit?: number,
+    @Query('minReviews') minReviews?: number,
+  ) {
+    return this.guidesService.findTopRated(
+      limit ? Number(limit) : 5,
+      minReviews ? Number(minReviews) : 1,
+    );
   }
 
   @Get(':id')

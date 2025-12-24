@@ -2,8 +2,16 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
+import { FindAllBookingsDto } from './dto/find-all-bookings.dto';
 import { BookingStatus } from './enums/booking.enum';
-import { bookingUncheckedUpdateInput } from '../generated/prisma/models/booking';
+import {
+  bookingUncheckedUpdateInput,
+  bookingWhereInput,
+} from '../generated/prisma/models/booking';
+import {
+  PaginatedResponse,
+  PaginationMeta,
+} from '../common/interfaces/paginated-response.interface';
 
 @Injectable()
 export class BookingsService {
@@ -26,23 +34,81 @@ export class BookingsService {
     });
   }
 
-  async findAll() {
-    return this.prisma.booking.findMany({
-      include: {
-        user: true,
-        experience: {
-          include: {
-            guide: {
-              include: {
-                user: true,
+  async findAll(query: FindAllBookingsDto): Promise<PaginatedResponse<any>> {
+    const {
+      page = 1,
+      limit = 20,
+      sort = 'booking_date',
+      order = 'desc',
+      userId,
+      experienceId,
+      status,
+      startDate,
+      endDate,
+    } = query;
+
+    // Construction des filtres WHERE
+    const where: bookingWhereInput = {};
+
+    if (userId) {
+      where.user_id = userId;
+    }
+
+    if (experienceId) {
+      where.experience_id = experienceId;
+    }
+
+    if (status) {
+      where.status = status;
+    }
+
+    // Filtre par dates
+    if (startDate || endDate) {
+      where.booking_date = {};
+      if (startDate) {
+        where.booking_date.gte = new Date(startDate);
+      }
+      if (endDate) {
+        where.booking_date.lte = new Date(endDate);
+      }
+    }
+
+    // Calcul de la pagination
+    const skip = (page - 1) * limit;
+
+    // Construction du tri
+    const orderBy: Record<string, 'asc' | 'desc'> = {};
+    orderBy[sort] = order as 'asc' | 'desc';
+
+    // Requêtes parallèles
+    const [data, total] = await Promise.all([
+      this.prisma.booking.findMany({
+        where,
+        include: {
+          user: true,
+          experience: {
+            include: {
+              guide: {
+                include: {
+                  user: true,
+                },
               },
+              city: true,
             },
-            city: true,
           },
+          payments: true,
         },
-        payments: true,
-      },
-    });
+        orderBy,
+        skip,
+        take: limit,
+      }),
+      this.prisma.booking.count({ where }),
+    ]);
+
+    return {
+      data,
+      meta: new PaginationMeta(page, limit, total),
+    };
   }
 
   async findOne(id: string) {

@@ -2,7 +2,15 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateExperienceDto } from './dto/create-experience.dto';
 import { UpdateExperienceDto } from './dto/update-experience.dto';
-import { experienceUncheckedUpdateInput } from '../generated/prisma/models/experience';
+import { FindAllExperiencesDto } from './dto/find-all-experiences.dto';
+import {
+  experienceUncheckedUpdateInput,
+  experienceWhereInput,
+} from '../generated/prisma/models/experience';
+import {
+  PaginatedResponse,
+  PaginationMeta,
+} from '../common/interfaces/paginated-response.interface';
 
 @Injectable()
 export class ExperiencesService {
@@ -26,30 +34,133 @@ export class ExperiencesService {
     });
   }
 
-  async findAll() {
-    return this.prisma.experience.findMany({
-      where: {
+  async findAll(query: FindAllExperiencesDto): Promise<PaginatedResponse<any>> {
+    const {
+      page = 1,
+      limit = 20,
+      sort = 'created_at',
+      order = 'desc',
+      minRating,
+      minPrice,
+      maxPrice,
+      cityId,
+      guideId,
+      categories,
+      search,
+      minDuration,
+      maxDuration,
+      maxParticipants,
+      available,
+    } = query;
+
+    // Construction des filtres WHERE
+    const where: experienceWhereInput = {
+      is_active: true,
+      is_published: true,
+      guide: {
         is_active: true,
-        is_published: true,
-        guide: {
-          is_active: true,
-        },
       },
-      include: {
-        city: true,
-        guide: {
-          include: {
-            user: true,
+    };
+
+    if (cityId) {
+      where.city_id = cityId;
+    }
+
+    if (guideId) {
+      where.guide_id = guideId;
+    }
+
+    if (minPrice !== undefined || maxPrice !== undefined) {
+      where.price = {};
+      if (minPrice !== undefined) where.price.gte = minPrice;
+      if (maxPrice !== undefined) where.price.lte = maxPrice;
+    }
+
+    if (minDuration !== undefined || maxDuration !== undefined) {
+      where.duration = {};
+      if (minDuration !== undefined) where.duration.gte = minDuration;
+      if (maxDuration !== undefined) where.duration.lte = maxDuration;
+    }
+
+    if (maxParticipants !== undefined) {
+      where.max_capacity = {
+        gte: maxParticipants,
+      };
+    }
+
+    if (available !== undefined && available) {
+      where.is_published = true;
+    }
+
+    // Filtre par catégories
+    if (categories) {
+      const categoryIds = categories.split(',').map((c) => c.trim());
+      where.categories = {
+        some: {
+          category_id: {
+            in: categoryIds,
           },
         },
-        categories: {
-          include: {
-            category: true,
+      };
+    }
+
+    // Recherche textuelle
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    // Calcul de la pagination
+    const skip = (page - 1) * limit;
+
+    // Construction du tri
+    const orderBy: Record<string, 'asc' | 'desc'> = {};
+    orderBy[sort] = order as 'asc' | 'desc';
+
+    // Requêtes parallèles
+    const [data, total] = await Promise.all([
+      this.prisma.experience.findMany({
+        where,
+        include: {
+          city: true,
+          guide: {
+            include: {
+              user: true,
+            },
           },
+          categories: {
+            include: {
+              category: true,
+            },
+          },
+          reviews: true,
         },
-        reviews: true,
-      },
-    });
+        orderBy,
+        skip,
+        take: limit,
+      }),
+      this.prisma.experience.count({ where }),
+    ]);
+
+    // Filtrage post-requête pour minRating
+    let filteredData = data;
+    if (minRating !== undefined) {
+      filteredData = data.filter((experience) => {
+        const reviews = experience.reviews;
+        const avgRating =
+          reviews.length > 0
+            ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+            : 0;
+        return avgRating >= minRating;
+      });
+    }
+
+    return {
+      data: filteredData,
+      meta: new PaginationMeta(page, limit, total),
+    };
   }
 
   async findOne(id: string) {

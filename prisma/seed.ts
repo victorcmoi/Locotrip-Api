@@ -50,7 +50,50 @@ async function main() {
     },
   });
 
-  const guideUser = await prisma.user.create({
+  const client2 = await prisma.user.create({
+    data: {
+      last_name: 'Bernard',
+      first_name: 'Marie',
+      email: 'marie.bernard@example.com',
+      phone: '+33612345679',
+      birth_date: new Date('1992-08-20'),
+      password: '$2a$10$abcdefghijklmnopqrstuv',
+      role: 'client',
+      is_active: true,
+      is_verified: true,
+    },
+  });
+
+  const client3 = await prisma.user.create({
+    data: {
+      last_name: 'Petit',
+      first_name: 'Pierre',
+      email: 'pierre.petit@example.com',
+      phone: '+33612345680',
+      birth_date: new Date('1985-12-10'),
+      password: '$2a$10$abcdefghijklmnopqrstuv',
+      role: 'client',
+      is_active: true,
+      is_verified: true,
+    },
+  });
+
+  const client4 = await prisma.user.create({
+    data: {
+      last_name: 'Moreau',
+      first_name: 'Julie',
+      email: 'julie.moreau@example.com',
+      phone: '+33612345681',
+      birth_date: new Date('1995-04-15'),
+      password: '$2a$10$abcdefghijklmnopqrstuv',
+      role: 'client',
+      is_active: true,
+      is_verified: true,
+    },
+  });
+
+  // Créer 5 utilisateurs guides
+  const guideUser1 = await prisma.user.create({
     data: {
       last_name: 'Martin',
       first_name: 'Sophie',
@@ -64,35 +107,64 @@ async function main() {
     },
   });
 
-  const admin = await prisma.user.create({
+  const guideUser2 = await prisma.user.create({
     data: {
-      last_name: 'Admin',
-      first_name: 'Système',
-      email: 'admin@locotrip.com',
+      last_name: 'Dubois',
+      first_name: 'Thomas',
+      email: 'thomas.dubois@example.com',
+      phone: '+33687654322',
+      birth_date: new Date('1985-07-12'),
       password: '$2a$10$abcdefghijklmnopqrstuv',
-      role: 'admin',
+      role: 'guide',
       is_active: true,
       is_verified: true,
     },
   });
 
-  // Créer un utilisateur inactif pour tester le soft delete
-  const inactiveUser = await prisma.user.create({
+  const guideUser3 = await prisma.user.create({
     data: {
-      last_name: 'Inactive',
-      first_name: 'Test',
-      email: 'inactive@example.com',
+      last_name: 'Rousseau',
+      first_name: 'Camille',
+      email: 'camille.rousseau@example.com',
+      phone: '+33687654323',
+      birth_date: new Date('1990-11-05'),
       password: '$2a$10$abcdefghijklmnopqrstuv',
-      role: 'client',
-      is_active: false,
-      is_verified: false,
-      deleted_at: new Date(),
-      deleted_reason: 'Test de soft delete',
+      role: 'guide',
+      is_active: true,
+      is_verified: true,
+    },
+  });
+
+  const guideUser4 = await prisma.user.create({
+    data: {
+      last_name: 'Laurent',
+      first_name: 'Alexandre',
+      email: 'alexandre.laurent@example.com',
+      phone: '+33687654324',
+      birth_date: new Date('1987-02-28'),
+      password: '$2a$10$abcdefghijklmnopqrstuv',
+      role: 'guide',
+      is_active: true,
+      is_verified: true,
+    },
+  });
+
+  const guideUser5 = await prisma.user.create({
+    data: {
+      last_name: 'Leroy',
+      first_name: 'Emma',
+      email: 'emma.leroy@example.com',
+      phone: '+33687654325',
+      birth_date: new Date('1993-09-18'),
+      password: '$2a$10$abcdefghijklmnopqrstuv',
+      role: 'guide',
+      is_active: true,
+      is_verified: true,
     },
   });
 
   console.log(
-    `✅ Utilisateurs créés: ${client1.email}, ${guideUser.email}, ${admin.email}, ${inactiveUser.email}`,
+    `✅ Utilisateurs créés: ${client1.email}, ${guideUser1.email}, etc.`,
   );
 
   // Créer des adresses
@@ -110,27 +182,14 @@ async function main() {
     },
   });
 
-  await prisma.address.create({
-    data: {
-      user_id: guideUser.id,
-      street: '45 Avenue des Champs-Élysées',
-      city: 'Paris',
-      state: 'Île-de-France',
-      postal_code: '75008',
-      country: 'France',
-      longitude: 2.3077,
-      latitude: 48.8698,
-    },
-  });
-
   console.log('✅ Adresses créées');
 
-  // Créer un guide
-  console.log('🎯 Création du profil guide...');
+  // Créer 5 profils guides
+  console.log('🎯 Création des profils guides...');
   const guide1 = await prisma.guide.create({
     data: {
-      user_id: guideUser.id,
-      bio: "Guide passionnée avec 5 ans d'expérience à Paris",
+      user_id: guideUser1.id,
+      bio: "Guide passionnée avec 5 ans d'expérience. Spécialiste de l'art et de l'histoire parisienne. J'adore faire découvrir les secrets cachés de la capitale !",
       languages: 'Français, Anglais, Espagnol',
       years_of_experience: 5,
       guide_status: 'pro',
@@ -139,7 +198,55 @@ async function main() {
     },
   });
 
-  console.log(`✅ Guide créé pour ${guideUser.first_name}`);
+  const guide2 = await prisma.guide.create({
+    data: {
+      user_id: guideUser2.id,
+      bio: "Expert en gastronomie française avec 8 ans d'expérience. Je vous emmène dans les meilleurs restaurants et marchés de France.",
+      languages: 'Français, Anglais, Italien',
+      years_of_experience: 8,
+      guide_status: 'pro',
+      pro_card: true,
+      country: 'France',
+    },
+  });
+
+  const guide3 = await prisma.guide.create({
+    data: {
+      user_id: guideUser3.id,
+      bio: "Passionnée d'architecture et d'urbanisme. 3 ans d'expérience à faire découvrir les trésors architecturaux de Lyon et Paris.",
+      languages: 'Français, Anglais',
+      years_of_experience: 3,
+      guide_status: 'local',
+      pro_card: false,
+      country: 'France',
+    },
+  });
+
+  const guide4 = await prisma.guide.create({
+    data: {
+      user_id: guideUser4.id,
+      bio: "Guide aventurier spécialisé dans les expériences insolites. 10 ans d'expérience dans le tourisme alternatif.",
+      languages: 'Français, Anglais, Allemand, Espagnol',
+      years_of_experience: 10,
+      guide_status: 'pro',
+      pro_card: true,
+      country: 'France',
+    },
+  });
+
+  const guide5 = await prisma.guide.create({
+    data: {
+      user_id: guideUser5.id,
+      bio: "Jeune guide dynamique spécialisée dans les visites pour les jeunes voyageurs. 2 ans d'expérience mais une passion infinie !",
+      languages: 'Français, Anglais, Japonais',
+      years_of_experience: 2,
+      guide_status: 'local',
+      pro_card: false,
+      country: 'France',
+    },
+  });
+
+  console.log('✅ 5 guides créés');
 
   // Créer des cities
   console.log('🌍 Création des cities...');
@@ -195,14 +302,15 @@ async function main() {
     `✅ Catégories créées: ${culture.name}, ${gastronomie.name}, ${aventure.name}`,
   );
 
-  // Créer des expériences
+  // Créer des expériences pour chaque guide
   console.log('🎨 Création des expériences...');
   const exp1 = await prisma.experience.create({
     data: {
       title: 'Visite guidée du Louvre',
-      description: "Découvrez les chefs-d'œuvre du plus grand musée du monde",
+      description:
+        "Découvrez les chefs-d'œuvre du plus grand musée du monde avec Sophie",
       price: 49.99,
-      duration: 180, // 3 heures
+      duration: 180,
       city_id: paris.id,
       guide_id: guide1.id,
       max_capacity: 15,
@@ -218,11 +326,11 @@ async function main() {
     data: {
       title: 'Tour gastronomique de Lyon',
       description:
-        'Dégustez les spécialités lyonnaises dans les meilleurs bouchons',
+        'Dégustez les spécialités lyonnaises avec Thomas, expert en gastronomie',
       price: 79.99,
-      duration: 240, // 4 heures
+      duration: 240,
       city_id: lyon.id,
-      guide_id: guide1.id,
+      guide_id: guide2.id,
       max_capacity: 10,
       meeting_point: 'Place Bellecour',
       meeting_latitude: 45.7578,
@@ -232,24 +340,87 @@ async function main() {
     },
   });
 
-  // Créer une expérience brouillon pour tester
   const exp3 = await prisma.experience.create({
     data: {
-      title: 'Visite des catacombes (Brouillon)',
-      description: 'Explorez les souterrains mystérieux de Paris',
+      title: 'Balade architecturale à Paris',
+      description: 'Découvrez les trésors architecturaux de Paris avec Camille',
       price: 35.0,
       duration: 120,
       city_id: paris.id,
-      guide_id: guide1.id,
+      guide_id: guide3.id,
       max_capacity: 20,
       is_active: true,
-      is_published: false, // Brouillon
+      is_published: true,
     },
   });
 
-  console.log(
-    `✅ Expériences créées: ${exp1.title}, ${exp2.title}, ${exp3.title}`,
-  );
+  const exp4 = await prisma.experience.create({
+    data: {
+      title: 'Paris insolite - Les passages couverts',
+      description: 'Explorez le Paris secret avec Alexandre, guide aventurier',
+      price: 45.0,
+      duration: 150,
+      city_id: paris.id,
+      guide_id: guide4.id,
+      max_capacity: 12,
+      meeting_point: 'Galerie Vivienne',
+      meeting_latitude: 48.8686,
+      meeting_longitude: 2.3396,
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp5 = await prisma.experience.create({
+    data: {
+      title: 'Paris pour les jeunes - Street Art Tour',
+      description:
+        'Découvrez le street art parisien avec Emma, guide dynamique',
+      price: 29.99,
+      duration: 120,
+      city_id: paris.id,
+      guide_id: guide5.id,
+      max_capacity: 15,
+      meeting_point: 'Belleville',
+      meeting_latitude: 48.8717,
+      meeting_longitude: 2.3824,
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp6 = await prisma.experience.create({
+    data: {
+      title: 'Montmartre et le Sacré-Cœur',
+      description: 'Visite complète du quartier mythique avec Sophie',
+      price: 39.99,
+      duration: 180,
+      city_id: paris.id,
+      guide_id: guide1.id,
+      max_capacity: 20,
+      meeting_point: 'Place du Tertre',
+      meeting_latitude: 48.8867,
+      meeting_longitude: 2.3407,
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp7 = await prisma.experience.create({
+    data: {
+      title: 'Dégustation de vins français',
+      description: 'Initiez-vous aux vins de France avec Thomas',
+      price: 65.0,
+      duration: 150,
+      city_id: paris.id,
+      guide_id: guide2.id,
+      max_capacity: 8,
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  console.log('✅ 7 expériences créées pour 5 guides');
 
   // Lier les expériences aux catégories
   await prisma.experience_category.create({
@@ -326,16 +497,186 @@ async function main() {
     },
   });
 
-  // Créer un review
-  console.log("⭐ Création d'un avis...");
+  // Créer plusieurs reviews pour chaque expérience
+  console.log('⭐ Création des avis...');
+
+  // Reviews pour exp1 (Louvre - Sophie)
   await prisma.review.create({
     data: {
       user_id: client1.id,
       experience_id: exp1.id,
       rating: 5,
-      comment: 'Expérience exceptionnelle ! Guide très compétente et passionnée.',
+      comment:
+        'Expérience exceptionnelle ! Sophie est très compétente et passionnée. Les 3h sont passées à une vitesse folle !',
     },
   });
+
+  await prisma.review.create({
+    data: {
+      user_id: client2.id,
+      experience_id: exp1.id,
+      rating: 5,
+      comment:
+        'Visite parfaite du Louvre. Sophie connaît chaque tableau par cœur et sait captiver son audience.',
+    },
+  });
+
+  await prisma.review.create({
+    data: {
+      user_id: client3.id,
+      experience_id: exp1.id,
+      rating: 4,
+      comment:
+        "Très bonne visite, beaucoup d'informations intéressantes. Petit bémol sur le rythme un peu rapide.",
+    },
+  });
+
+  // Reviews pour exp2 (Lyon - Thomas)
+  await prisma.review.create({
+    data: {
+      user_id: client1.id,
+      experience_id: exp2.id,
+      rating: 5,
+      comment:
+        "Thomas est un excellent guide gastronome ! Les bouchons qu'il nous a fait découvrir étaient délicieux.",
+    },
+  });
+
+  await prisma.review.create({
+    data: {
+      user_id: client4.id,
+      experience_id: exp2.id,
+      rating: 5,
+      comment:
+        "Tour gastronomique incroyable ! J'ai découvert des saveurs que je ne connaissais pas. Thomas est passionné et ça se voit !",
+    },
+  });
+
+  await prisma.review.create({
+    data: {
+      user_id: client2.id,
+      experience_id: exp2.id,
+      rating: 4,
+      comment:
+        'Excellente expérience culinaire. Seul petit bémol : un peu cher mais la qualité est au rendez-vous.',
+    },
+  });
+
+  // Reviews pour exp3 (Architecture - Camille)
+  await prisma.review.create({
+    data: {
+      user_id: client3.id,
+      experience_id: exp3.id,
+      rating: 5,
+      comment:
+        "Camille nous a fait voir Paris sous un autre angle. Passionnant pour les amateurs d'architecture !",
+    },
+  });
+
+  await prisma.review.create({
+    data: {
+      user_id: client1.id,
+      experience_id: exp3.id,
+      rating: 4,
+      comment: 'Belle découverte des bâtiments parisiens. Très instructif.',
+    },
+  });
+
+  // Reviews pour exp4 (Paris insolite - Alexandre)
+  await prisma.review.create({
+    data: {
+      user_id: client2.id,
+      experience_id: exp4.id,
+      rating: 5,
+      comment:
+        'Alexandre nous a emmené dans des endroits que je ne connaissais pas du tout ! Paris secret à son meilleur.',
+    },
+  });
+
+  await prisma.review.create({
+    data: {
+      user_id: client4.id,
+      experience_id: exp4.id,
+      rating: 5,
+      comment:
+        'Tour insolite incroyable ! Les passages couverts sont magnifiques. Alexandre est un guide exceptionnel.',
+    },
+  });
+
+  await prisma.review.create({
+    data: {
+      user_id: client3.id,
+      experience_id: exp4.id,
+      rating: 5,
+      comment:
+        "Meilleure visite que j'ai faite à Paris ! Alexandre connaît tous les secrets de la ville.",
+    },
+  });
+
+  // Reviews pour exp5 (Street Art - Emma)
+  await prisma.review.create({
+    data: {
+      user_id: client4.id,
+      experience_id: exp5.id,
+      rating: 5,
+      comment:
+        'Emma est super dynamique ! On a découvert des œuvres de street art incroyables à Belleville.',
+    },
+  });
+
+  await prisma.review.create({
+    data: {
+      user_id: client1.id,
+      experience_id: exp5.id,
+      rating: 4,
+      comment:
+        'Tour sympa pour découvrir le street art parisien. Emma connaît bien son sujet.',
+    },
+  });
+
+  // Reviews pour exp6 (Montmartre - Sophie)
+  await prisma.review.create({
+    data: {
+      user_id: client2.id,
+      experience_id: exp6.id,
+      rating: 5,
+      comment:
+        "Montmartre avec Sophie, c'est magique ! Elle connaît toutes les anecdotes du quartier.",
+    },
+  });
+
+  await prisma.review.create({
+    data: {
+      user_id: client3.id,
+      experience_id: exp6.id,
+      rating: 5,
+      comment:
+        'Visite parfaite du Sacré-Cœur et de ses alentours. Sophie est une guide exceptionnelle.',
+    },
+  });
+
+  // Reviews pour exp7 (Dégustation vins - Thomas)
+  await prisma.review.create({
+    data: {
+      user_id: client4.id,
+      experience_id: exp7.id,
+      rating: 5,
+      comment:
+        "Thomas est un vrai sommelier ! J'ai appris énormément sur les vins français.",
+    },
+  });
+
+  await prisma.review.create({
+    data: {
+      user_id: client2.id,
+      experience_id: exp7.id,
+      rating: 4,
+      comment:
+        'Très bonne initiation aux vins. Thomas sait transmettre sa passion.',
+    },
+  });
+
+  console.log('✅ 18 avis créés pour les différentes expériences');
 
   // Créer un subscription
   console.log("🎫 Création d'un subscription...");
@@ -369,7 +710,7 @@ async function main() {
   await prisma.message.create({
     data: {
       conversation_id: conversation.id,
-      author_id: guideUser.id,
+      author_id: guideUser1.id,
       content:
         'Bonjour ! Le point de rendez-vous est devant la pyramide du Louvre.',
     },
@@ -387,7 +728,7 @@ async function main() {
   });
 
   // Créer un ticket de support
-  console.log('🎫 Création d\'un ticket de support...');
+  console.log("🎫 Création d'un ticket de support...");
   const ticket = await prisma.support_ticket.create({
     data: {
       user_id: client1.id,

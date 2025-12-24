@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   Patch,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -21,6 +22,7 @@ import { UsersService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { SoftDeleteUserDto } from './dto/soft-delete-user.dto';
+import { FindAllUsersDto } from './dto/find-all-users.dto';
 import { UserEntity } from './entities/user.entity';
 import {
   ApiCreateResponse,
@@ -49,8 +51,8 @@ export class UsersController {
   @Get()
   @ApiOperation({ summary: 'Récupérer tous les utilisateurs' })
   @ApiGetManyResponse(UserEntity)
-  findAll() {
-    return this.usersService.findAll();
+  findAll(@Query() query: FindAllUsersDto) {
+    return this.usersService.findAll(query);
   }
 
   @Get(':id')

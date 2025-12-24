@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   Patch,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -25,6 +26,8 @@ import { CreateExperienceDto } from './dto/create-experience.dto';
 import { UpdateExperienceDto } from './dto/update-experience.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { FindAllCitiesDto } from './dto/find-all-cities.dto';
+import { FindAllExperiencesDto } from './dto/find-all-experiences.dto';
 import { ExperienceEntity } from './entities/experience.entity';
 import {
   ApiCreateResponse,
@@ -55,8 +58,8 @@ export class CitiesController {
   @Public()
   @ApiOperation({ summary: 'Récupérer toutes les villes' })
   @ApiGetManyResponse(Object)
-  findAll() {
-    return this.citiesService.findAll();
+  findAll(@Query() query: FindAllCitiesDto) {
+    return this.citiesService.findAll(query);
   }
 
   @Get(':id')
@@ -105,8 +108,8 @@ export class ExperiencesController {
   @Public()
   @ApiOperation({ summary: 'Récupérer toutes les expériences' })
   @ApiGetManyResponse(ExperienceEntity)
-  findAll() {
-    return this.experiencesService.findAll();
+  findAll(@Query() query: FindAllExperiencesDto) {
+    return this.experiencesService.findAll(query);
   }
 
   @Get(':id')
