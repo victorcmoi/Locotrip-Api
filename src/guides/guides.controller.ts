@@ -102,7 +102,7 @@ export class GuidesController {
   }
 
   @Get('user/:userId')
-  @Roles(UserRole.CLIENT, UserRole.GUIDE)
+  @Public()
   @ApiOperation({ summary: 'Récupérer le guide associé à un utilisateur' })
   @ApiParam({ name: 'userId', description: "ID de l'utilisateur" })
   @ApiGetOneResponse(GuideEntity)

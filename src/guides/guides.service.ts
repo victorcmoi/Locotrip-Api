@@ -219,7 +219,7 @@ export class GuidesService {
   }
 
   async findByUser(userId: string) {
-    return this.prisma.guide.findMany({
+    const guides = await this.prisma.guide.findMany({
       where: {
         user_id: userId,
         is_active: true,
@@ -230,6 +230,14 @@ export class GuidesService {
         experiences: true,
       },
     });
+
+    if (!guides || guides.length === 0) {
+      throw new NotFoundException(
+        `Aucun profil guide actif trouvé pour l'utilisateur ${userId}`,
+      );
+    }
+
+    return guides;
   }
 
   async update(id: string, updateGuideDto: UpdateGuideDto) {

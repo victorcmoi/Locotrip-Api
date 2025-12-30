@@ -75,6 +75,7 @@ export class UsersService {
       this.prisma.user.findMany({
         where,
         include: {
+          address: true,
           guides: true,
           bookings: true,
           reviews: true,
@@ -100,6 +101,7 @@ export class UsersService {
         is_active: true,
       },
       include: {
+        address: true,
         guides: true,
         bookings: true,
         reviews: true,
