@@ -81,7 +81,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.CLIENT)
+  @Roles(UserRole.CLIENT, UserRole.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Supprimer un utilisateur' })
   @ApiParam({ name: 'id', description: "ID de l'utilisateur (UUID)" })
@@ -90,8 +90,8 @@ export class UsersController {
     return this.usersService.delete(id);
   }
 
+  // TODO: Ajouter role ADMIN pour la suppression du compte
   @Delete(':id/soft')
-  @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Désactiver un utilisateur (soft delete)' })
   @ApiParam({ name: 'id', description: "ID de l'utilisateur (UUID)" })

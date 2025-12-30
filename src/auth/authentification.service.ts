@@ -19,7 +19,7 @@ export class AuthentificationService {
     private jwtService: JwtService,
     private configService: ConfigService,
     private mailService: MailService,
-  ) {}
+  ) { }
 
   async login(loginDto: LoginDto) {
     const user = await this.usersService.findByEmail(loginDto.email);
@@ -34,7 +34,7 @@ export class AuthentificationService {
       throw new NotFoundException(`Email ou mot de passe incorrect`);
     }
 
-    if (loginDto.requiredRole && user.role !== loginDto.requiredRole) {
+    if (loginDto.requiredRole && user.role.toUpperCase() !== loginDto.requiredRole.toUpperCase()) {
       throw new UnauthorizedException(
         `Accès refusé. Ce compte n'a pas les permissions nécessaires pour accéder à cette interface.`,
       );
@@ -43,7 +43,9 @@ export class AuthentificationService {
     const payload = { userId: user.id };
 
     return {
-      token: await this.jwtService.signAsync(payload),
+      token: await this.jwtService.signAsync(payload, {
+        expiresIn: '8h',
+      }),
       user: {
         id: user.id,
         email: user.email,
