@@ -76,7 +76,7 @@ export class UsersService {
         where,
         include: {
           address: true,
-          guides: true,
+          guide: true,
           bookings: true,
           reviews: true,
           subscriptions: true,
@@ -102,7 +102,7 @@ export class UsersService {
       },
       include: {
         address: true,
-        guides: true,
+        guide: true,
         bookings: true,
         reviews: true,
         subscriptions: true,
@@ -204,7 +204,7 @@ export class UsersService {
   async findAllIncludingDeleted() {
     return this.prisma.user.findMany({
       include: {
-        guides: true,
+        guide: true,
         bookings: true,
         reviews: true,
         subscriptions: true,

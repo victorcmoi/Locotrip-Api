@@ -1,4 +1,5 @@
 # Makefile - Locotrip API
+DOCKER_API = docker exec -it locotrip-api
 .PHONY: help install dev migrate studio docker-dev docker-prod docker-down docker-logs
 
 help: ## Afficher l'aide
@@ -16,12 +17,20 @@ help: ## Afficher l'aide
 	@echo "  make studio        - Ouvrir Prisma Studio"
 	@echo ""
 	@echo "Docker:"
-	@echo "  make docker-up     - Lancer tous les services en arriere-plan"
-	@echo "  make docker-dev    - Lancer en mode dev avec logs"
-	@echo "  make docker-down   - Arreter les conteneurs"
-	@echo "  make docker-logs   - Voir les logs"
-	@echo "  make docker-restart - Redemarrer les conteneurs"
-	@echo "  make docker-clean  - Arreter et supprimer les volumes"
+	@echo "  make dc-up         - Lancer tous les services en arriere-plan"
+	@echo "  make dc-dev        - Lancer en mode dev avec logs"
+	@echo "  make dc-down       - Arreter les conteneurs"
+	@echo "  make dc-logs       - Voir les logs"
+	@echo "  make dc-restart    - Redemarrer les conteneurs"
+	@echo "  make dc-clean      - Arreter et supprimer les volumes"
+	@echo ""
+	@echo "Docker (dans le conteneur):"
+	@echo "  make docker-migrate - Appliquer les migrations"
+	@echo "  make docker-gen     - Generer le client Prisma"
+	@echo "  make docker-seed    - Peupler la base"
+	@echo "  make docker-reset   - Reinitialiser la base"
+	@echo "  make docker-bash    - Ouvrir un shell"
+	@echo "  make docker-install - Installer les dependances"
 	@echo ""
 
 # === Installation ===
@@ -71,3 +80,23 @@ dc-restart: ## Redemarrer les conteneurs
 
 dc-clean: ## Arreter et supprimer les volumes
 	docker-compose down -v
+
+# === Docker Commands (inside container) ===
+
+docker-migrate: ## Appliquer les migrations (dans Docker)
+	$(DOCKER_API) npx prisma migrate dev
+
+docker-gen: ## Generer le client Prisma (dans Docker)
+	$(DOCKER_API) npx prisma generate
+
+docker-seed: ## Peupler la base (dans Docker)
+	$(DOCKER_API) npx prisma db seed
+
+docker-reset: ## Reinitialiser la base de donnees (dans Docker)
+	$(DOCKER_API) npx prisma migrate reset
+
+docker-bash: ## Ouvrir un shell dans le conteneur API
+	$(DOCKER_API) /bin/sh
+
+docker-install: ## Installer les dependances (dans Docker)
+	$(DOCKER_API) npm install

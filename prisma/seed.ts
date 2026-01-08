@@ -506,6 +506,7 @@ async function main() {
       user_id: client1.id,
       experience_id: exp1.id,
       rating: 5,
+      title: 'Expérience exceptionnelle au Louvre !',
       comment:
         'Expérience exceptionnelle ! Sophie est très compétente et passionnée. Les 3h sont passées à une vitesse folle !',
     },
@@ -516,6 +517,7 @@ async function main() {
       user_id: client2.id,
       experience_id: exp1.id,
       rating: 5,
+      title: 'Guide passionnée et captivante',
       comment:
         'Visite parfaite du Louvre. Sophie connaît chaque tableau par cœur et sait captiver son audience.',
     },
@@ -526,6 +528,7 @@ async function main() {
       user_id: client3.id,
       experience_id: exp1.id,
       rating: 4,
+      title: 'Très bonne visite, rythme un peu rapide',
       comment:
         "Très bonne visite, beaucoup d'informations intéressantes. Petit bémol sur le rythme un peu rapide.",
     },
@@ -537,6 +540,7 @@ async function main() {
       user_id: client1.id,
       experience_id: exp2.id,
       rating: 5,
+      title: 'Excellent guide gastronome',
       comment:
         "Thomas est un excellent guide gastronome ! Les bouchons qu'il nous a fait découvrir étaient délicieux.",
     },
@@ -547,6 +551,7 @@ async function main() {
       user_id: client4.id,
       experience_id: exp2.id,
       rating: 5,
+      title: 'Tour gastronomique incroyable !',
       comment:
         "Tour gastronomique incroyable ! J'ai découvert des saveurs que je ne connaissais pas. Thomas est passionné et ça se voit !",
     },
@@ -557,6 +562,7 @@ async function main() {
       user_id: client2.id,
       experience_id: exp2.id,
       rating: 4,
+      title: 'Excellente expérience, qualité au rendez-vous',
       comment:
         'Excellente expérience culinaire. Seul petit bémol : un peu cher mais la qualité est au rendez-vous.',
     },
@@ -568,6 +574,7 @@ async function main() {
       user_id: client3.id,
       experience_id: exp3.id,
       rating: 5,
+      title: 'Paris sous un autre angle',
       comment:
         "Camille nous a fait voir Paris sous un autre angle. Passionnant pour les amateurs d'architecture !",
     },
@@ -578,6 +585,7 @@ async function main() {
       user_id: client1.id,
       experience_id: exp3.id,
       rating: 4,
+      title: 'Belle découverte architecturale',
       comment: 'Belle découverte des bâtiments parisiens. Très instructif.',
     },
   });
@@ -588,6 +596,7 @@ async function main() {
       user_id: client2.id,
       experience_id: exp4.id,
       rating: 5,
+      title: 'Paris secret à son meilleur',
       comment:
         'Alexandre nous a emmené dans des endroits que je ne connaissais pas du tout ! Paris secret à son meilleur.',
     },
@@ -598,6 +607,7 @@ async function main() {
       user_id: client4.id,
       experience_id: exp4.id,
       rating: 5,
+      title: 'Tour insolite incroyable',
       comment:
         'Tour insolite incroyable ! Les passages couverts sont magnifiques. Alexandre est un guide exceptionnel.',
     },
@@ -608,6 +618,7 @@ async function main() {
       user_id: client3.id,
       experience_id: exp4.id,
       rating: 5,
+      title: 'Meilleure visite de Paris !',
       comment:
         "Meilleure visite que j'ai faite à Paris ! Alexandre connaît tous les secrets de la ville.",
     },
@@ -619,6 +630,7 @@ async function main() {
       user_id: client4.id,
       experience_id: exp5.id,
       rating: 5,
+      title: 'Guide dynamique, street art incroyable',
       comment:
         'Emma est super dynamique ! On a découvert des œuvres de street art incroyables à Belleville.',
     },
@@ -629,6 +641,7 @@ async function main() {
       user_id: client1.id,
       experience_id: exp5.id,
       rating: 4,
+      title: 'Tour sympa, guide compétente',
       comment:
         'Tour sympa pour découvrir le street art parisien. Emma connaît bien son sujet.',
     },
@@ -640,6 +653,7 @@ async function main() {
       user_id: client2.id,
       experience_id: exp6.id,
       rating: 5,
+      title: 'Montmartre magique avec Sophie',
       comment:
         "Montmartre avec Sophie, c'est magique ! Elle connaît toutes les anecdotes du quartier.",
     },
@@ -650,6 +664,7 @@ async function main() {
       user_id: client3.id,
       experience_id: exp6.id,
       rating: 5,
+      title: 'Visite parfaite du Sacré-Cœur',
       comment:
         'Visite parfaite du Sacré-Cœur et de ses alentours. Sophie est une guide exceptionnelle.',
     },
@@ -661,6 +676,7 @@ async function main() {
       user_id: client4.id,
       experience_id: exp7.id,
       rating: 5,
+      title: 'Un vrai sommelier passionné',
       comment:
         "Thomas est un vrai sommelier ! J'ai appris énormément sur les vins français.",
     },
@@ -671,6 +687,7 @@ async function main() {
       user_id: client2.id,
       experience_id: exp7.id,
       rating: 4,
+      title: 'Très bonne initiation aux vins',
       comment:
         'Très bonne initiation aux vins. Thomas sait transmettre sa passion.',
     },

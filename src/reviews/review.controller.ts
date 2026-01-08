@@ -8,6 +8,7 @@ import {
   Param,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -53,6 +54,24 @@ export class ReviewsController {
   @ApiGetManyResponse(ReviewEntity)
   findAll() {
     return this.reviewService.findAll();
+  }
+
+  @Get('top-reviews')
+  @Public()
+  @ApiOperation({
+    summary: "Récupérer des avis à afficher sur la page d'accueil",
+    description:
+      "Retourne 3 avis 5 étoiles avec un titre et une description d'une taille minimale",
+  })
+  @ApiGetManyResponse(ReviewEntity)
+  findTopReviews(
+    @Query('limit') limit?: number,
+    @Query('minDescriptionLength') minDescriptionLength?: number,
+  ) {
+    return this.reviewService.findTopReviews(
+      limit ? Number(limit) : 3,
+      minDescriptionLength ? Number(minDescriptionLength) : 40,
+    );
   }
 
   @Get(':id')

@@ -82,7 +82,9 @@ export class AuthentificationController {
   @Post('me')
   @Roles(UserRole.CLIENT, UserRole.GUIDE, UserRole.ADMIN)
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Récupérer les informations de l\'utilisateur connecté' })
+  @ApiOperation({
+    summary: "Récupérer les informations de l'utilisateur connecté",
+  })
   @ApiGetOneResponse(Object)
   getProfile(@Request() req: { user: { sub: string } }) {
     return this.authentificationService.getProfile(req.user.sub);

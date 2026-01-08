@@ -219,25 +219,31 @@ export class GuidesService {
   }
 
   async findByUser(userId: string) {
-    const guides = await this.prisma.guide.findMany({
+    const guide = await this.prisma.guide.findFirst({
       where: {
         user_id: userId,
-        is_active: true,
       },
       include: {
+        user: true,
         documents: true,
         availabilities: true,
         experiences: true,
       },
     });
 
-    if (!guides || guides.length === 0) {
+    if (!guide) {
       throw new NotFoundException(
-        `Aucun profil guide actif trouvé pour l'utilisateur ${userId}`,
+        `Aucun profil guide trouvé pour l'utilisateur ${userId}`,
       );
     }
 
-    return guides;
+    if (!guide.is_active) {
+      throw new NotFoundException(
+        `Le profil guide de l'utilisateur ${userId} n'est plus actif`,
+      );
+    }
+
+    return guide;
   }
 
   async update(id: string, updateGuideDto: UpdateGuideDto) {

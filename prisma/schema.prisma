@@ -129,7 +129,7 @@ model user {
   created_at      DateTime  @default(now()) @db.Timestamp(6)
   updated_at      DateTime  @updatedAt @db.Timestamp(6)
   
-  guides          guide[]
+  guide           guide?
   bookings        booking[]
   opened_disputes dispute[]  @relation("DisputeUser")
   resolved_disputes dispute[]  @relation("DisputeAdmin")
@@ -174,7 +174,7 @@ model address {
 
 model guide {
   id                        String              @id @default(uuid()) @db.Uuid
-  user_id                   String              @db.Uuid
+  user_id                   String              @unique @db.Uuid
   bio                       String?             @db.Text
   languages                 String?             @db.VarChar(100)
   years_of_experience       Int?
@@ -430,6 +430,7 @@ model review {
   user_id         String      @db.Uuid
   experience_id   String      @db.Uuid
   rating          Int
+  title           String?     @db.VarChar(150)
   comment         String?     @db.Text
   review_date     DateTime    @default(now()) @db.Timestamp(6)
   

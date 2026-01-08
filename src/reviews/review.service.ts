@@ -12,6 +12,7 @@ export class ReviewService {
     return this.prisma.review.create({
       data: {
         rating: createReviewDto.rating,
+        title: createReviewDto.title,
         comment: createReviewDto.comment,
         user: {
           connect: { id: createReviewDto.user_id },
@@ -88,5 +89,30 @@ export class ReviewService {
     } catch {
       throw new NotFoundException(`Avis avec l'ID ${id} introuvable`);
     }
+  }
+
+  async findTopReviews(limit = 3, minDescriptionLength = 40) {
+    const reviews = await this.prisma.review.findMany({
+      where: {
+        rating: 5,
+        comment: {
+          not: null,
+        },
+      },
+      include: {
+        user: true,
+        experience: true,
+      },
+      orderBy: {
+        review_date: 'desc',
+      },
+    });
+
+    const filteredReviews = reviews.filter(
+      (review) =>
+        review.comment && review.comment.length >= minDescriptionLength,
+    );
+
+    return filteredReviews.slice(0, limit);
   }
 }

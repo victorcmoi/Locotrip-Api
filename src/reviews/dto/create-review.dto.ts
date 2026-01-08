@@ -39,6 +39,14 @@ export class CreateReviewDto {
   rating: number;
 
   @ApiPropertyOptional({
+    description: "Titre de l'avis",
+    example: 'Expérience incroyable !',
+  })
+  @IsString()
+  @IsOptional()
+  title?: string;
+
+  @ApiPropertyOptional({
     description: "Commentaire de l'utilisateur",
     example: 'Excellente expérience, guide très professionnel !',
   })
