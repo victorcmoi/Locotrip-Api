@@ -219,7 +219,7 @@ export class GuidesService {
   }
 
   async findByUser(userId: string) {
-    const guide = await this.prisma.guide.findFirst({
+    const guide = await this.prisma.guide.findUnique({
       where: {
         user_id: userId,
       },
