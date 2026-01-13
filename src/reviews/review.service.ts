@@ -101,13 +101,22 @@ export class ReviewService {
       },
       include: {
         user: true,
-        experience: true,
+        experience: {
+          include: {
+            city: true,
+            guide: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        },
       },
       orderBy: {
         review_date: 'desc',
       },
     });
-
+    
     const filteredReviews = reviews.filter(
       (review) =>
         review.comment && review.comment.length >= minDescriptionLength,

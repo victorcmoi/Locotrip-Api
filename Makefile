@@ -1,6 +1,5 @@
 # Makefile - Locotrip API
-DOCKER_API = docker exec -it locotrip-api
-.PHONY: help install dev migrate studio docker-dev docker-prod docker-down docker-logs
+.PHONY: help install dev migrate studio dc-up dc-dev dc-down dc-logs
 
 help: ## Afficher l'aide
 	@echo "=== Locotrip API - Commandes ==="
@@ -15,22 +14,15 @@ help: ## Afficher l'aide
 	@echo "  make generate      - Generer le client Prisma"
 	@echo "  make seed          - Peupler la base de donnees"
 	@echo "  make studio        - Ouvrir Prisma Studio"
+	@echo "  make reset         - Reinitialiser la base"
 	@echo ""
-	@echo "Docker:"
-	@echo "  make dc-up         - Lancer tous les services en arriere-plan"
+	@echo "Docker (services uniquement - PG + MinIO):"
+	@echo "  make dc-up         - Lancer les services en arriere-plan"
 	@echo "  make dc-dev        - Lancer en mode dev avec logs"
 	@echo "  make dc-down       - Arreter les conteneurs"
 	@echo "  make dc-logs       - Voir les logs"
 	@echo "  make dc-restart    - Redemarrer les conteneurs"
 	@echo "  make dc-clean      - Arreter et supprimer les volumes"
-	@echo ""
-	@echo "Docker (dans le conteneur):"
-	@echo "  make docker-migrate - Appliquer les migrations"
-	@echo "  make docker-gen     - Generer le client Prisma"
-	@echo "  make docker-seed    - Peupler la base"
-	@echo "  make docker-reset   - Reinitialiser la base"
-	@echo "  make docker-bash    - Ouvrir un shell"
-	@echo "  make docker-install - Installer les dependances"
 	@echo ""
 
 # === Installation ===
@@ -61,9 +53,9 @@ seed: ## Peupler la base
 reset: ## Reinitialiser la base de donnees
 	npx prisma migrate reset
 
-# === Docker ===
+# === Docker (Services: PostgreSQL + MinIO uniquement) ===
 
-dc-up: ## Lancer tous les services (API + BDD + Prisma Studio)
+dc-up: ## Lancer les services (PG + MinIO)
 	docker-compose up -d
 
 dc-dev: ## Lancer en mode developpement avec logs
@@ -80,23 +72,3 @@ dc-restart: ## Redemarrer les conteneurs
 
 dc-clean: ## Arreter et supprimer les volumes
 	docker-compose down -v
-
-# === Docker Commands (inside container) ===
-
-docker-migrate: ## Appliquer les migrations (dans Docker)
-	$(DOCKER_API) npx prisma migrate dev
-
-docker-gen: ## Generer le client Prisma (dans Docker)
-	$(DOCKER_API) npx prisma generate
-
-docker-seed: ## Peupler la base (dans Docker)
-	$(DOCKER_API) npx prisma db seed
-
-docker-reset: ## Reinitialiser la base de donnees (dans Docker)
-	$(DOCKER_API) npx prisma migrate reset
-
-docker-bash: ## Ouvrir un shell dans le conteneur API
-	$(DOCKER_API) /bin/sh
-
-docker-install: ## Installer les dependances (dans Docker)
-	$(DOCKER_API) npm install
