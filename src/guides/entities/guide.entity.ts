@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CreateGuideDto } from '../dto/create-guide.dto';
+import { UserEntity } from '../../users/entities/user.entity';
 
 export class GuideEntity extends CreateGuideDto {
   @ApiProperty({
@@ -7,6 +8,13 @@ export class GuideEntity extends CreateGuideDto {
     example: '550e8400-e29b-41d4-a716-446655440000',
   })
   id: string;
+
+  @ApiProperty({
+    description: "Informations de l'utilisateur associé au guide",
+    type: () => UserEntity,
+    required: false,
+  })
+  user?: UserEntity;
 
   @ApiProperty({
     description: 'Date de demande de carte professionnelle',
