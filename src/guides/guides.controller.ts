@@ -92,6 +92,17 @@ export class GuidesController {
     );
   }
 
+
+  @Get('local')
+  @ApiOperation({
+    summary:
+      'Récupérer les guides locaux avec demande de carte - Admin uniquement',
+  })
+  @ApiGetManyResponse(GuideEntity)
+  findLocalWithCardRequests() {
+    return this.guidesService.findLocalWithCardRequests();
+  }
+
   @Get(':id')
   @Public()
   @ApiOperation({ summary: 'Récupérer un guide par son ID' })
