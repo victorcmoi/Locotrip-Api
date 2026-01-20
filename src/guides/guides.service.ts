@@ -63,17 +63,6 @@ export class GuidesService {
       };
     }
 
-    // Si une date est fournie, filtrer les guides avec des disponibilités
-    if (date) {
-      where.availabilities = {
-        some: {
-          status: 'available',
-          start_date: { lte: date },
-          end_date: { gte: date },
-        },
-      };
-    }
-
     const orConditions: guideWhereInput[] = [];
 
     if (languages) {
@@ -152,23 +141,27 @@ export class GuidesService {
         .map((guide) => {
           // Trouver la disponibilité la plus proche de la date recherchée
           let minDistance = Infinity;
-          guide.availabilities.forEach((availability) => {
-            if (availability.status === 'available') {
-              const startDate = new Date(availability.start_date);
-              const endDate = new Date(availability.end_date);
-              
-              // Si la date recherchée est dans la plage, distance = 0
-              if (searchDate >= startDate && searchDate <= endDate) {
-                minDistance = 0;
-              } else {
-                // Sinon, calculer la distance en jours
-                const distanceToStart = Math.abs(searchDate.getTime() - startDate.getTime());
-                const distanceToEnd = Math.abs(searchDate.getTime() - endDate.getTime());
-                const distance = Math.min(distanceToStart, distanceToEnd) / (1000 * 60 * 60 * 24);
-                minDistance = Math.min(minDistance, distance);
+          
+          if (guide.availabilities && guide.availabilities.length > 0) {
+            guide.availabilities.forEach((availability) => {
+              if (availability.status === 'available') {
+                const startDate = new Date(availability.start_date);
+                const endDate = new Date(availability.end_date);
+                
+                // Si la date recherchée est dans la plage, distance = 0
+                if (searchDate >= startDate && searchDate <= endDate) {
+                  minDistance = 0;
+                } else {
+                  // Sinon, calculer la distance en jours
+                  const distanceToStart = Math.abs(searchDate.getTime() - startDate.getTime());
+                  const distanceToEnd = Math.abs(searchDate.getTime() - endDate.getTime());
+                  const distance = Math.min(distanceToStart, distanceToEnd) / (1000 * 60 * 60 * 24);
+                  minDistance = Math.min(minDistance, distance);
+                }
               }
-            }
-          });
+            });
+          }
+          // Si le guide n'a pas de disponibilités, il sera en fin de liste (distance = Infinity)
           return { ...guide, dateProximity: minDistance };
         })
         .sort((a, b) => a.dateProximity - b.dateProximity)
