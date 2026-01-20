@@ -22,6 +22,7 @@ export class SupportTicketsService {
 
   async findAll() {
     return this.prisma.support_ticket.findMany({
+      orderBy: { created_at: 'desc' },
       include: {
         user: true,
         messages: true,
@@ -73,7 +74,7 @@ export class SupportTicketsService {
   async update(id: string, updateData: Partial<CreateSupportTicketDto>) {
     try {
       const data: support_ticketUncheckedUpdateInput = { ...updateData };
-
+      
       return await this.prisma.support_ticket.update({
         where: { id },
         data,

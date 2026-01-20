@@ -11,6 +11,7 @@ import {
   PaginatedResponse,
   PaginationMeta,
 } from '../common/interfaces/paginated-response.interface';
+import { GuideStatus } from '../generated/enums';
 
 @Injectable()
 export class GuidesService {
@@ -363,5 +364,28 @@ export class GuidesService {
         created_at: 'desc',
       },
     });
+  }
+
+  /**
+   * Récupère les guides locaux avec une demande de carte professionnelle
+   */
+  async findLocalWithCardRequests() {
+    const guides = await this.prisma.guide.findMany({
+      where: {
+        guide_status: GuideStatus.local,
+        is_active: true,
+        card_request_date: {
+          not: null,
+        },
+      },
+      include: {
+        user: true,
+        documents: true,
+      },
+      orderBy: {
+        card_request_date: 'asc',
+      },
+    });
+    return guides;
   }
 }

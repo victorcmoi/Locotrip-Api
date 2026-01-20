@@ -18,7 +18,7 @@ async function main() {
     create: {
       code: 'EUR',
       name: 'Euro',
-      exchange_rate: 1.0,
+      exchange_rate: 1.0, 
     },
   });
 
@@ -36,6 +36,21 @@ async function main() {
 
   // Créer des users
   console.log('👥 Création des users...');
+
+  const admin = await prisma.user.create({
+    data: {
+      last_name: 'Admin',
+      first_name: 'Admin',
+      email: 'admin@admin.com',
+      phone: '+33612345678',
+      birth_date: new Date('1990-05-15'),
+      password: '$2b$10$MW4ryE5jmOcqbKEn97xcHOPIUIK2TJiy.EjAf/338FY.ibPcsCQsi', 
+      role: 'admin',
+      is_active: true,
+      is_verified: true,
+    },
+  });
+
   const client1 = await prisma.user.create({
     data: {
       last_name: 'Dupont',
@@ -85,6 +100,90 @@ async function main() {
       email: 'julie.moreau@example.com',
       phone: '+33612345681',
       birth_date: new Date('1995-04-15'),
+      password: '$2a$10$abcdefghijklmnopqrstuv',
+      role: 'client',
+      is_active: true,
+      is_verified: true,
+    },
+  });
+
+  const client5 = await prisma.user.create({
+    data: {
+      last_name: 'Garcia',
+      first_name: 'Lucas',
+      email: 'lucas.garcia@example.com',
+      phone: '+33612345682',
+      birth_date: new Date('1988-07-22'),
+      password: '$2a$10$abcdefghijklmnopqrstuv',
+      role: 'client',
+      is_active: true,
+      is_verified: true,
+    },
+  });
+
+  const client6 = await prisma.user.create({
+    data: {
+      last_name: 'Lefebvre',
+      first_name: 'Camille',
+      email: 'camille.lefebvre@example.com',
+      phone: '+33612345683',
+      birth_date: new Date('1993-02-14'),
+      password: '$2a$10$abcdefghijklmnopqrstuv',
+      role: 'client',
+      is_active: true,
+      is_verified: true,
+    },
+  });
+
+  const client7 = await prisma.user.create({
+    data: {
+      last_name: 'Roux',
+      first_name: 'Antoine',
+      email: 'antoine.roux@example.com',
+      phone: '+33612345684',
+      birth_date: new Date('1991-11-30'),
+      password: '$2a$10$abcdefghijklmnopqrstuv',
+      role: 'client',
+      is_active: true,
+      is_verified: true,
+    },
+  });
+
+  const client8  = await prisma.user.create({
+    data: {
+      last_name: 'Fournier',
+      first_name: 'Léa',
+      email: 'lea.fournier@example.com',
+      phone: '+33612345685',
+      birth_date: new Date('1997-09-08'),
+      password: '$2a$10$abcdefghijklmnopqrstuv',
+      role: 'client',
+      is_active: true,
+      is_verified: true,
+    },
+  });
+
+  const client9 = await prisma.user.create({
+    data: {
+      last_name: 'Vincent',
+      first_name: 'Hugo',
+      email: 'hugo.vincent@example.com',
+      phone: '+33612345686',
+      birth_date: new Date('1986-03-25'),
+      password: '$2a$10$abcdefghijklmnopqrstuv',
+      role: 'client',
+      is_active: true,
+      is_verified: true,
+    },
+  });
+
+  const client10 = await prisma.user.create({
+    data: {
+      last_name: 'Mercier',
+      first_name: 'Chloé',
+      email: 'chloe.mercier@example.com',
+      phone: '+33612345687',
+      birth_date: new Date('1994-06-12'),
       password: '$2a$10$abcdefghijklmnopqrstuv',
       role: 'client',
       is_active: true,
@@ -182,7 +281,72 @@ async function main() {
     },
   });
 
-  console.log('✅ Adresses créées');
+  await prisma.address.create({
+    data: {
+      user_id: client2.id,
+      street: '45 Avenue des Champs-Élysées',
+      city: 'Paris',
+      state: 'Île-de-France',
+      postal_code: '75008',
+      country: 'France',
+      longitude: 2.3067,
+      latitude: 48.8698,
+    },
+  });
+
+  await prisma.address.create({
+    data: {
+      user_id: client5.id,
+      street: '78 Rue de la République',
+      city: 'Lyon',
+      state: 'Auvergne-Rhône-Alpes',
+      postal_code: '69002',
+      country: 'France',
+      longitude: 4.8357,
+      latitude: 45.764,
+    },
+  });
+
+  await prisma.address.create({
+    data: {
+      user_id: guideUser1.id,
+      street: '12 Rue du Faubourg Saint-Honoré',
+      city: 'Paris',
+      state: 'Île-de-France',
+      postal_code: '75008',
+      country: 'France',
+      longitude: 2.3173,
+      latitude: 48.8708,
+    },
+  });
+
+  await prisma.address.create({
+    data: {
+      user_id: guideUser2.id,
+      street: '34 Quai Saint-Antoine',
+      city: 'Lyon',
+      state: 'Auvergne-Rhône-Alpes',
+      postal_code: '69002',
+      country: 'France',
+      longitude: 4.8312,
+      latitude: 45.7627,
+    },
+  });
+
+  await prisma.address.create({
+    data: {
+      user_id: guideUser3.id,
+      street: '89 Cours de l\'Intendance',
+      city: 'Bordeaux',
+      state: 'Nouvelle-Aquitaine',
+      postal_code: '33000',
+      country: 'France',
+      longitude: -0.5792,
+      latitude: 44.8378,
+    },
+  });
+
+  console.log('✅ 6 adresses créées');
 
   // Créer 5 profils guides
   console.log('🎯 Création des profils guides...');
@@ -219,6 +383,7 @@ async function main() {
       guide_status: 'local',
       pro_card: false,
       country: 'France',
+      card_request_date: new Date('2025-12-15T10:30:00Z'),
     },
   });
 
@@ -243,10 +408,246 @@ async function main() {
       guide_status: 'local',
       pro_card: false,
       country: 'France',
+      card_request_date: new Date('2026-01-05T14:00:00Z'),
     },
   });
 
   console.log('✅ 5 guides créés');
+
+  // Créer des documents pour les guides
+  console.log('📄 Création des documents de guides...');
+  
+  // Documents pour guide1 (pro - tous vérifiés)
+  await prisma.guide_document.create({
+    data: {
+      guide_id: guide1.id,
+      document_type: 'CV',
+      verification_status: 'verified',
+      verification_comment: 'CV complet et professionnel',
+      verification_date: new Date('2024-06-15T10:00:00Z'),
+    },
+  });
+
+  await prisma.guide_document.create({
+    data: {
+      guide_id: guide1.id,
+      document_type: 'diploma',
+      verification_status: 'verified',
+      verification_comment: 'Diplôme de guide-conférencier validé',
+      verification_date: new Date('2024-06-15T10:30:00Z'),
+    },
+  });
+
+  // Documents pour guide2 (pro - tous vérifiés)
+  await prisma.guide_document.create({
+    data: {
+      guide_id: guide2.id,
+      document_type: 'CV',
+      verification_status: 'verified',
+      verification_comment: 'Expérience en gastronomie confirmée',
+      verification_date: new Date('2024-05-20T14:00:00Z'),
+    },
+  });
+
+  await prisma.guide_document.create({
+    data: {
+      guide_id: guide2.id,
+      document_type: 'proof_of_residence',
+      verification_status: 'verified',
+      verification_comment: 'Justificatif de domicile valide',
+      verification_date: new Date('2024-05-20T14:30:00Z'),
+    },
+  });
+
+  // Documents pour guide3 (local avec demande de carte - en attente)
+  await prisma.guide_document.create({
+    data: {
+      guide_id: guide3.id,
+      document_type: 'CV',
+      verification_status: 'pending',
+      verification_comment: null,
+    },
+  });
+
+  await prisma.guide_document.create({
+    data: {
+      guide_id: guide3.id,
+      document_type: 'diploma',
+      verification_status: 'pending',
+      verification_comment: null,
+    },
+  });
+
+  await prisma.guide_document.create({
+    data: {
+      guide_id: guide3.id,
+      document_type: 'proof_of_residence',
+      verification_status: 'verified',
+      verification_comment: 'Justificatif accepté',
+      verification_date: new Date('2025-12-20T11:00:00Z'),
+    },
+  });
+
+  // Documents pour guide4 (pro)
+  await prisma.guide_document.create({
+    data: {
+      guide_id: guide4.id,
+      document_type: 'CV',
+      verification_status: 'verified',
+      verification_comment: '10 ans d\'expérience confirmée',
+      verification_date: new Date('2024-03-10T09:00:00Z'),
+    },
+  });
+
+  await prisma.guide_document.create({
+    data: {
+      guide_id: guide4.id,
+      document_type: 'diploma',
+      verification_status: 'verified',
+      verification_comment: 'Formation tourisme validée',
+      verification_date: new Date('2024-03-10T09:30:00Z'),
+    },
+  });
+
+  // Documents pour guide5 (local avec demande de carte - mixte)
+  await prisma.guide_document.create({
+    data: {
+      guide_id: guide5.id,
+      document_type: 'CV',
+      verification_status: 'pending',
+      verification_comment: null,
+    },
+  });
+
+  await prisma.guide_document.create({
+    data: {
+      guide_id: guide5.id,
+      document_type: 'diploma',
+      verification_status: 'rejected',
+      verification_comment: 'Diplôme non reconnu - veuillez fournir une attestation officielle',
+      verification_date: new Date('2026-01-10T16:00:00Z'),
+    },
+  });
+
+  await prisma.guide_document.create({
+    data: {
+      guide_id: guide5.id,
+      document_type: 'proof_of_residence',
+      verification_status: 'pending',
+      verification_comment: null,
+    },
+  });
+
+  console.log('✅ Documents de guides créés');
+
+  // Créer des disponibilités de guides
+  console.log('📅 Création des disponibilités de guides...');
+  
+  // Disponibilités pour guide1 (Sophie) - prochaines semaines
+  await prisma.guide_availability.create({
+    data: {
+      guide_id: guide1.id,
+      start_date: new Date('2026-01-20T09:00:00Z'),
+      end_date: new Date('2026-01-20T18:00:00Z'),
+      status: 'available',
+    },
+  });
+
+  await prisma.guide_availability.create({
+    data: {
+      guide_id: guide1.id,
+      start_date: new Date('2026-01-21T09:00:00Z'),
+      end_date: new Date('2026-01-21T18:00:00Z'),
+      status: 'available',
+    },
+  });
+
+  await prisma.guide_availability.create({
+    data: {
+      guide_id: guide1.id,
+      start_date: new Date('2026-01-22T09:00:00Z'),
+      end_date: new Date('2026-01-22T12:00:00Z'),
+      status: 'unavailable',
+    },
+  });
+
+  // Disponibilités pour guide2 (Thomas)
+  await prisma.guide_availability.create({
+    data: {
+      guide_id: guide2.id,
+      start_date: new Date('2026-01-18T14:00:00Z'),
+      end_date: new Date('2026-01-18T22:00:00Z'),
+      status: 'available',
+    },
+  });
+
+  await prisma.guide_availability.create({
+    data: {
+      guide_id: guide2.id,
+      start_date: new Date('2026-01-25T10:00:00Z'),
+      end_date: new Date('2026-01-25T20:00:00Z'),
+      status: 'available',
+    },
+  });
+
+  // Disponibilités pour guide3 (Camille) - bloqué certains jours
+  await prisma.guide_availability.create({
+    data: {
+      guide_id: guide3.id,
+      start_date: new Date('2026-01-19T09:00:00Z'),
+      end_date: new Date('2026-01-19T17:00:00Z'),
+      status: 'available',
+    },
+  });
+
+  await prisma.guide_availability.create({
+    data: {
+      guide_id: guide3.id,
+      start_date: new Date('2026-01-26T00:00:00Z'),
+      end_date: new Date('2026-02-02T00:00:00Z'),
+      status: 'blocked',
+    },
+  });
+
+  // Disponibilités pour guide4 (Alexandre)
+  await prisma.guide_availability.create({
+    data: {
+      guide_id: guide4.id,
+      start_date: new Date('2026-01-20T10:00:00Z'),
+      end_date: new Date('2026-01-20T19:00:00Z'),
+      status: 'available',
+    },
+  });
+
+  await prisma.guide_availability.create({
+    data: {
+      guide_id: guide4.id,
+      start_date: new Date('2026-01-27T10:00:00Z'),
+      end_date: new Date('2026-01-27T19:00:00Z'),
+      status: 'available',
+    },
+  });
+
+  // Disponibilités pour guide5 (Emma)
+  await prisma.guide_availability.create({
+    data: {
+      guide_id: guide5.id,
+      start_date: new Date('2026-01-18T14:00:00Z'),
+      end_date: new Date('2026-01-18T18:00:00Z'),
+      status: 'available',
+    },
+  });
+
+  await prisma.guide_availability.create({
+    data: {
+      guide_id: guide5.id,
+      start_date: new Date('2026-01-19T14:00:00Z'),
+      end_date: new Date('2026-01-19T18:00:00Z'),
+      status: 'available',
+    },
+  });
+
+  console.log('✅ Disponibilités de guides créées');
 
   // Créer des cities
   console.log('🌍 Création des cities...');
@@ -276,7 +677,59 @@ async function main() {
     },
   });
 
-  console.log(`✅ Villes créées: ${paris.name}, ${lyon.name}`);
+  const marseille = await prisma.city.create({
+    data: {
+      name: 'Marseille',
+      country: 'France',
+      slug: 'marseille-france',
+      description: 'Cité phocéenne, porte de la Méditerranée',
+      latitude: 43.2965,
+      longitude: 5.3698,
+      image_url: 'https://example.com/images/marseille.jpg',
+      is_active: true,
+    },
+  });
+
+  const bordeaux = await prisma.city.create({
+    data: {
+      name: 'Bordeaux',
+      country: 'France',
+      slug: 'bordeaux-france',
+      description: 'Capitale mondiale du vin',
+      latitude: 44.8378,
+      longitude: -0.5792,
+      image_url: 'https://example.com/images/bordeaux.jpg',
+      is_active: true,
+    },
+  });
+
+  const nice = await prisma.city.create({
+    data: {
+      name: 'Nice',
+      country: 'France',
+      slug: 'nice-france',
+      description: 'Perle de la Côte d\'Azur',
+      latitude: 43.7102,
+      longitude: 7.262,
+      image_url: 'https://example.com/images/nice.jpg',
+      is_active: true,
+    },
+  });
+
+  const strasbourg = await prisma.city.create({
+    data: {
+      name: 'Strasbourg',
+      country: 'France',
+      slug: 'strasbourg-france',
+      description: 'Capitale européenne, au cœur de l\'Alsace',
+      latitude: 48.5734,
+      longitude: 7.7521,
+      image_url: 'https://example.com/images/strasbourg.jpg',
+      is_active: true,
+    },
+  });
+
+  console.log(`✅ Villes créées: ${paris.name}, ${lyon.name}, ${marseille.name}, ${bordeaux.name}, ${nice.name}, ${strasbourg.name}`);
 
   // Créer des catégories
   console.log('📂 Création des catégories...');
@@ -298,8 +751,26 @@ async function main() {
     },
   });
 
+  const nature = await prisma.category.create({
+    data: {
+      name: 'Nature & Plein air',
+    },
+  });
+
+  const artisanat = await prisma.category.create({
+    data: {
+      name: 'Artisanat & Savoir-faire',
+    },
+  });
+
+  const nightlife = await prisma.category.create({
+    data: {
+      name: 'Vie nocturne',
+    },
+  });
+
   console.log(
-    `✅ Catégories créées: ${culture.name}, ${gastronomie.name}, ${aventure.name}`,
+    `✅ Catégories créées: ${culture.name}, ${gastronomie.name}, ${aventure.name}, ${nature.name}, ${artisanat.name}, ${nightlife.name}`,
   );
 
   // Créer des expériences pour chaque guide
@@ -496,6 +967,225 @@ async function main() {
       },
     },
   });
+
+  // Créer plus de réservations
+  console.log('📅 Création de réservations supplémentaires...');
+
+  const booking2 = await prisma.booking.create({
+    data: {
+      user_id: client2.id,
+      experience_id: exp2.id,
+      booking_date: new Date('2025-12-01T14:00:00Z'),
+      status: 'completed',
+      number_of_participants: 4,
+      total_price: 319.96,
+    },
+  });
+
+  await prisma.payment.create({
+    data: {
+      booking_id: booking2.id,
+      amount: 319.96,
+      currency: 'eur',
+      method: 'carte_bancaire',
+      status: 'completed',
+      stripe_payment_intent_id: 'pi_test_223456789',
+      stripe_charge_id: 'ch_test_223456789',
+      stripe_customer_id: 'cus_test_223456789',
+      metadata: { booking_reference: 'BOOK-002', payment_method: 'mastercard' },
+    },
+  });
+
+  const booking3 = await prisma.booking.create({
+    data: {
+      user_id: client3.id,
+      experience_id: exp4.id,
+      booking_date: new Date('2025-12-10T11:00:00Z'),
+      status: 'cancelled',
+      number_of_participants: 2,
+      total_price: 90.0,
+    },
+  });
+
+  await prisma.payment.create({
+    data: {
+      booking_id: booking3.id,
+      amount: 90.0,
+      currency: 'eur',
+      method: 'carte_bancaire',
+      status: 'refunded',
+      stripe_payment_intent_id: 'pi_test_323456789',
+      refunded_amount: 90.0,
+      refunded_at: new Date('2025-12-08T15:00:00Z'),
+      metadata: { booking_reference: 'BOOK-003', cancellation_reason: 'client_request' },
+    },
+  });
+
+  const booking4 = await prisma.booking.create({
+    data: {
+      user_id: client5.id,
+      experience_id: exp5.id,
+      booking_date: new Date('2026-01-20T10:00:00Z'),
+      status: 'confirmed',
+      number_of_participants: 3,
+      total_price: 89.97,
+    },
+  });
+
+  await prisma.payment.create({
+    data: {
+      booking_id: booking4.id,
+      amount: 89.97,
+      currency: 'eur',
+      method: 'carte_bancaire',
+      status: 'completed',
+      stripe_payment_intent_id: 'pi_test_423456789',
+      metadata: { booking_reference: 'BOOK-004', payment_method: 'visa' },
+    },
+  });
+
+  const booking5 = await prisma.booking.create({
+    data: {
+      user_id: client6.id,
+      experience_id: exp6.id,
+      booking_date: new Date('2025-11-25T09:00:00Z'),
+      status: 'completed',
+      number_of_participants: 2,
+      total_price: 79.98,
+    },
+  });
+
+  await prisma.payment.create({
+    data: {
+      booking_id: booking5.id,
+      amount: 79.98,
+      currency: 'eur',
+      method: 'carte_bancaire',
+      status: 'completed',
+      stripe_payment_intent_id: 'pi_test_523456789',
+      metadata: { booking_reference: 'BOOK-005', payment_method: 'visa' },
+    },
+  });
+
+  const booking6 = await prisma.booking.create({
+    data: {
+      user_id: client7.id,
+      experience_id: exp7.id,
+      booking_date: new Date('2025-12-15T18:00:00Z'),
+      status: 'completed',
+      number_of_participants: 2,
+      total_price: 130.0,
+    },
+  });
+
+  await prisma.payment.create({
+    data: {
+      booking_id: booking6.id,
+      amount: 130.0,
+      currency: 'eur',
+      method: 'carte_bancaire',
+      status: 'completed',
+      stripe_payment_intent_id: 'pi_test_623456789',
+      metadata: { booking_reference: 'BOOK-006', payment_method: 'amex' },
+    },
+  });
+
+  const booking7 = await prisma.booking.create({
+    data: {
+      user_id: client8.id,
+      experience_id: exp3.id,
+      booking_date: new Date('2026-01-10T14:00:00Z'),
+      status: 'pending',
+      number_of_participants: 1,
+      total_price: 35.0,
+    },
+  });
+
+  await prisma.payment.create({
+    data: {
+      booking_id: booking7.id,
+      amount: 35.0,
+      currency: 'eur',
+      method: 'carte_bancaire',
+      status: 'pending',
+      stripe_payment_intent_id: 'pi_test_723456789',
+      metadata: { booking_reference: 'BOOK-007' },
+    },
+  });
+
+  const booking8 = await prisma.booking.create({
+    data: {
+      user_id: client9.id,
+      experience_id: exp1.id,
+      booking_date: new Date('2025-10-20T10:00:00Z'),
+      status: 'completed',
+      number_of_participants: 5,
+      total_price: 249.95,
+    },
+  });
+
+  await prisma.payment.create({
+    data: {
+      booking_id: booking8.id,
+      amount: 249.95,
+      currency: 'eur',
+      method: 'carte_bancaire',
+      status: 'completed',
+      stripe_payment_intent_id: 'pi_test_823456789',
+      metadata: { booking_reference: 'BOOK-008', payment_method: 'visa' },
+    },
+  });
+
+  console.log('✅ 8 réservations créées avec leurs paiements');
+
+  // Créer des disputes
+  console.log('⚖️ Création des disputes...');
+
+  // Dispute 1 - Ouverte, client mécontent du guide
+  await prisma.dispute.create({
+    data: {
+      booking_id: booking5.id,
+      user_id: client6.id,
+      reason: "Le guide est arrivé avec 30 minutes de retard et la visite a été écourtée. Je demande un remboursement partiel de 50% car nous n'avons pas pu voir tous les points prévus dans le programme.",
+      status: 'open',
+    },
+  });
+
+  // Dispute 2 - En attente, problème de description de l'expérience
+  await prisma.dispute.create({
+    data: {
+      booking_id: booking6.id,
+      user_id: client7.id,
+      reason: "La dégustation ne correspondait pas à la description. Il était mentionné 6 vins différents mais nous n'en avons goûté que 4. De plus, les fromages promis n'étaient pas inclus. Je souhaite un remboursement partiel.",
+      status: 'pending',
+    },
+  });
+
+  // Dispute 3 - Résolue en faveur du client
+  await prisma.dispute.create({
+    data: {
+      booking_id: booking8.id,
+      user_id: client9.id,
+      reason: "L'expérience a été annulée par le guide sans préavis. J'ai attendu 45 minutes au point de rendez-vous avant de recevoir un message d'annulation. Je demande un remboursement complet.",
+      status: 'resolved',
+      resolution_date: new Date('2025-10-25T16:30:00Z'),
+      admin_id: admin.id,
+    },
+  });
+
+  // Dispute 4 - Rejetée, réclamation non fondée
+  await prisma.dispute.create({
+    data: {
+      booking_id: booking2.id,
+      user_id: client2.id,
+      reason: "Je trouve que le prix était trop élevé pour la prestation fournie. Les restaurants étaient de qualité moyenne. Je demande un remboursement de 30%.",
+      status: 'rejected',
+      resolution_date: new Date('2025-12-05T11:00:00Z'),
+      admin_id: admin.id,
+    },
+  });
+
+  console.log('✅ 4 disputes créées');
 
   // Créer plusieurs reviews pour chaque expérience
   console.log('⭐ Création des avis...');
@@ -745,8 +1435,8 @@ async function main() {
   });
 
   // Créer un ticket de support
-  console.log("🎫 Création d'un ticket de support...");
-  const ticket = await prisma.support_ticket.create({
+  console.log("🎫 Création des tickets de support...");
+  const ticket1 = await prisma.support_ticket.create({
     data: {
       user_id: client1.id,
       subject: 'Question sur le remboursement',
@@ -756,12 +1446,123 @@ async function main() {
 
   await prisma.ticket_message.create({
     data: {
-      ticket_id: ticket.id,
+      ticket_id: ticket1.id,
       author_id: client1.id,
       content:
         "Bonjour, j'aimerais savoir comment fonctionne la politique de remboursement.",
     },
   });
+
+  // Ticket 2 - En cours de traitement
+  const ticket2 = await prisma.support_ticket.create({
+    data: {
+      user_id: client5.id,
+      subject: 'Problème de connexion à mon compte',
+      status: 'in_progress',
+    },
+  });
+
+  await prisma.ticket_message.create({
+    data: {
+      ticket_id: ticket2.id,
+      author_id: client5.id,
+      content: "Bonjour, je n'arrive plus à me connecter à mon compte depuis hier. J'ai essayé de réinitialiser mon mot de passe mais je ne reçois pas l'email.",
+    },
+  });
+
+  await prisma.ticket_message.create({
+    data: {
+      ticket_id: ticket2.id,
+      author_id: admin.id,
+      content: "Bonjour, merci de nous avoir contacté. Pouvez-vous me confirmer l'adresse email associée à votre compte ? Je vais vérifier si les emails de réinitialisation sont bien envoyés.",
+    },
+  });
+
+  await prisma.ticket_message.create({
+    data: {
+      ticket_id: ticket2.id,
+      author_id: client5.id,
+      content: "Mon adresse email est lucas.garcia@example.com. Merci de votre aide !",
+    },
+  });
+
+  // Ticket 3 - Fermé, résolu
+  const ticket3 = await prisma.support_ticket.create({
+    data: {
+      user_id: client7.id,
+      subject: 'Modification de réservation',
+      status: 'closed',
+      closed_at: new Date('2025-12-18T14:30:00Z'),
+    },
+  });
+
+  await prisma.ticket_message.create({
+    data: {
+      ticket_id: ticket3.id,
+      author_id: client7.id,
+      content: "Bonjour, est-il possible de changer la date de ma réservation pour la dégustation de vins ? Je souhaite passer du 15 décembre au 20 décembre.",
+    },
+  });
+
+  await prisma.ticket_message.create({
+    data: {
+      ticket_id: ticket3.id,
+      author_id: admin.id,
+      content: "Bonjour, j'ai bien transmis votre demande au guide. La modification a été acceptée. Votre réservation est maintenant programmée pour le 20 décembre à 18h. Bonne dégustation !",
+    },
+  });
+
+  await prisma.ticket_message.create({
+    data: {
+      ticket_id: ticket3.id,
+      author_id: client7.id,
+      content: "Parfait, merci beaucoup pour votre réactivité !",
+    },
+  });
+
+  // Ticket 4 - Ouvert, réclamation
+  const ticket4 = await prisma.support_ticket.create({
+    data: {
+      user_id: client9.id,
+      subject: 'Réclamation suite à annulation',
+      status: 'open',
+    },
+  });
+
+  await prisma.ticket_message.create({
+    data: {
+      ticket_id: ticket4.id,
+      author_id: client9.id,
+      content: "Bonjour, ma visite guidée du Louvre a été annulée sans explication le jour même. J'étais au point de rendez-vous avec ma famille (5 personnes). C'est inacceptable ! Je demande un remboursement complet et un geste commercial.",
+    },
+  });
+
+  // Ticket 5 - En cours, question technique
+  const ticket5 = await prisma.support_ticket.create({
+    data: {
+      user_id: guideUser3.id,
+      subject: 'Comment ajouter mes disponibilités ?',
+      status: 'in_progress',
+    },
+  });
+
+  await prisma.ticket_message.create({
+    data: {
+      ticket_id: ticket5.id,
+      author_id: guideUser3.id,
+      content: "Bonjour, je suis nouvelle sur la plateforme et je ne trouve pas comment définir mes disponibilités pour les prochaines semaines. Pouvez-vous m'aider ?",
+    },
+  });
+
+  await prisma.ticket_message.create({
+    data: {
+      ticket_id: ticket5.id,
+      author_id: admin.id,
+      content: "Bonjour Camille ! Pour définir vos disponibilités, rendez-vous dans votre espace guide > Calendrier > Ajouter des créneaux. Vous pouvez définir des plages horaires récurrentes ou ponctuelles. N'hésitez pas si vous avez d'autres questions !",
+    },
+  });
+
+  console.log('✅ 5 tickets de support créés avec leurs conversations');
 
   // Créer des offres de boost
   console.log("🚀 Création d'offres de boost...");
