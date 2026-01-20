@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsOptional, IsNumber, Min, IsString } from 'class-validator';
+import { IsOptional, IsNumber, Min, IsString, IsDate } from 'class-validator';
 import { PaginationDto } from '../../common/dto/pagination.dto';
 
 export class FindAllGuidesDto extends PaginationDto {
@@ -60,4 +60,12 @@ export class FindAllGuidesDto extends PaginationDto {
   @Min(0)
   @IsOptional()
   minExperience?: number;
+
+  @ApiPropertyOptional({
+    description: 'Date pour rechercher les guides disponibles (format ISO 8601)',
+    example: '2026-02-15T10:00:00Z',
+  })
+  @Type(() => Date)
+  @IsOptional()
+  date?: Date;
 }

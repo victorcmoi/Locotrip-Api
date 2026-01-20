@@ -45,6 +45,7 @@ export class GuidesService {
       languages,
       search,
       minExperience,
+      date,
     } = query;
 
     const where: guideWhereInput = {
@@ -58,6 +59,17 @@ export class GuidesService {
     if (minExperience !== undefined) {
       where.years_of_experience = {
         gte: minExperience,
+      };
+    }
+
+    // Si une date est fournie, filtrer les guides avec des disponibilités
+    if (date) {
+      where.availabilities = {
+        some: {
+          status: 'available',
+          start_date: { lte: date },
+          end_date: { gte: date },
+        },
       };
     }
 
@@ -86,8 +98,12 @@ export class GuidesService {
 
     const skip = (page - 1) * limit;
 
-    const orderBy: Record<string, 'asc' | 'desc'> = {};
-    orderBy[sort] = order as 'asc' | 'desc';
+    // Si une date est fournie, ne pas utiliser le tri par défaut (on triera par proximité après)
+    let orderBy: Record<string, 'asc' | 'desc'> | undefined;
+    if (!date) {
+      orderBy = {};
+      orderBy[sort] = order as 'asc' | 'desc';
+    }
 
     const [data, total] = await Promise.all([
       this.prisma.guide.findMany({
@@ -104,13 +120,15 @@ export class GuidesService {
           },
         },
         orderBy,
-        skip,
-        take: limit,
+        skip: !date ? skip : undefined,
+        take: !date ? limit : undefined,
       }),
       this.prisma.guide.count({ where }),
     ]);
 
     let filteredData = data;
+    
+    // Filtrage par rating et reviews
     if (minRating !== undefined || minReviews !== undefined) {
       filteredData = data.filter((guide) => {
         const allReviews = guide.experiences.flatMap((exp) => exp.reviews);
@@ -124,6 +142,36 @@ export class GuidesService {
         if (minReviews !== undefined && reviewCount < minReviews) return false;
         return true;
       });
+    }
+
+    // Si une date est fournie, trier par proximité de date
+    if (date) {
+      const searchDate = new Date(date);
+      filteredData = filteredData
+        .map((guide) => {
+          // Trouver la disponibilité la plus proche de la date recherchée
+          let minDistance = Infinity;
+          guide.availabilities.forEach((availability) => {
+            if (availability.status === 'available') {
+              const startDate = new Date(availability.start_date);
+              const endDate = new Date(availability.end_date);
+              
+              // Si la date recherchée est dans la plage, distance = 0
+              if (searchDate >= startDate && searchDate <= endDate) {
+                minDistance = 0;
+              } else {
+                // Sinon, calculer la distance en jours
+                const distanceToStart = Math.abs(searchDate.getTime() - startDate.getTime());
+                const distanceToEnd = Math.abs(searchDate.getTime() - endDate.getTime());
+                const distance = Math.min(distanceToStart, distanceToEnd) / (1000 * 60 * 60 * 24);
+                minDistance = Math.min(minDistance, distance);
+              }
+            }
+          });
+          return { ...guide, dateProximity: minDistance };
+        })
+        .sort((a, b) => a.dateProximity - b.dateProximity)
+        .slice(skip, skip + limit);
     }
 
     return {
