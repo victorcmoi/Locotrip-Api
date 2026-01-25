@@ -13,6 +13,7 @@ import { AuthentificationModule } from './auth/authentification.module';
 import { StripeModule } from './stripe/stripe.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { MailModule } from './mail/mail.module';
+import { MinioModule } from './minio/minio.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { MailModule } from './mail/mail.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    MinioModule,
     MailModule,
     UsersModule,
     GuidesModule,

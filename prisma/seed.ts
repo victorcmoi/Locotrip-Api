@@ -1,14 +1,42 @@
 import { PrismaClient } from '../src/generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import 'dotenv/config';
+import * as fs from 'fs';
+import * as path from 'path';
+import { MinioService } from '../src/minio/minio.service';
+import { ConfigService } from '@nestjs/config';
+import { BucketName } from '../src/minio/enums/minio.enum';
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
 });
 const prisma = new PrismaClient({ adapter });
 
+// Initialiser MinIO pour upload des images
+const configService = new ConfigService();
+const minioService = new MinioService(configService);
+
 async function main() {
   console.log('🌱 Début du seeding...');
+
+  console.log('🧹 Nettoyage et création des buckets MinIO...');
+  try {
+    const existingBuckets = await minioService.listBuckets();
+    console.log(`Buckets existants: ${existingBuckets.join(', ') || 'aucun'}`);
+
+    for (const bucket of existingBuckets) {
+      await minioService.deleteBucket(bucket);
+    }
+
+    const buckets = Object.values(BucketName);
+    for (const bucket of buckets) {
+      await minioService.ensureBucketExists(bucket);
+    }
+    console.log(`✅ Buckets MinIO créés: ${buckets.join(', ')}`);
+  } catch (error) {
+    console.error('❌ Erreur lors de la création des buckets MinIO:', error.message);
+    throw error;
+  }
 
   // Créer des currencies
   console.log('💱 Création des currencies...');
@@ -413,6 +441,78 @@ async function main() {
   });
 
   console.log('✅ 5 guides créés');
+
+  // Créer des images de profil pour les guides
+  console.log('📸 Upload des images de profil des guides vers MinIO...');
+  
+  // Guide 1 - Upload de l'image locale par défaut
+  try {
+    const imagePath = path.join(__dirname, 'assets', 'guide-pp-default.avif');
+    
+    if (fs.existsSync(imagePath)) {
+      const imageBuffer = fs.readFileSync(imagePath);
+      const uploadResult1 = await minioService.uploadFile(
+        BucketName.LOCOTRIP,
+        'profiles/guides/images/guide1-sophie-martin.avif',
+        imageBuffer,
+        'image/avif',
+        {
+          guideId: guide1.id,
+          uploadedBy: 'seeder',
+        }
+      );
+
+      await prisma.media.create({
+        data: {
+          url: uploadResult1.url,
+          media_type: 'photo',
+          entity_type: 'guide',
+          entity_id: guide1.id,
+          description: 'Photo de profil de Sophie Martin',
+        },
+      });
+      console.log('✅ Image de Sophie Martin uploadée');
+    } else {
+      console.log('⚠️ Image par défaut non trouvée, utilisation d\'un placeholder');
+      await prisma.media.create({
+        data: {
+          url: 'https://i.pravatar.cc/300?img=1',
+          media_type: 'photo',
+          entity_type: 'guide',
+          entity_id: guide1.id,
+          description: 'Photo de profil de Sophie Martin',
+        },
+      });
+    }
+  } catch (error) {
+    console.error('❌ Erreur upload image guide1:', error.message);
+  }
+
+  // Guide 2 - Image placeholder
+  await prisma.media.create({
+    data: {
+      url: 'https://i.pravatar.cc/300?img=12',
+      media_type: 'photo',
+      entity_type: 'guide',
+      entity_id: guide2.id,
+      description: 'Photo de profil de Thomas Dubois',
+    },
+  });
+  console.log('✅ Image de Thomas Dubois créée (placeholder)');
+
+  // Guide 3 - Image placeholder
+  await prisma.media.create({
+    data: {
+      url: 'https://i.pravatar.cc/300?img=5',
+      media_type: 'photo',
+      entity_type: 'guide',
+      entity_id: guide3.id,
+      description: 'Photo de profil de Camille Rousseau',
+    },
+  });
+  console.log('✅ Image de Camille Rousseau créée (placeholder)');
+
+  console.log('✅ Images de profil des guides créées');
 
   // Créer des documents pour les guides
   console.log('📄 Création des documents de guides...');
