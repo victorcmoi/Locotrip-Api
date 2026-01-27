@@ -11,7 +11,7 @@ import {
   PaginatedResponse,
   PaginationMeta,
 } from '../common/interfaces/paginated-response.interface';
-import { GuideStatus } from '../generated/enums';
+import { GuideStatus } from './enums/guide.enum';
 
 @Injectable()
 export class GuidesService {
@@ -365,7 +365,7 @@ export class GuidesService {
   async findLocalWithCardRequests() {
     const guides = await this.prisma.guide.findMany({
       where: {
-        guide_status: GuideStatus.local,
+        guide_status: GuideStatus.LOCAL,
         is_active: true,
         card_request_date: {
           not: null,
