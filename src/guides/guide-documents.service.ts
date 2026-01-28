@@ -50,13 +50,11 @@ export class GuideDocumentsService {
     });
   }
 
-  async update(id: string, updateData: Partial<CreateGuideDocumentDto>) {
+  async update(id: string, updateData: guide_documentUncheckedUpdateInput) {
     try {
-      const data: guide_documentUncheckedUpdateInput = { ...updateData };
-
       return await this.prisma.guide_document.update({
         where: { id },
-        data,
+        data: updateData,
       });
     } catch {
       throw new NotFoundException(`Document avec l'ID ${id} introuvable`);

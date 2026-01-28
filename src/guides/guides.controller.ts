@@ -27,6 +27,7 @@ import { CreateGuideDto } from './dto/create-guide.dto';
 import { UpdateGuideDto } from './dto/update-guide.dto';
 import { SoftDeleteGuideDto } from './dto/soft-delete-guide.dto';
 import { CreateGuideDocumentDto } from './dto/create-guide-document.dto';
+import { UpdateGuideDocumentDto } from './dto/update-guide-document.dto';
 import { CreateGuideAvailabilityDto } from './dto/create-guide-availability.dto';
 import { CreateGuideBoostDto } from './dto/create-guide-boost.dto';
 import { CreateBoostOfferDto } from './dto/create-boost-offer.dto';
@@ -151,7 +152,6 @@ export class GuidesController {
   }
 
   @Put(':id')
-  @Roles(UserRole.GUIDE)
   @ApiOperation({ summary: 'Mettre à jour un guide' })
   @ApiParam({ name: 'id', description: 'ID du guide' })
   @ApiUpdateResponse(GuideEntity)
@@ -221,6 +221,20 @@ export class GuidesController {
   @ApiGetManyResponse(Object)
   findDocumentsByGuide(@Param('guideId') guideId: string) {
     return this.guideDocumentsService.findByGuide(guideId);
+  }
+
+  @Patch(':guideId/documents/:documentId')
+  @ApiOperation({ summary: 'Mettre à jour un document de guide' })
+  @ApiParam({ name: 'documentId', description: 'ID du document' })
+  @ApiUpdateResponse(Object)
+  updateDocument(
+    @Param('documentId') documentId: string,
+    @Body() updateDocumentDto: UpdateGuideDocumentDto,
+  ) {
+    return this.guideDocumentsService.update(documentId, {
+      ...updateDocumentDto,
+      verification_date: updateDocumentDto.verification_status ? new Date() : undefined,
+    });
   }
 
   // === DISPONIBILITÉS ===
