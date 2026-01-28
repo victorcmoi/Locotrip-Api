@@ -17,10 +17,21 @@ export class DisputesService {
 
   async findAll() {
     return this.prisma.dispute.findMany({
+      orderBy: {
+        created_at: 'desc',
+      },
       include: {
         booking: {
           include: {
-            experience: true,
+            experience: {
+              include: {
+                guide: {
+                  include: {
+                    user: true,
+                  },
+                },
+              },
+            },
           },
         },
         user: true,

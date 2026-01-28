@@ -195,7 +195,6 @@ export class DisputesController {
   }
 
   @Put(':id')
-  @Roles(UserRole.CLIENT)
   @ApiOperation({ summary: 'Mettre à jour un litige' })
   @ApiParam({ name: 'id', description: 'ID du litige' })
   @ApiUpdateResponse(Object)
