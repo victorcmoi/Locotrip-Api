@@ -6,7 +6,7 @@ import { reviewUncheckedUpdateInput } from '../generated/prisma/models/review';
 
 @Injectable()
 export class ReviewService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create(createReviewDto: CreateReviewDto) {
     return this.prisma.review.create({
@@ -29,6 +29,7 @@ export class ReviewService {
       include: {
         user: true,
         experience: true,
+        media: true,
       },
     });
   }
@@ -39,6 +40,7 @@ export class ReviewService {
       include: {
         user: true,
         experience: true,
+        media: true,
       },
     });
 
@@ -54,6 +56,7 @@ export class ReviewService {
       where: { experience_id: experienceId },
       include: {
         user: true,
+        media: true,
       },
       orderBy: { review_date: 'desc' },
     });
@@ -64,6 +67,7 @@ export class ReviewService {
       where: { user_id: userId },
       include: {
         experience: true,
+        media: true,
       },
     });
   }
@@ -101,6 +105,7 @@ export class ReviewService {
       },
       include: {
         user: true,
+        media: true,
         experience: {
           include: {
             city: true,
@@ -116,7 +121,7 @@ export class ReviewService {
         review_date: 'desc',
       },
     });
-    
+
     const filteredReviews = reviews.filter(
       (review) =>
         review.comment && review.comment.length >= minDescriptionLength,

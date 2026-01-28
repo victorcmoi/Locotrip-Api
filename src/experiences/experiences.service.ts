@@ -14,7 +14,7 @@ import {
 
 @Injectable()
 export class ExperiencesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create(createExperienceDto: CreateExperienceDto) {
     return this.prisma.experience.create({
@@ -135,6 +135,7 @@ export class ExperiencesService {
               category: true,
             },
           },
+          medias: true,
           reviews: true,
         },
         orderBy,
@@ -175,6 +176,7 @@ export class ExperiencesService {
         },
         bookings: true,
         reviews: true,
+        medias: true,
         categories: {
           include: {
             category: true,
@@ -217,6 +219,7 @@ export class ExperiencesService {
             user: true,
           },
         },
+        medias: true,
         categories: {
           include: {
             category: true,
@@ -234,6 +237,7 @@ export class ExperiencesService {
       },
       include: {
         city: true,
+        medias: true,
         reviews: true,
       },
     });
@@ -325,6 +329,7 @@ export class ExperiencesService {
             user: true,
           },
         },
+        medias: true,
         categories: {
           include: {
             category: true,
@@ -347,6 +352,7 @@ export class ExperiencesService {
       },
       include: {
         city: true,
+        medias: true,
         categories: {
           include: {
             category: true,

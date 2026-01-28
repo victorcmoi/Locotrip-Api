@@ -5,8 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
   moduleFormat = "commonjs"
 }
 
@@ -104,42 +104,42 @@ enum NotificationType {
 // ============================================
 
 model user {
-  id              String    @id @default(uuid()) @db.Uuid
-  last_name       String    @db.VarChar(100)
-  first_name      String    @db.VarChar(50)
-  email           String    @unique @db.VarChar(100)
-  phone           String?   @db.VarChar(20)
-  address         address?
-  birth_date      DateTime? @db.Date
-  password        String    @db.VarChar(255)
-  role            UserRole
-  refresh_token   String?   @db.Text
-  
-  is_active       Boolean   @default(true)
-  is_verified     Boolean   @default(false)
-  deleted_at      DateTime? @db.Timestamp(6)
-  deleted_reason  String?   @db.Text
-  
+  id            String    @id @default(uuid()) @db.Uuid
+  last_name     String    @db.VarChar(100)
+  first_name    String    @db.VarChar(50)
+  email         String    @unique @db.VarChar(100)
+  phone         String?   @db.VarChar(20)
+  address       address?
+  birth_date    DateTime? @db.Date
+  password      String    @db.VarChar(255)
+  role          UserRole
+  refresh_token String?   @db.Text
+
+  is_active      Boolean   @default(true)
+  is_verified    Boolean   @default(false)
+  deleted_at     DateTime? @db.Timestamp(6)
+  deleted_reason String?   @db.Text
+
   // RGPD - Consentements
-  marketing_consent         Boolean   @default(false)
-  marketing_consent_date    DateTime? @db.Timestamp(6)
-  data_processing_consent   Boolean   @default(true)
-  data_processing_consent_date DateTime @default(now()) @db.Timestamp(6)
-  
-  created_at      DateTime  @default(now()) @db.Timestamp(6)
-  updated_at      DateTime  @updatedAt @db.Timestamp(6)
-  
-  guide           guide?
-  bookings        booking[]
-  opened_disputes dispute[]  @relation("DisputeUser")
-  resolved_disputes dispute[]  @relation("DisputeAdmin")
-  reviews         review[]
-  subscriptions   subscription[]
-  messages        message[]
-  support_tickets support_ticket[]
-  ticket_messages ticket_message[]
-  notifications   notification[]
-  
+  marketing_consent            Boolean   @default(false)
+  marketing_consent_date       DateTime? @db.Timestamp(6)
+  data_processing_consent      Boolean   @default(true)
+  data_processing_consent_date DateTime  @default(now()) @db.Timestamp(6)
+
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @updatedAt @db.Timestamp(6)
+
+  guide             guide?
+  bookings          booking[]
+  opened_disputes   dispute[]        @relation("DisputeUser")
+  resolved_disputes dispute[]        @relation("DisputeAdmin")
+  reviews           review[]
+  subscriptions     subscription[]
+  messages          message[]
+  support_tickets   support_ticket[]
+  ticket_messages   ticket_message[]
+  notifications     notification[]
+
   @@index([is_active])
   @@index([email, is_active])
   @@map("user")
@@ -150,20 +150,20 @@ model user {
 // ============================================
 
 model address {
-  id          String    @id @default(uuid()) @db.Uuid
-  user_id     String    @unique @db.Uuid
-  street      String    @db.VarChar(150)
-  city        String    @db.VarChar(100)
-  state       String?   @db.VarChar(100)
-  postal_code String    @db.VarChar(20)
-  country     String    @db.VarChar(50)
+  id          String   @id @default(uuid()) @db.Uuid
+  user_id     String   @unique @db.Uuid
+  street      String   @db.VarChar(150)
+  city        String   @db.VarChar(100)
+  state       String?  @db.VarChar(100)
+  postal_code String   @db.VarChar(20)
+  country     String   @db.VarChar(50)
   longitude   Float
   latitude    Float
-  created_at  DateTime  @default(now()) @db.Timestamp(6)
-  updated_at  DateTime  @updatedAt @db.Timestamp(6)
-  
-  user        user      @relation(fields: [user_id], references: [id])
-  
+  created_at  DateTime @default(now()) @db.Timestamp(6)
+  updated_at  DateTime @updatedAt @db.Timestamp(6)
+
+  user user @relation(fields: [user_id], references: [id])
+
   @@index([user_id])
   @@map("address")
 }
@@ -172,61 +172,66 @@ model address {
 // GUIDES & DOCUMENTS
 // ============================================
 
-model guide {
-  id                        String              @id @default(uuid()) @db.Uuid
-  user_id                   String              @unique @db.Uuid
-  bio                       String?             @db.Text
-  languages                 String?             @db.VarChar(100)
-  years_of_experience       Int?
-  guide_status              GuideStatus
-  pro_card                  Boolean             @default(false)
-  country                   String?             @db.VarChar(50)
-  card_request_date         DateTime?           @db.Timestamp(6)
-  card_verification_date    DateTime?           @db.Timestamp(6)
-  internal_comment          String?             @db.Text
-  
-  is_active                 Boolean             @default(true)
-  suspended_at              DateTime?           @db.Timestamp(6)
-  suspension_reason         String?             @db.Text
-  
-  created_at                DateTime            @default(now()) @db.Timestamp(6)
-  updated_at                DateTime            @updatedAt @db.Timestamp(6)
-  user                      user                @relation(fields: [user_id], references: [id])
+// TODO : add recommandations field
 
-  documents                 guide_document[]
-  availabilities            guide_availability[]
-  boosts                    guide_boost[]
-  experiences               experience[]
-  
+model guide {
+  id                     String      @id @default(uuid()) @db.Uuid
+  user_id                String      @unique @db.Uuid
+  bio                    String?     @db.Text
+  languages              String?     @db.VarChar(100)
+  years_of_experience    Int?
+  guide_status           GuideStatus
+  pro_card               Boolean     @default(false)
+  country                String?     @db.VarChar(50)
+  card_request_date      DateTime?   @db.Timestamp(6)
+  card_verification_date DateTime?   @db.Timestamp(6)
+  internal_comment       String?     @db.Text
+  response_time_hours    Float?
+
+  is_active         Boolean   @default(true)
+  suspended_at      DateTime? @db.Timestamp(6)
+  suspension_reason String?   @db.Text
+
+  created_at      DateTime @default(now()) @db.Timestamp(6)
+  updated_at      DateTime @updatedAt @db.Timestamp(6)
+  user            user     @relation(fields: [user_id], references: [id])
+  profile_picture media?   @relation("GuideProfilePicture")
+
+  documents      guide_document[]
+  availabilities guide_availability[]
+  boosts         guide_boost[]
+  experiences    experience[]
+  hobbies        guide_hobby[]
+
   @@index([user_id])
   @@index([is_active])
   @@map("guide")
 }
 
 model guide_document {
-  id                    String    @id @default(uuid()) @db.Uuid
-  guide_id              String    @db.Uuid
-  document_type         DocumentType
-  verification_status   VerificationStatus
-  verification_comment  String?   @db.Text
-  upload_date           DateTime  @default(now()) @db.Timestamp(6)
-  verification_date     DateTime? @db.Timestamp(6)
-  
-  guide                 guide     @relation(fields: [guide_id], references: [id])
-  
+  id                   String             @id @default(uuid()) @db.Uuid
+  guide_id             String             @db.Uuid
+  document_type        DocumentType
+  verification_status  VerificationStatus
+  verification_comment String?            @db.Text
+  upload_date          DateTime           @default(now()) @db.Timestamp(6)
+  verification_date    DateTime?          @db.Timestamp(6)
+
+  guide guide @relation(fields: [guide_id], references: [id])
+
   @@index([guide_id])
   @@map("guide_document")
 }
 
 model guide_availability {
-  id          String    @id @default(uuid()) @db.Uuid
-  guide_id    String    @db.Uuid
-  start_date  DateTime  @db.Timestamp(6)
-  end_date    DateTime  @db.Timestamp(6)
-  status      AvailabilityStatus
-  
-  guide       guide     @relation(fields: [guide_id], references: [id], map: "guide_availability_guide_fkey")
-  
+  id         String             @id @default(uuid()) @db.Uuid
+  guide_id   String             @db.Uuid
+  start_date DateTime           @db.Timestamp(6)
+  end_date   DateTime           @db.Timestamp(6)
+  status     AvailabilityStatus
+
+  guide guide @relation(fields: [guide_id], references: [id], map: "guide_availability_guide_fkey")
+
   @@index([guide_id])
   @@map("guide_availability")
 }
@@ -236,15 +241,15 @@ model guide_availability {
 // ============================================
 
 model boost_offer {
-  id                      String        @id @default(uuid()) @db.Uuid
-  name                    String        @db.VarChar(100)
-  description             String?       @db.Text
-  duration_days           Int
-  discount_percentage     Int
-  price                   Decimal       @db.Decimal(10, 2)
+  id                  String  @id @default(uuid()) @db.Uuid
+  name                String  @db.VarChar(100)
+  description         String? @db.Text
+  duration_days       Int
+  discount_percentage Int
+  price               Decimal @db.Decimal(10, 2)
 
-  guide_boosts            guide_boost[]
-  
+  guide_boosts guide_boost[]
+
   @@map("boost_offer")
 }
 
@@ -255,10 +260,10 @@ model guide_boost {
   purchase_date   DateTime    @default(now()) @db.Timestamp(6)
   expiration_date DateTime    @db.Timestamp(6)
   status          BoostStatus
-  
-  guide           guide       @relation(fields: [guide_id], references: [id])
-  boost_offer     boost_offer @relation(fields: [boost_offer_id], references: [id])
-  
+
+  guide       guide       @relation(fields: [guide_id], references: [id])
+  boost_offer boost_offer @relation(fields: [boost_offer_id], references: [id])
+
   @@index([guide_id])
   @@index([boost_offer_id])
   @@map("guide_boost")
@@ -269,52 +274,53 @@ model guide_boost {
 // ============================================
 
 model city {
-  id          String       @id @default(uuid()) @db.Uuid
-  name        String       @db.VarChar(100)
-  country     String       @db.VarChar(50)
-  slug        String       @unique @db.VarChar(150)
-  description String?      @db.Text
+  id          String  @id @default(uuid()) @db.Uuid
+  name        String  @db.VarChar(100)
+  country     String  @db.VarChar(50)
+  slug        String  @unique @db.VarChar(150)
+  description String? @db.Text
   latitude    Float?
   longitude   Float?
-  image_url   String?      @db.VarChar(255)
-  is_active   Boolean      @default(true)
-  
-  created_at  DateTime     @default(now()) @db.Timestamp(6)
-  
+  image_url   String? @db.VarChar(255)
+  is_active   Boolean @default(true)
+
+  created_at DateTime @default(now()) @db.Timestamp(6)
+
   experiences experience[]
-  
+
   @@index([slug])
   @@index([is_active])
   @@map("city")
 }
 
 model experience {
-  id              String                  @id @default(uuid()) @db.Uuid
-  title           String                  @db.VarChar(150)
-  description     String?                 @db.Text
-  price           Decimal                 @db.Decimal(10, 2)
-  duration        Int
-  city_id         String                  @db.Uuid
-  guide_id        String                  @db.Uuid
-  max_capacity    Int?
-  meeting_point   String?                 @db.VarChar(255)
-  meeting_latitude Float?
+  id                String  @id @default(uuid()) @db.Uuid
+  title             String  @db.VarChar(150)
+  description       String? @db.Text
+  price             Decimal @db.Decimal(10, 2)
+  duration          Int
+  city_id           String  @db.Uuid
+  guide_id          String  @db.Uuid
+  max_capacity      Int?
+  meeting_point     String? @db.VarChar(255)
+  meeting_latitude  Float?
   meeting_longitude Float?
-  
-  is_active       Boolean                 @default(true)
-  is_published    Boolean                 @default(false)
-  deleted_at      DateTime?               @db.Timestamp(6)
-  
-  created_at      DateTime                @default(now()) @db.Timestamp(6)
-  updated_at      DateTime                @updatedAt @db.Timestamp(6)
-  
-  city            city                    @relation(fields: [city_id], references: [id])
-  guide           guide                   @relation(fields: [guide_id], references: [id])
+
+  is_active    Boolean   @default(true)
+  is_published Boolean   @default(false)
+  deleted_at   DateTime? @db.Timestamp(6)
+
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @updatedAt @db.Timestamp(6)
+
+  city            city                  @relation(fields: [city_id], references: [id])
+  guide           guide                 @relation(fields: [guide_id], references: [id])
   bookings        booking[]
   reviews         review[]
   categories      experience_category[]
   currency_prices experience_price[]
-  
+  medias          media[]               @relation("ExperienceMedias")
+
   @@index([city_id])
   @@index([guide_id])
   @@index([is_active])
@@ -323,25 +329,39 @@ model experience {
 }
 
 model category {
-  id          String                  @id @default(uuid()) @db.Uuid
-  name        String                  @db.VarChar(50)
-  
+  id   String @id @default(uuid()) @db.Uuid
+  name String @db.VarChar(50)
+
   experiences experience_category[]
-  
+  guides      guide_hobby[]
+
   @@map("category")
 }
 
 model experience_category {
-  experience_id String     @db.Uuid
-  category_id   String     @db.Uuid
-  
-  experience    experience @relation(fields: [experience_id], references: [id])
-  category      category   @relation(fields: [category_id], references: [id])
-  
+  experience_id String @db.Uuid
+  category_id   String @db.Uuid
+
+  experience experience @relation(fields: [experience_id], references: [id])
+  category   category   @relation(fields: [category_id], references: [id])
+
   @@id([experience_id, category_id])
   @@index([experience_id])
   @@index([category_id])
   @@map("experience_category")
+}
+
+model guide_hobby {
+  guide_id    String @db.Uuid
+  category_id String @db.Uuid
+
+  guide    guide    @relation(fields: [guide_id], references: [id])
+  category category @relation(fields: [category_id], references: [id])
+
+  @@id([guide_id, category_id])
+  @@index([guide_id])
+  @@index([category_id])
+  @@map("guide_hobby")
 }
 
 // ============================================
@@ -349,51 +369,51 @@ model experience_category {
 // ============================================
 
 model booking {
-  id                     String         @id @default(uuid()) @db.Uuid
-  user_id                String         @db.Uuid
-  experience_id          String         @db.Uuid
-  booking_date           DateTime       @db.Timestamp(6)
+  id                     String        @id @default(uuid()) @db.Uuid
+  user_id                String        @db.Uuid
+  experience_id          String        @db.Uuid
+  booking_date           DateTime      @db.Timestamp(6)
   status                 BookingStatus
   number_of_participants Int
-  total_price            Decimal        @db.Decimal(10, 2)
-  
-  user                   user    @relation(fields: [user_id], references: [id])
-  experience             experience     @relation(fields: [experience_id], references: [id])
-  payments               payment[]
-  disputes               dispute[]
-  conversations          conversation[]
-  
+  total_price            Decimal       @db.Decimal(10, 2)
+
+  user          user           @relation(fields: [user_id], references: [id])
+  experience    experience     @relation(fields: [experience_id], references: [id])
+  payments      payment[]
+  disputes      dispute[]
+  conversations conversation[]
+
   @@index([user_id])
   @@index([experience_id])
   @@map("booking")
 }
 
 model payment {
-  id                        String        @id @default(uuid()) @db.Uuid
-  booking_id                String        @db.Uuid
-  amount                    Decimal       @db.Decimal(10, 2)
-  currency                  String        @default("eur") @db.VarChar(3)
-  payment_date              DateTime      @default(now()) @db.Timestamp(6)
-  method                    String        @db.VarChar(50)
-  status                    PaymentStatus
-  
+  id           String        @id @default(uuid()) @db.Uuid
+  booking_id   String        @db.Uuid
+  amount       Decimal       @db.Decimal(10, 2)
+  currency     String        @default("eur") @db.VarChar(3)
+  payment_date DateTime      @default(now()) @db.Timestamp(6)
+  method       String        @db.VarChar(50)
+  status       PaymentStatus
+
   // Stripe identifiers
-  stripe_payment_intent_id  String?       @unique @db.VarChar(255)
-  stripe_charge_id          String?       @db.VarChar(255)
-  stripe_customer_id        String?       @db.VarChar(255)
-  
+  stripe_payment_intent_id String? @unique @db.VarChar(255)
+  stripe_charge_id         String? @db.VarChar(255)
+  stripe_customer_id       String? @db.VarChar(255)
+
   // Payment metadata
-  failure_reason            String?       @db.Text
-  refunded_amount           Decimal?      @db.Decimal(10, 2)
-  refunded_at               DateTime?     @db.Timestamp(6)
-  metadata                  Json?
-  
+  failure_reason  String?   @db.Text
+  refunded_amount Decimal?  @db.Decimal(10, 2)
+  refunded_at     DateTime? @db.Timestamp(6)
+  metadata        Json?
+
   // Audit trail
-  created_at                DateTime      @default(now()) @db.Timestamp(6)
-  updated_at                DateTime      @default(now()) @updatedAt @db.Timestamp(6)
-  
-  booking                   booking @relation(fields: [booking_id], references: [id])
-  
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamp(6)
+
+  booking booking @relation(fields: [booking_id], references: [id])
+
   @@index([booking_id])
   @@index([stripe_payment_intent_id])
   @@index([stripe_customer_id])
@@ -402,19 +422,19 @@ model payment {
 }
 
 model dispute {
-  id                String      @id @default(uuid()) @db.Uuid
-  booking_id        String      @db.Uuid
-  user_id           String      @db.Uuid
-  reason            String      @db.Text
-  status            DisputeStatus
-  created_at        DateTime    @default(now()) @db.Timestamp(6)
-  resolution_date   DateTime?   @db.Timestamp(6)
-  admin_id          String?     @db.Uuid
-  
-  booking           booking @relation(fields: [booking_id], references: [id])
-  user              user @relation("DisputeUser", fields: [user_id], references: [id])
-  admin             user? @relation("DisputeAdmin", fields: [admin_id], references: [id])
-  
+  id              String        @id @default(uuid()) @db.Uuid
+  booking_id      String        @db.Uuid
+  user_id         String        @db.Uuid
+  reason          String        @db.Text
+  status          DisputeStatus
+  created_at      DateTime      @default(now()) @db.Timestamp(6)
+  resolution_date DateTime?     @db.Timestamp(6)
+  admin_id        String?       @db.Uuid
+
+  booking booking @relation(fields: [booking_id], references: [id])
+  user    user    @relation("DisputeUser", fields: [user_id], references: [id])
+  admin   user?   @relation("DisputeAdmin", fields: [admin_id], references: [id])
+
   @@index([booking_id])
   @@index([user_id])
   @@index([admin_id])
@@ -426,32 +446,33 @@ model dispute {
 // ============================================
 
 model review {
-  id              String      @id @default(uuid()) @db.Uuid
-  user_id         String      @db.Uuid
-  experience_id   String      @db.Uuid
-  rating          Int
-  title           String?     @db.VarChar(150)
-  comment         String?     @db.Text
-  review_date     DateTime    @default(now()) @db.Timestamp(6)
-  
-  user            user @relation(fields: [user_id], references: [id])
-  experience      experience  @relation(fields: [experience_id], references: [id])
-  
+  id            String   @id @default(uuid()) @db.Uuid
+  user_id       String   @db.Uuid
+  experience_id String   @db.Uuid
+  rating        Int
+  title         String?  @db.VarChar(150)
+  comment       String?  @db.Text
+  review_date   DateTime @default(now()) @db.Timestamp(6)
+
+  user       user       @relation(fields: [user_id], references: [id])
+  experience experience @relation(fields: [experience_id], references: [id])
+  media      media?     @relation("ReviewMedia")
+
   @@index([user_id])
   @@index([experience_id])
   @@map("review")
 }
 
 model subscription {
-  id                String      @id @default(uuid()) @db.Uuid
-  user_id           String      @db.Uuid
+  id                String           @id @default(uuid()) @db.Uuid
+  user_id           String           @db.Uuid
   subscription_type SubscriptionType
-  start_date        DateTime    @db.Timestamp(6)
-  end_date          DateTime    @db.Timestamp(6)
-  status            String      @db.VarChar(20)
-  
-  user              user @relation(fields: [user_id], references: [id])
-  
+  start_date        DateTime         @db.Timestamp(6)
+  end_date          DateTime         @db.Timestamp(6)
+  status            String           @db.VarChar(20)
+
+  user user @relation(fields: [user_id], references: [id])
+
   @@index([user_id])
   @@map("subscription")
 }
@@ -461,27 +482,27 @@ model subscription {
 // ============================================
 
 model conversation {
-  id              String      @id @default(uuid()) @db.Uuid
-  booking_id      String      @db.Uuid // booking_id
-  created_at      DateTime    @default(now()) @db.Timestamp(6)
-  
-  booking         booking @relation(fields: [booking_id], references: [id])
-  messages        message[]
-  
+  id         String   @id @default(uuid()) @db.Uuid
+  booking_id String   @db.Uuid // booking_id
+  created_at DateTime @default(now()) @db.Timestamp(6)
+
+  booking  booking   @relation(fields: [booking_id], references: [id])
+  messages message[]
+
   @@index([booking_id])
   @@map("conversation")
 }
 
 model message {
-  id                String        @id @default(uuid()) @db.Uuid
-  conversation_id   String        @db.Uuid
-  author_id         String        @db.Uuid
-  content           String        @db.Text
-  sent_at           DateTime      @default(now()) @db.Timestamp(6)
-  
-  conversation      conversation  @relation(fields: [conversation_id], references: [id])
-  author            user   @relation(fields: [author_id], references: [id])
-  
+  id              String   @id @default(uuid()) @db.Uuid
+  conversation_id String   @db.Uuid
+  author_id       String   @db.Uuid
+  content         String   @db.Text
+  sent_at         DateTime @default(now()) @db.Timestamp(6)
+
+  conversation conversation @relation(fields: [conversation_id], references: [id])
+  author       user         @relation(fields: [author_id], references: [id])
+
   @@index([conversation_id])
   @@index([author_id])
   @@map("message")
@@ -492,14 +513,23 @@ model message {
 // ============================================
 
 model media {
-  id            String    @id @default(uuid()) @db.Uuid
-  entity_type   String    @db.VarChar(50) // "experience", "guide", "user", "booking"
-  entity_id     String    @db.Uuid
-  url           String    @db.VarChar(255)
-  media_type    MediaType
-  description   String?   @db.Text
-  upload_date   DateTime  @default(now()) @db.Timestamp(6)
-  
+  id          String    @id @default(uuid()) @db.Uuid
+  entity_type String    @db.VarChar(50) // "experience", "guide", "user", "booking"
+  entity_id   String    @db.Uuid
+  url         String    @db.VarChar(255)
+  media_type  MediaType
+  description String?   @db.Text
+  upload_date DateTime  @default(now()) @db.Timestamp(6)
+
+  guide_id String? @unique @db.Uuid
+  guide    guide?  @relation("GuideProfilePicture", fields: [guide_id], references: [id])
+
+  experience_id String?     @db.Uuid
+  experience    experience? @relation("ExperienceMedias", fields: [experience_id], references: [id])
+
+  review_id String? @unique @db.Uuid
+  review    review? @relation("ReviewMedia", fields: [review_id], references: [id])
+
   @@index([entity_type, entity_id])
   @@map("media")
 }
@@ -509,30 +539,30 @@ model media {
 // ============================================
 
 model support_ticket {
-  id              String            @id @default(uuid()) @db.Uuid
-  user_id         String            @db.Uuid
-  subject         String            @db.VarChar(150)
-  status          SupportTicketStatus
-  created_at      DateTime          @default(now()) @db.Timestamp(6)
-  closed_at       DateTime?         @db.Timestamp(6)
-  
-  user     user       @relation(fields: [user_id], references: [id])
-  messages        ticket_message[]
-  
+  id         String              @id @default(uuid()) @db.Uuid
+  user_id    String              @db.Uuid
+  subject    String              @db.VarChar(150)
+  status     SupportTicketStatus
+  created_at DateTime            @default(now()) @db.Timestamp(6)
+  closed_at  DateTime?           @db.Timestamp(6)
+
+  user     user             @relation(fields: [user_id], references: [id])
+  messages ticket_message[]
+
   @@index([user_id])
   @@map("support_ticket")
 }
 
 model ticket_message {
-  id          String          @id @default(uuid()) @db.Uuid
-  ticket_id   String          @db.Uuid
-  author_id   String          @db.Uuid
-  content     String          @db.Text
-  sent_at     DateTime        @default(now()) @db.Timestamp(6)
-  
-  ticket      support_ticket  @relation(fields: [ticket_id], references: [id])
-  author      user     @relation(fields: [author_id], references: [id])
-  
+  id        String   @id @default(uuid()) @db.Uuid
+  ticket_id String   @db.Uuid
+  author_id String   @db.Uuid
+  content   String   @db.Text
+  sent_at   DateTime @default(now()) @db.Timestamp(6)
+
+  ticket support_ticket @relation(fields: [ticket_id], references: [id])
+  author user           @relation(fields: [author_id], references: [id])
+
   @@index([ticket_id])
   @@index([author_id])
   @@map("ticket_message")
@@ -543,15 +573,15 @@ model ticket_message {
 // ============================================
 
 model notification {
-  id              String      @id @default(uuid()) @db.Uuid
-  user_id         String      @db.Uuid
-  type            NotificationType
-  content         String      @db.Text
-  read            Boolean     @default(false)
-  sent_at         DateTime    @default(now()) @db.Timestamp(6)
-  
-  user     user @relation(fields: [user_id], references: [id])
-  
+  id      String           @id @default(uuid()) @db.Uuid
+  user_id String           @db.Uuid
+  type    NotificationType
+  content String           @db.Text
+  read    Boolean          @default(false)
+  sent_at DateTime         @default(now()) @db.Timestamp(6)
+
+  user user @relation(fields: [user_id], references: [id])
+
   @@index([user_id])
   @@map("notification")
 }
@@ -561,16 +591,16 @@ model notification {
 // ============================================
 
 model data_access_log {
-  id              String      @id @default(uuid()) @db.Uuid
-  user_id         String?     @db.Uuid
-  accessed_by     String      @db.Uuid
-  entity_type     String      @db.VarChar(50)
-  entity_id       String      @db.Uuid
-  action          String      @db.VarChar(50)
-  ip_address      String?     @db.VarChar(45)
-  reason          String?     @db.Text
-  access_date     DateTime    @default(now()) @db.Timestamp(6)
-  
+  id          String   @id @default(uuid()) @db.Uuid
+  user_id     String?  @db.Uuid
+  accessed_by String   @db.Uuid
+  entity_type String   @db.VarChar(50)
+  entity_id   String   @db.Uuid
+  action      String   @db.VarChar(50)
+  ip_address  String?  @db.VarChar(45)
+  reason      String?  @db.Text
+  access_date DateTime @default(now()) @db.Timestamp(6)
+
   @@index([user_id])
   @@index([accessed_by])
   @@index([access_date])
@@ -582,23 +612,23 @@ model data_access_log {
 // ============================================
 
 model currency {
-  code            String            @id @db.Char(3) // "EUR", "USD"
-  name            String            @db.VarChar(50)
-  exchange_rate   Decimal           @db.Decimal(10, 4)
-  
-  prices          experience_price[]
-  
+  code          String  @id @db.Char(3) // "EUR", "USD"
+  name          String  @db.VarChar(50)
+  exchange_rate Decimal @db.Decimal(10, 4)
+
+  prices experience_price[]
+
   @@map("currency")
 }
 
-model experience_price { // experience_price
-  experience_id String     @db.Uuid
-  currency_code String     @db.Char(3)
-  price         Decimal    @db.Decimal(10, 2)
-  
-  experience    experience @relation(fields: [experience_id], references: [id])
-  currency      currency   @relation(fields: [currency_code], references: [code])
-  
+model experience_price {
+  experience_id String  @db.Uuid
+  currency_code String  @db.Char(3)
+  price         Decimal @db.Decimal(10, 2)
+
+  experience experience @relation(fields: [experience_id], references: [id])
+  currency   currency   @relation(fields: [currency_code], references: [code])
+
   @@id([experience_id, currency_code])
   @@index([experience_id])
   @@index([currency_code])

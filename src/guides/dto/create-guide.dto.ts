@@ -8,6 +8,7 @@ import {
   IsUUID,
   IsEnum,
   Min,
+  IsNumber,
 } from 'class-validator';
 import { GuideStatus } from '../enums/guide.enum';
 
@@ -81,4 +82,14 @@ export class CreateGuideDto {
   @IsString()
   @IsOptional()
   internal_comment?: string;
+
+  @ApiPropertyOptional({
+    description: 'Délai moyen de réponse du guide en heures',
+    example: 2.5,
+    minimum: 0,
+  })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  response_time_hours?: number;
 }

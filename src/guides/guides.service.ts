@@ -15,7 +15,88 @@ import { GuideStatus } from './enums/guide.enum';
 
 @Injectable()
 export class GuidesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
+
+  /**
+   * Convertit un délai de réponse en heures en plage lisible
+   */
+  getResponseTimeRange(hours: number | null | undefined): string | null {
+    if (hours === null || hours === undefined) return null;
+
+    if (hours < 1) return '< 1h';
+    if (hours < 3) return '1-3h';
+    if (hours < 6) return '3-6h';
+    if (hours < 12) return '6-12h';
+    if (hours < 24) return '12-24h';
+    return '> 24h';
+  }
+
+  /**
+   * Calcule le délai moyen de réponse d'un guide en heures
+   * Basé sur les messages dans les conversations liées aux bookings de ses expériences
+   */
+  async calculateAverageResponseTime(guideId: string): Promise<number | null> {
+    // Récupérer les expériences du guide
+    const experiences = await this.prisma.experience.findMany({
+      where: { guide_id: guideId },
+      select: { id: true },
+    });
+
+    if (experiences.length === 0) return null;
+
+    const experienceIds = experiences.map((exp) => exp.id);
+
+    // Récupérer les conversations liées aux bookings de ces expériences
+    const conversations = await this.prisma.conversation.findMany({
+      where: {
+        booking: {
+          experience_id: { in: experienceIds },
+        },
+      },
+      include: {
+        messages: {
+          orderBy: { sent_at: 'asc' },
+        },
+        booking: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    const responseTimes: number[] = [];
+
+    // Pour chaque conversation, calculer les délais de réponse du guide
+    for (const conversation of conversations) {
+      const clientUserId = conversation.booking.user_id;
+
+      for (let i = 0; i < conversation.messages.length - 1; i++) {
+        const currentMessage = conversation.messages[i];
+        const nextMessage = conversation.messages[i + 1];
+
+        // Si le message actuel vient du client et le suivant du guide
+        if (
+          currentMessage.author_id === clientUserId &&
+          nextMessage.author_id !== clientUserId
+        ) {
+          const timeDiff =
+            new Date(nextMessage.sent_at).getTime() -
+            new Date(currentMessage.sent_at).getTime();
+          const hoursDelay = timeDiff / (1000 * 60 * 60);
+          responseTimes.push(hoursDelay);
+        }
+      }
+    }
+
+    if (responseTimes.length === 0) return null;
+
+    // Calculer la moyenne
+    const avgResponseTime =
+      responseTimes.reduce((sum, time) => sum + time, 0) / responseTimes.length;
+
+    return avgResponseTime;
+  }
 
   async create(createGuideDto: CreateGuideDto) {
     return this.prisma.guide.create({
@@ -100,9 +181,15 @@ export class GuidesService {
         where,
         include: {
           user: true,
+          profile_picture: true,
           documents: true,
           availabilities: true,
           boosts: true,
+          hobbies: {
+            include: {
+              category: true,
+            },
+          },
           experiences: {
             include: {
               reviews: true,
@@ -117,7 +204,7 @@ export class GuidesService {
     ]);
 
     let filteredData = data;
-    
+
     // Filtrage par rating et reviews
     if (minRating !== undefined || minReviews !== undefined) {
       filteredData = data.filter((guide) => {
@@ -141,13 +228,13 @@ export class GuidesService {
         .map((guide) => {
           // Trouver la disponibilité la plus proche de la date recherchée
           let minDistance = Infinity;
-          
+
           if (guide.availabilities && guide.availabilities.length > 0) {
             guide.availabilities.forEach((availability) => {
               if (availability.status === 'available') {
                 const startDate = new Date(availability.start_date);
                 const endDate = new Date(availability.end_date);
-                
+
                 // Si la date recherchée est dans la plage, distance = 0
                 if (searchDate >= startDate && searchDate <= endDate) {
                   minDistance = 0;
@@ -181,14 +268,24 @@ export class GuidesService {
       },
       include: {
         user: true,
+        profile_picture: true,
         documents: true,
         availabilities: true,
+        hobbies: {
+          include: {
+            category: true,
+          },
+        },
         boosts: {
           include: {
             boost_offer: true,
           },
         },
-        experiences: true,
+        experiences: {
+          include: {
+            reviews: true,
+          },
+        },
       },
     });
 
@@ -200,7 +297,34 @@ export class GuidesService {
       throw new NotFoundException(`Guide avec l'ID ${id} n'est plus actif`);
     }
 
-    return guide;
+    const reviewCount = guide.experiences.reduce(
+      (total, exp) => total + exp.reviews.length,
+      0,
+    );
+
+    const experiencesCount = guide.experiences.length;
+
+    // Si response_time_hours n'est pas défini, le calculer
+    let responseTime = guide.response_time_hours;
+    if (responseTime === null || responseTime === undefined) {
+      responseTime = await this.calculateAverageResponseTime(id);
+      if (responseTime !== null) {
+        await this.prisma.guide.update({
+          where: { id },
+          data: { response_time_hours: responseTime },
+        });
+      }
+    }
+
+    const responseTimeRange = this.getResponseTimeRange(responseTime);
+
+    return {
+      ...guide,
+      reviewCount,
+      experiencesCount,
+      response_time_hours: responseTime,
+      response_time_range: responseTimeRange,
+    };
   }
 
   /**
@@ -215,6 +339,12 @@ export class GuidesService {
       },
       include: {
         user: true,
+        profile_picture: true,
+        hobbies: {
+          include: {
+            category: true,
+          },
+        },
         experiences: {
           include: {
             reviews: true,
@@ -267,8 +397,14 @@ export class GuidesService {
       },
       include: {
         user: true,
+        profile_picture: true,
         documents: true,
         availabilities: true,
+        hobbies: {
+          include: {
+            category: true,
+          },
+        },
         experiences: true,
       },
     });
@@ -348,9 +484,15 @@ export class GuidesService {
     return this.prisma.guide.findMany({
       include: {
         user: true,
+        profile_picture: true,
         documents: true,
         availabilities: true,
         boosts: true,
+        hobbies: {
+          include: {
+            category: true,
+          },
+        },
         experiences: true,
       },
       orderBy: {
@@ -373,6 +515,12 @@ export class GuidesService {
       },
       include: {
         user: true,
+        profile_picture: true,
+        hobbies: {
+          include: {
+            category: true,
+          },
+        },
         documents: true,
       },
       orderBy: {

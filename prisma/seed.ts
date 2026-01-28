@@ -46,7 +46,7 @@ async function main() {
     create: {
       code: 'EUR',
       name: 'Euro',
-      exchange_rate: 1.0, 
+      exchange_rate: 1.0,
     },
   });
 
@@ -72,7 +72,7 @@ async function main() {
       email: 'admin@admin.com',
       phone: '+33612345678',
       birth_date: new Date('1990-05-15'),
-      password: '$2b$10$MW4ryE5jmOcqbKEn97xcHOPIUIK2TJiy.EjAf/338FY.ibPcsCQsi', 
+      password: '$2b$10$MW4ryE5jmOcqbKEn97xcHOPIUIK2TJiy.EjAf/338FY.ibPcsCQsi',
       role: 'admin',
       is_active: true,
       is_verified: true,
@@ -177,7 +177,7 @@ async function main() {
     },
   });
 
-  const client8  = await prisma.user.create({
+  const client8 = await prisma.user.create({
     data: {
       last_name: 'Fournier',
       first_name: 'Léa',
@@ -444,11 +444,11 @@ async function main() {
 
   // Créer des images de profil pour les guides
   console.log('📸 Upload des images de profil des guides vers MinIO...');
-  
+
   // Guide 1 - Upload de l'image locale par défaut
   try {
     const imagePath = path.join(__dirname, 'assets', 'guide-pp-default.avif');
-    
+
     if (fs.existsSync(imagePath)) {
       const imageBuffer = fs.readFileSync(imagePath);
       const uploadResult1 = await minioService.uploadFile(
@@ -516,7 +516,7 @@ async function main() {
 
   // Créer des documents pour les guides
   console.log('📄 Création des documents de guides...');
-  
+
   // Documents pour guide1 (pro - tous vérifiés)
   await prisma.guide_document.create({
     data: {
@@ -642,7 +642,7 @@ async function main() {
 
   // Créer des disponibilités de guides
   console.log('📅 Création des disponibilités de guides...');
-  
+
   // Disponibilités pour guide1 (Sophie) - prochaines semaines
   await prisma.guide_availability.create({
     data: {
@@ -869,9 +869,174 @@ async function main() {
     },
   });
 
-  console.log(
-    `✅ Catégories créées: ${culture.name}, ${gastronomie.name}, ${aventure.name}, ${nature.name}, ${artisanat.name}, ${nightlife.name}`,
-  );
+  const sport = await prisma.category.create({
+    data: {
+      name: 'Sport & Fitness',
+    },
+  });
+
+  const art = await prisma.category.create({
+    data: {
+      name: 'Art & Créativité',
+    },
+  });
+
+  const musique = await prisma.category.create({
+    data: {
+      name: 'Musique',
+    },
+  });
+
+  const photographie = await prisma.category.create({
+    data: {
+      name: 'Photographie',
+    },
+  });
+
+  const lecture = await prisma.category.create({
+    data: {
+      name: 'Lecture',
+    },
+  });
+
+  const cinema = await prisma.category.create({
+    data: {
+      name: 'Cinéma & Théâtre',
+    },
+  });
+
+  const mode = await prisma.category.create({
+    data: {
+      name: 'Mode & Style',
+    },
+  });
+
+  const technologie = await prisma.category.create({
+    data: {
+      name: 'Technologie',
+    },
+  });
+
+  const jardinage = await prisma.category.create({
+    data: {
+      name: 'Jardinage',
+    },
+  });
+
+  const cuisine = await prisma.category.create({
+    data: {
+      name: 'Cuisine',
+    },
+  });
+
+  const voyage = await prisma.category.create({
+    data: {
+      name: 'Voyage',
+    },
+  });
+
+  const animaux = await prisma.category.create({
+    data: {
+      name: 'Animaux',
+    },
+  });
+
+  const yoga = await prisma.category.create({
+    data: {
+      name: 'Yoga & Méditation',
+    },
+  });
+
+  const danse = await prisma.category.create({
+    data: {
+      name: 'Danse',
+    },
+  });
+
+  // Créer des hobbies pour les guides
+  console.log('🎨 Association des hobbies aux guides...');
+
+  // Guide 1 - Sophie Martin (Culture & Histoire)
+  await prisma.guide_hobby.createMany({
+    data: [
+      { guide_id: guide1.id, category_id: culture.id },
+      { guide_id: guide1.id, category_id: art.id },
+      { guide_id: guide1.id, category_id: lecture.id },
+      { guide_id: guide1.id, category_id: cinema.id },
+      { guide_id: guide1.id, category_id: photographie.id },
+      { guide_id: guide1.id, category_id: musique.id },
+      { guide_id: guide1.id, category_id: voyage.id },
+      { guide_id: guide1.id, category_id: gastronomie.id },
+      { guide_id: guide1.id, category_id: mode.id },
+      { guide_id: guide1.id, category_id: jardinage.id },
+    ],
+  });
+
+  // Guide 2 - Thomas Dubois (Gastronomie)
+  await prisma.guide_hobby.createMany({
+    data: [
+      { guide_id: guide2.id, category_id: gastronomie.id },
+      { guide_id: guide2.id, category_id: cuisine.id },
+      { guide_id: guide2.id, category_id: voyage.id },
+      { guide_id: guide2.id, category_id: culture.id },
+      { guide_id: guide2.id, category_id: nature.id },
+      { guide_id: guide2.id, category_id: jardinage.id },
+      { guide_id: guide2.id, category_id: artisanat.id },
+      { guide_id: guide2.id, category_id: photographie.id },
+      { guide_id: guide2.id, category_id: musique.id },
+      { guide_id: guide2.id, category_id: lecture.id },
+    ],
+  });
+
+  // Guide 3 - Camille Rousseau (Architecture)
+  await prisma.guide_hobby.createMany({
+    data: [
+      { guide_id: guide3.id, category_id: art.id },
+      { guide_id: guide3.id, category_id: culture.id },
+      { guide_id: guide3.id, category_id: photographie.id },
+      { guide_id: guide3.id, category_id: mode.id },
+      { guide_id: guide3.id, category_id: cinema.id },
+      { guide_id: guide3.id, category_id: voyage.id },
+      { guide_id: guide3.id, category_id: lecture.id },
+      { guide_id: guide3.id, category_id: technologie.id },
+      { guide_id: guide3.id, category_id: danse.id },
+      { guide_id: guide3.id, category_id: yoga.id },
+    ],
+  });
+
+  // Guide 4 - Marc Leroy (Aventure)
+  await prisma.guide_hobby.createMany({
+    data: [
+      { guide_id: guide4.id, category_id: aventure.id },
+      { guide_id: guide4.id, category_id: nature.id },
+      { guide_id: guide4.id, category_id: sport.id },
+      { guide_id: guide4.id, category_id: voyage.id },
+      { guide_id: guide4.id, category_id: photographie.id },
+      { guide_id: guide4.id, category_id: animaux.id },
+      { guide_id: guide4.id, category_id: musique.id },
+      { guide_id: guide4.id, category_id: technologie.id },
+      { guide_id: guide4.id, category_id: cuisine.id },
+      { guide_id: guide4.id, category_id: yoga.id },
+    ],
+  });
+
+  // Guide 5 - Laura Fontaine (Jeune & Dynamique)
+  await prisma.guide_hobby.createMany({
+    data: [
+      { guide_id: guide5.id, category_id: nightlife.id },
+      { guide_id: guide5.id, category_id: musique.id },
+      { guide_id: guide5.id, category_id: danse.id },
+      { guide_id: guide5.id, category_id: mode.id },
+      { guide_id: guide5.id, category_id: art.id },
+      { guide_id: guide5.id, category_id: cinema.id },
+      { guide_id: guide5.id, category_id: photographie.id },
+      { guide_id: guide5.id, category_id: voyage.id },
+      { guide_id: guide5.id, category_id: sport.id },
+      { guide_id: guide5.id, category_id: technologie.id },
+    ],
+  });
+
+  console.log('✅ Hobbies associés aux guides (10 par guide)');
 
   // Créer des expériences pour chaque guide
   console.log('🎨 Création des expériences...');

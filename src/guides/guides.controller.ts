@@ -54,7 +54,7 @@ export class GuidesController {
     private readonly guideAvailabilityService: GuideAvailabilityService,
     private readonly boostOffersService: BoostOffersService,
     private readonly guideBoostsService: GuideBoostsService,
-  ) {}
+  ) { }
 
   // === GUIDES ===
   @Post()
@@ -110,6 +110,35 @@ export class GuidesController {
   @ApiGetOneResponse(GuideEntity)
   findOne(@Param('id') id: string) {
     return this.guidesService.findOne(id);
+  }
+
+  @Patch(':id/update-response-time')
+  @Roles(UserRole.ADMIN, UserRole.GUIDE)
+  @ApiOperation({ summary: 'Recalculer et mettre à jour le délai de réponse du guide' })
+  @ApiParam({ name: 'id', description: 'ID du guide' })
+  @ApiUpdateResponse(Object)
+  async updateResponseTime(@Param('id') id: string) {
+    const responseTime = await this.guidesService.calculateAverageResponseTime(id);
+
+    if (responseTime !== null) {
+      await this.guidesService.update(id, {
+        response_time_hours: responseTime
+      });
+
+      const responseTimeRange = this.guidesService.getResponseTimeRange(responseTime);
+
+      return {
+        message: 'Délai de réponse mis à jour avec succès',
+        response_time_hours: responseTime,
+        response_time_range: responseTimeRange,
+      };
+    }
+
+    return {
+      message: 'Pas assez de données pour calculer le délai de réponse',
+      response_time_hours: null,
+      response_time_range: null,
+    };
   }
 
   @Get('user/:userId')
@@ -240,7 +269,7 @@ export class GuidesController {
 @ApiBearerAuth('JWT-auth')
 @Controller('boost-offers')
 export class BoostOffersController {
-  constructor(private readonly boostOffersService: BoostOffersService) {}
+  constructor(private readonly boostOffersService: BoostOffersService) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
