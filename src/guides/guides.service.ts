@@ -181,7 +181,7 @@ export class GuidesService {
         where,
         include: {
           user: true,
-          profile_picture: true,
+          medias: true,
           documents: true,
           availabilities: true,
           boosts: true,
@@ -268,7 +268,7 @@ export class GuidesService {
       },
       include: {
         user: true,
-        profile_picture: true,
+        medias: true,
         documents: true,
         availabilities: true,
         hobbies: {
@@ -339,7 +339,7 @@ export class GuidesService {
       },
       include: {
         user: true,
-        profile_picture: true,
+        medias: true,
         hobbies: {
           include: {
             category: true,
@@ -397,7 +397,7 @@ export class GuidesService {
       },
       include: {
         user: true,
-        profile_picture: true,
+        medias: true,
         documents: true,
         availabilities: true,
         hobbies: {
@@ -484,7 +484,7 @@ export class GuidesService {
     return this.prisma.guide.findMany({
       include: {
         user: true,
-        profile_picture: true,
+        medias: true,
         documents: true,
         availabilities: true,
         boosts: true,
@@ -515,7 +515,7 @@ export class GuidesService {
       },
       include: {
         user: true,
-        profile_picture: true,
+        medias: true,
         hobbies: {
           include: {
             category: true,

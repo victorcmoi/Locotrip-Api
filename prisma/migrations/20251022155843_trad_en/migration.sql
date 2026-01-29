@@ -20,7 +20,7 @@ CREATE TYPE "AvailabilityStatus" AS ENUM ('available', 'unavailable', 'blocked')
 CREATE TYPE "DocumentType" AS ENUM ('CV', 'diploma', 'proof_of_residence');
 
 -- CreateEnum
-CREATE TYPE "MediaType" AS ENUM ('photo', 'video', 'document', 'audio');
+CREATE TYPE "MediaType" AS ENUM ('photo', 'video', 'audio');
 
 -- CreateEnum
 CREATE TYPE "PaymentStatus" AS ENUM ('pending', 'completed', 'refunded');

@@ -445,74 +445,121 @@ async function main() {
   // Créer des images de profil pour les guides
   console.log('📸 Upload des images de profil des guides vers MinIO...');
 
-  // Guide 1 - Upload de l'image locale par défaut
-  try {
-    const imagePath = path.join(__dirname, 'assets', 'guide-pp-default.avif');
+  const guides = [
+    { guide: guide1, name: 'Sophie Martin', userId: guideUser1.id },
+    { guide: guide2, name: 'Thomas Dubois', userId: guideUser2.id },
+    { guide: guide3, name: 'Camille Rousseau', userId: guideUser3.id },
+    { guide: guide4, name: 'Alexandre Laurent', userId: guideUser4.id },
+    { guide: guide5, name: 'Emma Leroy', userId: guideUser5.id },
+  ];
 
-    if (fs.existsSync(imagePath)) {
-      const imageBuffer = fs.readFileSync(imagePath);
-      const uploadResult1 = await minioService.uploadFile(
-        BucketName.LOCOTRIP,
-        'profiles/guides/images/guide1-sophie-martin.avif',
-        imageBuffer,
-        'image/avif',
-        {
-          guideId: guide1.id,
-          uploadedBy: 'seeder',
-        }
-      );
+  // Upload des photos de profil (profile_picture)
+  for (let i = 0; i < guides.length; i++) {
+    const { guide, name } = guides[i];
+    try {
+      const imageFileName = `guide-home-${i + 1}.avif`;
+      const imagePath = path.join(__dirname, 'assets', imageFileName);
 
-      await prisma.media.create({
-        data: {
-          url: uploadResult1.url,
-          media_type: 'photo',
-          entity_type: 'guide',
-          entity_id: guide1.id,
-          description: 'Photo de profil de Sophie Martin',
-        },
-      });
-      console.log('✅ Image de Sophie Martin uploadée');
-    } else {
-      console.log('⚠️ Image par défaut non trouvée, utilisation d\'un placeholder');
-      await prisma.media.create({
-        data: {
-          url: 'https://i.pravatar.cc/300?img=1',
-          media_type: 'photo',
-          entity_type: 'guide',
-          entity_id: guide1.id,
-          description: 'Photo de profil de Sophie Martin',
-        },
-      });
+      if (fs.existsSync(imagePath)) {
+        const imageBuffer = fs.readFileSync(imagePath);
+        const fileName = `profiles/guides/profile-picture/${guide.id}-${name.toLowerCase().replace(/ /g, '-')}.avif`;
+
+        const uploadResult = await minioService.uploadFile(
+          BucketName.LOCOTRIP,
+          fileName,
+          imageBuffer,
+          'image/avif',
+          {
+            guideId: guide.id,
+            uploadedBy: 'seeder',
+            mediaType: 'profile_picture',
+          }
+        );
+
+        await prisma.media.create({
+          data: {
+            url: uploadResult.url,
+            media_type: 'profile_picture',
+            entity_type: 'guide',
+            entity_id: guide.id,
+            guide_id: guide.id,
+            description: `Photo de profil de ${name}`,
+          },
+        });
+        console.log(`✅ Photo de profil de ${name} uploadée (${imageFileName})`);
+      }
+    } catch (error) {
+      console.error(`❌ Erreur upload photo de profil ${name}:`, error.message);
     }
-  } catch (error) {
-    console.error('❌ Erreur upload image guide1:', error.message);
   }
 
-  // Guide 2 - Image placeholder
-  await prisma.media.create({
-    data: {
-      url: 'https://i.pravatar.cc/300?img=12',
-      media_type: 'photo',
-      entity_type: 'guide',
-      entity_id: guide2.id,
-      description: 'Photo de profil de Thomas Dubois',
-    },
-  });
-  console.log('✅ Image de Thomas Dubois créée (placeholder)');
-
-  // Guide 3 - Image placeholder
-  await prisma.media.create({
-    data: {
-      url: 'https://i.pravatar.cc/300?img=5',
-      media_type: 'photo',
-      entity_type: 'guide',
-      entity_id: guide3.id,
-      description: 'Photo de profil de Camille Rousseau',
-    },
-  });
-  console.log('✅ Image de Camille Rousseau créée (placeholder)');
-
   console.log('✅ Images de profil des guides créées');
+
+  // Upload des images de galerie (pictures) pour chaque guide
+  console.log('📸 Upload des images de galerie des guides vers MinIO...');
+
+  const baladeImages = [
+    'Balade corniche 1.png',
+    'Balade corniche 2.png',
+    'Balade corniche 3.png',
+    'Balade corniche 4.png',
+    'Balade corniche 5.png',
+    'Balade corniche 6.png',
+    'Balade corniche 7.png',
+    'Balade corniche 8.png',
+    'Balade corniche 9.png',
+    'Balade corniche 10.png',
+    'Balade corniche 11.png',
+    'Balade corniche 12.png',
+  ];
+
+  // Distribuer les images de galerie entre les guides (2-3 images par guide)
+  let imageIndex = 0;
+  for (const { guide, name } of guides) {
+    const imagesCount = 2 + Math.floor(Math.random() * 2); // 2 ou 3 images par guide
+
+    for (let i = 0; i < imagesCount && imageIndex < baladeImages.length; i++) {
+      try {
+        const imageName = baladeImages[imageIndex];
+        const imagePath = path.join(__dirname, 'assets', imageName);
+
+        if (fs.existsSync(imagePath)) {
+          const imageBuffer = fs.readFileSync(imagePath);
+          const fileName = `profiles/guides/pictures/${guide.id}/${imageName}`;
+
+          const uploadResult = await minioService.uploadFile(
+            BucketName.LOCOTRIP,
+            fileName,
+            imageBuffer,
+            'image/png',
+            {
+              guideId: guide.id,
+              uploadedBy: 'seeder',
+              mediaType: 'pictures',
+            }
+          );
+
+          await prisma.media.create({
+            data: {
+              url: uploadResult.url,
+              media_type: 'pictures',
+              entity_type: 'guide',
+              entity_id: guide.id,
+              experience_id: null,
+              description: `Image de galerie ${i + 1} de ${name}`,
+            },
+          });
+          console.log(`✅ Image de galerie ${imageIndex + 1} pour ${name} uploadée`);
+        }
+        imageIndex++;
+      } catch (error) {
+        console.error(`❌ Erreur upload image galerie ${imageIndex + 1} pour ${name}:`, error.message);
+        imageIndex++;
+      }
+    }
+  }
+
+  console.log('✅ Images de galerie des guides créées');
 
   // Créer des documents pour les guides
   console.log('📄 Création des documents de guides...');
@@ -1864,30 +1911,6 @@ async function main() {
       status: 'active',
     },
   });
-
-  // Créer des médias
-  console.log('📸 Ajout de médias...');
-  await prisma.media.create({
-    data: {
-      entity_type: 'experience',
-      entity_id: exp1.id,
-      url: 'https://example.com/images/louvre1.jpg',
-      media_type: 'photo',
-      description: 'Vue extérieure du Louvre',
-    },
-  });
-
-  await prisma.media.create({
-    data: {
-      entity_type: 'guide',
-      entity_id: guide1.id,
-      url: 'https://example.com/images/sophie-profile.jpg',
-      media_type: 'photo',
-      description: 'Photo de profil',
-    },
-  });
-
-  console.log('✅ Médias ajoutés');
 
   console.log('\n🎉 Seeding terminé avec succès !');
 }

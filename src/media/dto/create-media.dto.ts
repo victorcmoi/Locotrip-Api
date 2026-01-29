@@ -38,7 +38,7 @@ export class CreateMediaDto {
   @ApiProperty({
     description: 'Type de média',
     enum: MediaType,
-    example: MediaType.PHOTO,
+    example: MediaType.PICTURES,
   })
   @IsEnum(MediaType)
   @IsNotEmpty()

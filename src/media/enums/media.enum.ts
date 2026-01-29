@@ -1,6 +1,4 @@
 export enum MediaType {
-  PHOTO = 'photo',
-  VIDEO = 'video',
-  DOCUMENT = 'document',
-  AUDIO = 'audio',
+  PROFILE_PICTURE = 'profile_picture',
+  PICTURES = 'pictures',
 }

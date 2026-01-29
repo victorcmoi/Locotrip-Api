@@ -56,13 +56,13 @@ enum DocumentType {
   CV
   diploma
   proof_of_residence
+  guide_card
+  other
 }
 
 enum MediaType {
-  photo
-  video
-  document
-  audio
+  profile_picture
+  pictures
 }
 
 enum PaymentStatus {
@@ -192,11 +192,11 @@ model guide {
   suspended_at      DateTime? @db.Timestamp(6)
   suspension_reason String?   @db.Text
 
-  created_at      DateTime @default(now()) @db.Timestamp(6)
-  updated_at      DateTime @updatedAt @db.Timestamp(6)
-  user            user     @relation(fields: [user_id], references: [id])
-  profile_picture media?   @relation("GuideProfilePicture")
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @updatedAt @db.Timestamp(6)
+  user       user     @relation(fields: [user_id], references: [id])
 
+  medias         media[]              @relation("GuideMedias")
   documents      guide_document[]
   availabilities guide_availability[]
   boosts         guide_boost[]
@@ -521,8 +521,8 @@ model media {
   description String?   @db.Text
   upload_date DateTime  @default(now()) @db.Timestamp(6)
 
-  guide_id String? @unique @db.Uuid
-  guide    guide?  @relation("GuideProfilePicture", fields: [guide_id], references: [id])
+  guide_id String? @db.Uuid
+  guide    guide?  @relation("GuideMedias", fields: [guide_id], references: [id])
 
   experience_id String?     @db.Uuid
   experience    experience? @relation("ExperienceMedias", fields: [experience_id], references: [id])
