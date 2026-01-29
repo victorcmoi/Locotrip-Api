@@ -462,7 +462,7 @@ async function main() {
 
       if (fs.existsSync(imagePath)) {
         const imageBuffer = fs.readFileSync(imagePath);
-        const fileName = `profiles/guides/profile-picture/${guide.id}-${name.toLowerCase().replace(/ /g, '-')}.avif`;
+        const fileName = `profiles/guides/profile-picture/${guide.id}.avif`;
 
         const uploadResult = await minioService.uploadFile(
           BucketName.LOCOTRIP,
