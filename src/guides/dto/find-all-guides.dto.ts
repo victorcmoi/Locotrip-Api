@@ -62,10 +62,18 @@ export class FindAllGuidesDto extends PaginationDto {
   minExperience?: number;
 
   @ApiPropertyOptional({
-    description: 'Date pour rechercher les guides disponibles (format ISO 8601)',
-    example: '2026-02-15T10:00:00Z',
+    description: 'Date de début pour rechercher les guides ayant des expériences dans cette plage (format ISO 8601)',
+    example: '2026-01-11T00:00:00Z',
   })
   @Type(() => Date)
   @IsOptional()
-  date?: Date;
+  startDate?: Date;
+
+  @ApiPropertyOptional({
+    description: 'Date de fin pour rechercher les guides ayant des expériences dans cette plage (format ISO 8601)',
+    example: '2026-01-11T23:59:59Z',
+  })
+  @Type(() => Date)
+  @IsOptional()
+  endDate?: Date;
 }

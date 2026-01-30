@@ -20,12 +20,14 @@ import {
 import { CitiesService } from './cities.service';
 import { ExperiencesService } from './experiences.service';
 import { CategoriesService } from './categories.service';
+import { ExperienceAvailabilityService } from './experience-availability.service';
 import { CreateCityDto } from './dto/create-city.dto';
 import { UpdateCityDto } from './dto/update-city.dto';
 import { CreateExperienceDto } from './dto/create-experience.dto';
 import { UpdateExperienceDto } from './dto/update-experience.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { CreateExperienceAvailabilityDto } from './dto/create-experience-availability.dto';
 import { FindAllCitiesDto } from './dto/find-all-cities.dto';
 import { FindAllExperiencesDto } from './dto/find-all-experiences.dto';
 import { ExperienceEntity } from './entities/experience.entity';
@@ -44,7 +46,7 @@ import { Public } from '../common/decorators/authentification-decorator';
 @ApiBearerAuth('JWT-auth')
 @Controller('cities')
 export class CitiesController {
-  constructor(private readonly citiesService: CitiesService) {}
+  constructor(private readonly citiesService: CitiesService) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -93,7 +95,10 @@ export class CitiesController {
 @ApiBearerAuth('JWT-auth')
 @Controller('experiences')
 export class ExperiencesController {
-  constructor(private readonly experiencesService: ExperiencesService) {}
+  constructor(
+    private readonly experiencesService: ExperiencesService,
+    private readonly experienceAvailabilityService: ExperienceAvailabilityService,
+  ) { }
 
   @Post()
   @Roles(UserRole.GUIDE)
@@ -219,13 +224,43 @@ export class ExperiencesController {
   findDraftsByGuide(@Param('guideId') guideId: string) {
     return this.experiencesService.findDraftsByGuide(guideId);
   }
+
+  // === DISPONIBILITÉS ===
+  @Post(':experienceId/availability')
+  @Roles(UserRole.GUIDE)
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: "Créer une disponibilité pour une expérience" })
+  @ApiParam({
+    name: 'experienceId',
+    description: "ID de l'expérience",
+  })
+  @ApiCreateResponse(Object)
+  createAvailability(
+    @Body() createAvailabilityDto: CreateExperienceAvailabilityDto,
+  ) {
+    return this.experienceAvailabilityService.create(createAvailabilityDto);
+  }
+
+  @Get(':experienceId/availability')
+  @Public()
+  @ApiOperation({
+    summary: "Récupérer les disponibilités d'une expérience",
+  })
+  @ApiParam({
+    name: 'experienceId',
+    description: "ID de l'expérience",
+  })
+  @ApiGetManyResponse(Object)
+  findAvailabilityByExperience(@Param('experienceId') experienceId: string) {
+    return this.experienceAvailabilityService.findByExperience(experienceId);
+  }
 }
 
 @ApiTags('Catégories')
 @ApiBearerAuth('JWT-auth')
 @Controller('categories')
 export class CategoriesController {
-  constructor(private readonly categoriesService: CategoriesService) {}
+  constructor(private readonly categoriesService: CategoriesService) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)

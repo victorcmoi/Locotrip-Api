@@ -687,115 +687,6 @@ async function main() {
 
   console.log('✅ Documents de guides créés');
 
-  // Créer des disponibilités de guides
-  console.log('📅 Création des disponibilités de guides...');
-
-  // Disponibilités pour guide1 (Sophie) - prochaines semaines
-  await prisma.guide_availability.create({
-    data: {
-      guide_id: guide1.id,
-      start_date: new Date('2026-01-20T09:00:00Z'),
-      end_date: new Date('2026-01-20T18:00:00Z'),
-      status: 'available',
-    },
-  });
-
-  await prisma.guide_availability.create({
-    data: {
-      guide_id: guide1.id,
-      start_date: new Date('2026-01-21T09:00:00Z'),
-      end_date: new Date('2026-01-21T18:00:00Z'),
-      status: 'available',
-    },
-  });
-
-  await prisma.guide_availability.create({
-    data: {
-      guide_id: guide1.id,
-      start_date: new Date('2026-01-22T09:00:00Z'),
-      end_date: new Date('2026-01-22T12:00:00Z'),
-      status: 'unavailable',
-    },
-  });
-
-  // Disponibilités pour guide2 (Thomas)
-  await prisma.guide_availability.create({
-    data: {
-      guide_id: guide2.id,
-      start_date: new Date('2026-01-18T14:00:00Z'),
-      end_date: new Date('2026-01-18T22:00:00Z'),
-      status: 'available',
-    },
-  });
-
-  await prisma.guide_availability.create({
-    data: {
-      guide_id: guide2.id,
-      start_date: new Date('2026-01-25T10:00:00Z'),
-      end_date: new Date('2026-01-25T20:00:00Z'),
-      status: 'available',
-    },
-  });
-
-  // Disponibilités pour guide3 (Camille) - bloqué certains jours
-  await prisma.guide_availability.create({
-    data: {
-      guide_id: guide3.id,
-      start_date: new Date('2026-01-19T09:00:00Z'),
-      end_date: new Date('2026-01-19T17:00:00Z'),
-      status: 'available',
-    },
-  });
-
-  await prisma.guide_availability.create({
-    data: {
-      guide_id: guide3.id,
-      start_date: new Date('2026-01-26T00:00:00Z'),
-      end_date: new Date('2026-02-02T00:00:00Z'),
-      status: 'blocked',
-    },
-  });
-
-  // Disponibilités pour guide4 (Alexandre)
-  await prisma.guide_availability.create({
-    data: {
-      guide_id: guide4.id,
-      start_date: new Date('2026-01-20T10:00:00Z'),
-      end_date: new Date('2026-01-20T19:00:00Z'),
-      status: 'available',
-    },
-  });
-
-  await prisma.guide_availability.create({
-    data: {
-      guide_id: guide4.id,
-      start_date: new Date('2026-01-27T10:00:00Z'),
-      end_date: new Date('2026-01-27T19:00:00Z'),
-      status: 'available',
-    },
-  });
-
-  // Disponibilités pour guide5 (Emma)
-  await prisma.guide_availability.create({
-    data: {
-      guide_id: guide5.id,
-      start_date: new Date('2026-01-18T14:00:00Z'),
-      end_date: new Date('2026-01-18T18:00:00Z'),
-      status: 'available',
-    },
-  });
-
-  await prisma.guide_availability.create({
-    data: {
-      guide_id: guide5.id,
-      start_date: new Date('2026-01-19T14:00:00Z'),
-      end_date: new Date('2026-01-19T18:00:00Z'),
-      status: 'available',
-    },
-  });
-
-  console.log('✅ Disponibilités de guides créées');
-
   // Créer des cities
   console.log('🌍 Création des cities...');
   const paris = await prisma.city.create({
@@ -1204,6 +1095,155 @@ async function main() {
   });
 
   console.log('✅ 7 expériences créées pour 5 guides');
+
+  // Créer des disponibilités pour les expériences
+  console.log('📅 Création des disponibilités d\'expériences...');
+
+  // Disponibilités pour exp1 (Visite du Louvre)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp1.id,
+        start_date: new Date('2026-02-10T09:00:00Z'),
+        end_date: new Date('2026-02-10T12:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp1.id,
+        start_date: new Date('2026-02-11T09:00:00Z'),
+        end_date: new Date('2026-02-11T12:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp1.id,
+        start_date: new Date('2026-02-15T14:00:00Z'),
+        end_date: new Date('2026-02-15T17:00:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp2 (Atelier cuisine)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp2.id,
+        start_date: new Date('2026-02-12T18:00:00Z'),
+        end_date: new Date('2026-02-12T21:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp2.id,
+        start_date: new Date('2026-02-14T18:00:00Z'),
+        end_date: new Date('2026-02-14T21:00:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp3 (Balade architecture)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp3.id,
+        start_date: new Date('2026-02-08T10:00:00Z'),
+        end_date: new Date('2026-02-08T12:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp3.id,
+        start_date: new Date('2026-02-09T10:00:00Z'),
+        end_date: new Date('2026-02-09T12:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp3.id,
+        start_date: new Date('2026-02-16T14:00:00Z'),
+        end_date: new Date('2026-02-16T16:00:00Z'),
+        status: 'unavailable',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp4 (Randonnée)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp4.id,
+        start_date: new Date('2026-02-20T08:00:00Z'),
+        end_date: new Date('2026-02-20T13:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp4.id,
+        start_date: new Date('2026-02-22T08:00:00Z'),
+        end_date: new Date('2026-02-22T13:00:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp5 (Vie nocturne)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp5.id,
+        start_date: new Date('2026-02-13T20:00:00Z'),
+        end_date: new Date('2026-02-14T02:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp5.id,
+        start_date: new Date('2026-02-14T20:00:00Z'),
+        end_date: new Date('2026-02-15T02:00:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp6 (Visite vignobles)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp6.id,
+        start_date: new Date('2026-02-18T10:00:00Z'),
+        end_date: new Date('2026-02-18T14:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp6.id,
+        start_date: new Date('2026-02-19T10:00:00Z'),
+        end_date: new Date('2026-02-19T14:00:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp7 (Dégustation vins)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp7.id,
+        start_date: new Date('2026-02-17T14:00:00Z'),
+        end_date: new Date('2026-02-17T16:30:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp7.id,
+        start_date: new Date('2026-02-21T14:00:00Z'),
+        end_date: new Date('2026-02-21T16:30:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp7.id,
+        start_date: new Date('2026-02-25T14:00:00Z'),
+        end_date: new Date('2026-02-25T16:30:00Z'),
+        status: 'blocked',
+      },
+    ],
+  });
+
+  console.log('✅ Disponibilités d\'expériences créées');
 
   // Lier les expériences aux catégories
   await prisma.experience_category.create({

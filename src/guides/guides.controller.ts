@@ -20,7 +20,6 @@ import {
 } from '@nestjs/swagger';
 import { GuidesService } from './guides.service';
 import { GuideDocumentsService } from './guide-documents.service';
-import { GuideAvailabilityService } from './guide-availability.service';
 import { BoostOffersService } from './boost-offers.service';
 import { GuideBoostsService } from './guide-boosts.service';
 import { CreateGuideDto } from './dto/create-guide.dto';
@@ -28,7 +27,6 @@ import { UpdateGuideDto } from './dto/update-guide.dto';
 import { SoftDeleteGuideDto } from './dto/soft-delete-guide.dto';
 import { CreateGuideDocumentDto } from './dto/create-guide-document.dto';
 import { UpdateGuideDocumentDto } from './dto/update-guide-document.dto';
-import { CreateGuideAvailabilityDto } from './dto/create-guide-availability.dto';
 import { CreateGuideBoostDto } from './dto/create-guide-boost.dto';
 import { CreateBoostOfferDto } from './dto/create-boost-offer.dto';
 import { UpdateBoostOfferDto } from './dto/update-boost-offer.dto';
@@ -52,7 +50,6 @@ export class GuidesController {
   constructor(
     private readonly guidesService: GuidesService,
     private readonly guideDocumentsService: GuideDocumentsService,
-    private readonly guideAvailabilityService: GuideAvailabilityService,
     private readonly boostOffersService: BoostOffersService,
     private readonly guideBoostsService: GuideBoostsService,
   ) { }
@@ -235,27 +232,6 @@ export class GuidesController {
       ...updateDocumentDto,
       verification_date: updateDocumentDto.verification_status ? new Date() : undefined,
     });
-  }
-
-  // === DISPONIBILITÉS ===
-  @Post(':guideId/availability')
-  @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Ajouter une disponibilité' })
-  @ApiParam({ name: 'guideId', description: 'ID du guide' })
-  @ApiCreateResponse(Object)
-  createAvailability(
-    @Body() createAvailabilityDto: CreateGuideAvailabilityDto,
-  ) {
-    return this.guideAvailabilityService.create(createAvailabilityDto);
-  }
-
-  @Get(':guideId/availability')
-  @Public()
-  @ApiOperation({ summary: "Récupérer les disponibilités d'un guide" })
-  @ApiParam({ name: 'guideId', description: 'ID du guide' })
-  @ApiGetManyResponse(Object)
-  findAvailabilityByGuide(@Param('guideId') guideId: string) {
-    return this.guideAvailabilityService.findByGuide(guideId);
   }
 
   // === BOOSTS ===

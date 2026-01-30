@@ -127,7 +127,8 @@ export class GuidesService {
       languages,
       search,
       minExperience,
-      date,
+      startDate,
+      endDate,
     } = query;
 
     const where: guideWhereInput = {
@@ -167,14 +168,28 @@ export class GuidesService {
       where.OR = orConditions;
     }
 
+    // Si une plage de dates est fournie, filtrer les guides ayant des expériences disponibles dans cette plage
+    if (startDate || endDate) {
+      const searchStart = startDate || endDate;
+      const searchEnd = endDate || startDate;
+
+      where.experiences = {
+        some: {
+          availabilities: {
+            some: {
+              status: 'available',
+              start_date: { lte: searchEnd },
+              end_date: { gte: searchStart },
+            },
+          },
+        },
+      };
+    }
+
     const skip = (page - 1) * limit;
 
-    // Si une date est fournie, ne pas utiliser le tri par défaut (on triera par proximité après)
-    let orderBy: Record<string, 'asc' | 'desc'> | undefined;
-    if (!date) {
-      orderBy = {};
-      orderBy[sort] = order as 'asc' | 'desc';
-    }
+    const orderBy: Record<string, 'asc' | 'desc'> = {};
+    orderBy[sort] = order as 'asc' | 'desc';
 
     const [data, total] = await Promise.all([
       this.prisma.guide.findMany({
@@ -183,7 +198,6 @@ export class GuidesService {
           user: true,
           medias: true,
           documents: true,
-          availabilities: true,
           boosts: true,
           hobbies: {
             include: {
@@ -193,12 +207,19 @@ export class GuidesService {
           experiences: {
             include: {
               reviews: true,
+              availabilities: startDate || endDate ? {
+                where: {
+                  status: 'available',
+                  start_date: { lte: endDate || startDate },
+                  end_date: { gte: startDate || endDate },
+                },
+              } : true,
             },
           },
         },
         orderBy,
-        skip: !date ? skip : undefined,
-        take: !date ? limit : undefined,
+        skip,
+        take: limit,
       }),
       this.prisma.guide.count({ where }),
     ]);
@@ -221,40 +242,6 @@ export class GuidesService {
       });
     }
 
-    // Si une date est fournie, trier par proximité de date
-    if (date) {
-      const searchDate = new Date(date);
-      filteredData = filteredData
-        .map((guide) => {
-          // Trouver la disponibilité la plus proche de la date recherchée
-          let minDistance = Infinity;
-
-          if (guide.availabilities && guide.availabilities.length > 0) {
-            guide.availabilities.forEach((availability) => {
-              if (availability.status === 'available') {
-                const startDate = new Date(availability.start_date);
-                const endDate = new Date(availability.end_date);
-
-                // Si la date recherchée est dans la plage, distance = 0
-                if (searchDate >= startDate && searchDate <= endDate) {
-                  minDistance = 0;
-                } else {
-                  // Sinon, calculer la distance en jours
-                  const distanceToStart = Math.abs(searchDate.getTime() - startDate.getTime());
-                  const distanceToEnd = Math.abs(searchDate.getTime() - endDate.getTime());
-                  const distance = Math.min(distanceToStart, distanceToEnd) / (1000 * 60 * 60 * 24);
-                  minDistance = Math.min(minDistance, distance);
-                }
-              }
-            });
-          }
-          // Si le guide n'a pas de disponibilités, il sera en fin de liste (distance = Infinity)
-          return { ...guide, dateProximity: minDistance };
-        })
-        .sort((a, b) => a.dateProximity - b.dateProximity)
-        .slice(skip, skip + limit);
-    }
-
     return {
       data: filteredData,
       meta: new PaginationMeta(page, limit, total),
@@ -270,7 +257,6 @@ export class GuidesService {
         user: true,
         medias: true,
         documents: true,
-        availabilities: true,
         hobbies: {
           include: {
             category: true,
@@ -399,7 +385,6 @@ export class GuidesService {
         user: true,
         medias: true,
         documents: true,
-        availabilities: true,
         hobbies: {
           include: {
             category: true,
@@ -486,7 +471,6 @@ export class GuidesService {
         user: true,
         medias: true,
         documents: true,
-        availabilities: true,
         boosts: true,
         hobbies: {
           include: {
