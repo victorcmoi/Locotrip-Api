@@ -238,7 +238,22 @@ export class ExperiencesService {
       include: {
         city: true,
         medias: true,
-        reviews: true,
+        reviews: {
+          include: {
+            user: true,
+          },
+          orderBy: {
+            review_date: 'desc',
+          },
+        },
+        bookings: {
+          include: {
+            user: true,
+          },
+          orderBy: {
+            booking_date: 'desc',
+          },
+        },
       },
     });
   }
@@ -363,5 +378,52 @@ export class ExperiencesService {
         updated_at: 'desc',
       },
     });
+  }
+
+  async findOneAdmin(id: string) {
+    const experience = await this.prisma.experience.findUnique({
+      where: { id },
+      include: {
+        city: true,
+        guide: {
+          include: {
+            user: true,
+          },
+        },
+        bookings: {
+          include: {
+            user: true,
+          },
+          orderBy: {
+            booking_date: 'desc',
+          },
+        },
+        reviews: {
+          include: {
+            user: true,
+          },
+          orderBy: {
+            review_date: 'desc',
+          },
+        },
+        medias: true,
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+        currency_prices: {
+          include: {
+            currency: true,
+          },
+        },
+      },
+    });
+
+    if (!experience) {
+      throw new NotFoundException(`Expérience avec l'ID ${id} introuvable`);
+    }
+
+    return experience;
   }
 }

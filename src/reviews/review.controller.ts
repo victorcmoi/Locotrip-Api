@@ -111,7 +111,6 @@ export class ReviewsController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.CLIENT)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Supprimer un avis' })
   @ApiParam({ name: 'id', description: "ID de l'avis" })

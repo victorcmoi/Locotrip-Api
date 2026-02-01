@@ -32,6 +32,7 @@ export class DisputesService {
                 },
               },
             },
+            user: true,
           },
         },
         user: true,
@@ -69,6 +70,7 @@ export class DisputesService {
         booking: {
           include: {
             experience: true,
+            user: true,
           },
         },
       },
@@ -82,6 +84,7 @@ export class DisputesService {
         booking: {
           include: {
             experience: true,
+            user: true,
           },
         },
         user: true,
@@ -92,6 +95,13 @@ export class DisputesService {
   async update(id: string, updateDisputeDto: UpdateDisputeDto) {
     try {
       const data: disputeUncheckedUpdateInput = { ...updateDisputeDto };
+
+      if (
+        updateDisputeDto.status === DisputeStatus.RESOLVED ||
+        updateDisputeDto.status === DisputeStatus.REJECTED
+      ) {
+        data.resolution_date = new Date();
+      }
 
       return await this.prisma.dispute.update({
         where: { id },

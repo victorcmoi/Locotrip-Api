@@ -216,6 +216,17 @@ export class ExperiencesController {
     return this.experiencesService.findAllIncludingDeleted();
   }
 
+  @Get('admin/:id')
+  @ApiOperation({
+    summary:
+      "Récupérer une expérience (Admin) - inclut les expériences inactives/non publiées avec réservations et avis",
+  })
+  @ApiParam({ name: 'id', description: "ID de l'expérience (UUID)" })
+  @ApiGetOneResponse(ExperienceEntity)
+  findOneAdmin(@Param('id') id: string) {
+    return this.experiencesService.findOneAdmin(id);
+  }
+
   @Get('guide/:guideId/drafts')
   @Roles(UserRole.GUIDE)
   @ApiOperation({ summary: "Récupérer les expériences brouillons d'un guide" })

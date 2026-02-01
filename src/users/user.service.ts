@@ -102,9 +102,41 @@ export class UsersService {
       },
       include: {
         address: true,
-        guide: true,
-        bookings: true,
-        reviews: true,
+        guide: {
+          include: {
+            documents: true,
+            medias: true,
+          },
+        },
+        bookings: {
+          include: {
+            experience: {
+              include: {
+                city: true,
+                guide: {
+                  include: {
+                    user: true,
+                  },
+                },
+              },
+            },
+          },
+          orderBy: {
+            booking_date: 'desc',
+          },
+        },
+        reviews: {
+          include: {
+            experience: {
+              include: {
+                city: true,
+              },
+            },
+          },
+          orderBy: {
+            review_date: 'desc',
+          },
+        },
         subscriptions: true,
         support_tickets: true,
         notifications: true,
