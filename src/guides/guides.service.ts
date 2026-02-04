@@ -242,8 +242,31 @@ export class GuidesService {
       });
     }
 
+    // Ajouter reviewCount et prix des expériences à chaque guide
+    const dataWithReviewCount = filteredData.map((guide) => {
+      const reviewCount = guide.experiences.reduce(
+        (total, exp) => total + exp.reviews.length,
+        0,
+      );
+      
+      // Calculer le prix minimum et maximum des expériences du guide
+      const experiencePrices = guide.experiences
+        .filter(exp => exp.is_active && exp.is_published)
+        .map(exp => exp.price.toNumber());
+      
+      const minPrice = experiencePrices.length > 0 ? Math.min(...experiencePrices) : null;
+      const maxPrice = experiencePrices.length > 0 ? Math.max(...experiencePrices) : null;
+      
+      return {
+        ...guide,
+        reviewCount,
+        minExperiencePrice: minPrice,
+        maxExperiencePrice: maxPrice,
+      };
+    }); 
+
     return {
-      data: filteredData,
+      data: dataWithReviewCount,
       meta: new PaginationMeta(page, limit, total),
     };
   }
