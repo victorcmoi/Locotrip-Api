@@ -163,6 +163,25 @@ export class BookingsService {
     });
   }
 
+  async findByGuide(guideId: string) {
+    return this.prisma.booking.findMany({
+      where: {
+        experience: { guide_id: guideId },
+      },
+      include: {
+        user: true,
+        experience: {
+          include: {
+            city: true,
+            medias: true,
+          },
+        },
+        payments: true,
+      },
+      orderBy: { booking_date: 'desc' },
+    });
+  }
+
   async findByExperience(experienceId: string) {
     return this.prisma.booking.findMany({
       where: { experience_id: experienceId },

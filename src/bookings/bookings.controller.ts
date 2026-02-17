@@ -65,6 +65,14 @@ export class BookingsController {
     return this.bookingsService.findAll(query);
   }
 
+  @Get('guide/:guideId')
+  @ApiOperation({ summary: "Récupérer les réservations d'un guide" })
+  @ApiParam({ name: 'guideId', description: 'ID du guide' })
+  @ApiGetManyResponse(BookingEntity)
+  findByGuide(@Param('guideId') guideId: string) {
+    return this.bookingsService.findByGuide(guideId);
+  }
+
   @Get(':id')
   @Roles(UserRole.CLIENT)
   @ApiOperation({ summary: 'Récupérer une réservation' })
