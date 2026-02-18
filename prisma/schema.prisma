@@ -63,6 +63,7 @@ enum DocumentType {
 enum MediaType {
   profile_picture
   pictures
+  city_image
 }
 
 enum PaymentStatus {
@@ -273,19 +274,20 @@ model guide_boost {
 // ============================================
 
 model city {
-  id          String  @id @default(uuid()) @db.Uuid
-  name        String  @db.VarChar(100)
-  country     String  @db.VarChar(50)
-  slug        String  @unique @db.VarChar(150)
-  description String? @db.Text
-  latitude    Float?
-  longitude   Float?
-  image_url   String? @db.VarChar(255)
-  is_active   Boolean @default(true)
+  id           String  @id @default(uuid()) @db.Uuid
+  name         String  @db.VarChar(100)
+  country      String  @db.VarChar(50)
+  slug         String  @unique @db.VarChar(150)
+  description  String? @db.Text
+  latitude     Float?
+  longitude    Float?
+  is_active    Boolean @default(true)
+  is_suggested Boolean @default(false)
 
   created_at DateTime @default(now()) @db.Timestamp(6)
 
   experiences experience[]
+  image       media?       @relation("CityImage")
 
   @@index([slug])
   @@index([is_active])
@@ -514,7 +516,7 @@ model message {
 
 model media {
   id          String    @id @default(uuid()) @db.Uuid
-  entity_type String    @db.VarChar(50) // "experience", "guide", "user", "booking"
+  entity_type String    @db.VarChar(50) // "experience", "guide", "user", "booking", "city"
   entity_id   String    @db.Uuid
   url         String    @db.VarChar(255)
   media_type  MediaType
@@ -529,6 +531,9 @@ model media {
 
   review_id String? @unique @db.Uuid
   review    review? @relation("ReviewMedia", fields: [review_id], references: [id])
+
+  city_id String? @unique @db.Uuid
+  city    city?   @relation("CityImage", fields: [city_id], references: [id])
 
   @@index([entity_type, entity_id])
   @@map("media")

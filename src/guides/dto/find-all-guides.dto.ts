@@ -76,4 +76,12 @@ export class FindAllGuidesDto extends PaginationDto {
   @Type(() => Date)
   @IsOptional()
   endDate?: Date;
+
+  @ApiPropertyOptional({
+    description: 'Nom de la ville (commence par)',
+    example: 'Paris',
+  })
+  @IsString()
+  @IsOptional()
+  cityName?: string;
 }

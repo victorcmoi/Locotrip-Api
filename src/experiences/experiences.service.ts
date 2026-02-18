@@ -44,6 +44,7 @@ export class ExperiencesService {
       minPrice,
       maxPrice,
       cityId,
+      cityName,
       guideId,
       categories,
       search,
@@ -64,6 +65,15 @@ export class ExperiencesService {
 
     if (cityId) {
       where.city_id = cityId;
+    }
+
+    if (cityName) {
+      where.city = {
+        name: {
+          startsWith: cityName,
+          mode: 'insensitive',
+        },
+      };
     }
 
     if (guideId) {

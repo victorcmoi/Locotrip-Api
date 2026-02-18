@@ -60,14 +60,6 @@ export class CreateCityDto {
   longitude?: number;
 
   @ApiPropertyOptional({
-    description: "URL de l'image de la ville",
-    example: 'https://example.com/paris.jpg',
-  })
-  @IsString()
-  @IsOptional()
-  image_url?: string;
-
-  @ApiPropertyOptional({
     description: 'Ville active ou non',
     example: true,
     default: true,
@@ -75,4 +67,13 @@ export class CreateCityDto {
   @IsBoolean()
   @IsOptional()
   is_active?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Ville suggérée sur la page d\'accueil',
+    example: false,
+    default: false,
+  })
+  @IsBoolean()
+  @IsOptional()
+  is_suggested?: boolean;
 }

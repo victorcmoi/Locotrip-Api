@@ -11,7 +11,7 @@ import {
 
 @Injectable()
 export class CitiesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create(createCityDto: CreateCityDto) {
     return this.prisma.city.create({
@@ -38,7 +38,7 @@ export class CitiesService {
 
     if (search) {
       where.name = {
-        contains: search,
+        startsWith: search,
         mode: 'insensitive',
       };
     }
@@ -56,6 +56,7 @@ export class CitiesService {
         where,
         include: {
           experiences: true,
+          image: true,
         },
         orderBy,
         skip,
@@ -75,6 +76,7 @@ export class CitiesService {
       where: { id },
       include: {
         experiences: true,
+        image: true,
       },
     });
 
@@ -104,5 +106,24 @@ export class CitiesService {
     } catch {
       throw new NotFoundException(`Ville avec l'ID ${id} introuvable`);
     }
+  }
+
+  async findSuggested(): Promise<PaginatedResponse<any>> {
+    const data = await this.prisma.city.findMany({
+      where: {
+        is_suggested: true,
+        is_active: true,
+      } as any,
+      include: {
+        image: true,
+      },
+      orderBy: {
+        name: 'asc',
+      },
+    });
+    return {
+      data,
+      meta: new PaginationMeta(1, data.length, data.length),
+    };
   }
 }

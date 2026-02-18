@@ -129,6 +129,7 @@ export class GuidesService {
       minExperience,
       startDate,
       endDate,
+      cityName,
     } = query;
 
     const where: guideWhereInput = {
@@ -168,21 +169,36 @@ export class GuidesService {
       where.OR = orConditions;
     }
 
-    // Si une plage de dates est fournie, filtrer les guides ayant des expériences disponibles dans cette plage
-    if (startDate || endDate) {
-      const searchStart = startDate || endDate;
-      const searchEnd = endDate || startDate;
+    // Filtrage par nom de ville et/ou dates sur les expériences
+    if (cityName || startDate || endDate) {
+      const experienceConditions: any = {};
+
+      // Condition de localisation par nom de ville
+      if (cityName) {
+        experienceConditions.city = {
+          name: {
+            startsWith: cityName,
+            mode: 'insensitive',
+          },
+        };
+      }
+
+      // Condition de dates
+      if (startDate || endDate) {
+        const searchStart = startDate || endDate;
+        const searchEnd = endDate || startDate;
+
+        experienceConditions.availabilities = {
+          some: {
+            status: 'available',
+            start_date: { lte: searchEnd },
+            end_date: { gte: searchStart },
+          },
+        };
+      }
 
       where.experiences = {
-        some: {
-          availabilities: {
-            some: {
-              status: 'available',
-              start_date: { lte: searchEnd },
-              end_date: { gte: searchStart },
-            },
-          },
-        },
+        some: experienceConditions,
       };
     }
 
@@ -248,22 +264,22 @@ export class GuidesService {
         (total, exp) => total + exp.reviews.length,
         0,
       );
-      
+
       // Calculer le prix minimum et maximum des expériences du guide
       const experiencePrices = guide.experiences
         .filter(exp => exp.is_active && exp.is_published)
         .map(exp => exp.price.toNumber());
-      
+
       const minPrice = experiencePrices.length > 0 ? Math.min(...experiencePrices) : null;
       const maxPrice = experiencePrices.length > 0 ? Math.max(...experiencePrices) : null;
-      
+
       return {
         ...guide,
         reviewCount,
         minExperiencePrice: minPrice,
         maxExperiencePrice: maxPrice,
       };
-    }); 
+    });
 
     return {
       data: dataWithReviewCount,

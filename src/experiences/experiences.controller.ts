@@ -41,6 +41,7 @@ import {
 import { Roles } from '../common/decorators/role.decorator';
 import { UserRole } from '../users/enums/user.enum';
 import { Public } from '../common/decorators/authentification-decorator';
+import { find } from 'rxjs';
 
 @ApiTags('Villes')
 @ApiBearerAuth('JWT-auth')
@@ -62,6 +63,14 @@ export class CitiesController {
   @ApiGetManyResponse(Object)
   findAll(@Query() query: FindAllCitiesDto) {
     return this.citiesService.findAll(query);
+  }
+
+  @Get('suggested')
+  @Public()
+  @ApiOperation({ summary: 'Récupérer les villes suggérées' })
+  @ApiGetManyResponse(Object)
+  findSuggested() {
+    return this.citiesService.findSuggested();
   }
 
   @Get(':id')

@@ -549,7 +549,6 @@ async function main() {
               description: `Image de galerie ${i + 1} de ${name}`,
             },
           });
-          console.log(`✅ Image de galerie ${imageIndex + 1} pour ${name} uploadée`);
         }
         imageIndex++;
       } catch (error) {
@@ -687,87 +686,106 @@ async function main() {
 
   console.log('✅ Documents de guides créés');
 
-  // Créer des cities
-  console.log('🌍 Création des cities...');
-  const paris = await prisma.city.create({
-    data: {
-      name: 'Paris',
-      country: 'France',
-      slug: 'paris-france',
-      description: 'La ville lumière, capitale de la France',
-      latitude: 48.8566,
-      longitude: 2.3522,
-      image_url: 'https://example.com/images/paris.jpg',
-      is_active: true,
-    },
+  // Créer des cities depuis le fichier JSON
+  console.log('🌍 Création des cities depuis cities.json...');
+
+  const citiesJsonPath = path.join(__dirname, 'assets', 'cities.json');
+  const citiesData = JSON.parse(fs.readFileSync(citiesJsonPath, 'utf-8'));
+
+  console.log(`📊 ${citiesData.length} villes à créer...`);
+
+  // Créer toutes les villes en batch pour la performance
+  await prisma.city.createMany({
+    data: citiesData.map((city: any) => ({
+      name: city.name,
+      country: city.country,
+      slug: city.slug,
+      description: city.description,
+      latitude: city.latitude,
+      longitude: city.longitude,
+      is_active: city.is_active,
+      is_suggested: city.is_suggested || false,
+    })),
+    skipDuplicates: true,
   });
 
-  const lyon = await prisma.city.create({
-    data: {
-      name: 'Lyon',
-      country: 'France',
-      slug: 'lyon-france',
-      description: 'Capitale de la gastronomie française',
-      latitude: 45.764,
-      longitude: 4.8357,
-      image_url: 'https://example.com/images/lyon.jpg',
-      is_active: true,
-    },
-  });
+  console.log(`✅ ${citiesData.length} villes créées avec succès`);
 
-  const marseille = await prisma.city.create({
-    data: {
-      name: 'Marseille',
-      country: 'France',
-      slug: 'marseille-france',
-      description: 'Cité phocéenne, porte de la Méditerranée',
-      latitude: 43.2965,
-      longitude: 5.3698,
-      image_url: 'https://example.com/images/marseille.jpg',
-      is_active: true,
-    },
-  });
+  // Récupérer les villes françaises spécifiques pour les utiliser dans les expériences
+  const paris = await prisma.city.findUnique({ where: { slug: 'paris-france' } });
+  const lyon = await prisma.city.findUnique({ where: { slug: 'lyon-france' } });
+  const marseille = await prisma.city.findUnique({ where: { slug: 'marseille-france' } });
+  const bordeaux = await prisma.city.findUnique({ where: { slug: 'bordeaux-france' } });
+  const nice = await prisma.city.findUnique({ where: { slug: 'nice-france' } });
+  const strasbourg = await prisma.city.findUnique({ where: { slug: 'strasbourg-france' } });
 
-  const bordeaux = await prisma.city.create({
-    data: {
-      name: 'Bordeaux',
-      country: 'France',
-      slug: 'bordeaux-france',
-      description: 'Capitale mondiale du vin',
-      latitude: 44.8378,
-      longitude: -0.5792,
-      image_url: 'https://example.com/images/bordeaux.jpg',
-      is_active: true,
-    },
-  });
+  if (!paris || !lyon || !marseille || !bordeaux || !nice || !strasbourg) {
+    throw new Error('❌ Erreur: Les villes françaises n\'ont pas été trouvées dans la base de données');
+  }
 
-  const nice = await prisma.city.create({
-    data: {
-      name: 'Nice',
-      country: 'France',
-      slug: 'nice-france',
-      description: 'Perle de la Côte d\'Azur',
-      latitude: 43.7102,
-      longitude: 7.262,
-      image_url: 'https://example.com/images/nice.jpg',
-      is_active: true,
-    },
-  });
+  console.log(`✅ Villes françaises récupérées pour les expériences: ${paris.name}, ${lyon.name}, ${marseille.name}, ${bordeaux.name}, ${nice.name}, ${strasbourg.name}`);
 
-  const strasbourg = await prisma.city.create({
-    data: {
-      name: 'Strasbourg',
-      country: 'France',
-      slug: 'strasbourg-france',
-      description: 'Capitale européenne, au cœur de l\'Alsace',
-      latitude: 48.5734,
-      longitude: 7.7521,
-      image_url: 'https://example.com/images/strasbourg.jpg',
-      is_active: true,
-    },
-  });
+  // Upload des images des villes suggérées vers MinIO
+  console.log('📸 Upload des images des villes suggérées vers MinIO...');
 
-  console.log(`✅ Villes créées: ${paris.name}, ${lyon.name}, ${marseille.name}, ${bordeaux.name}, ${nice.name}, ${strasbourg.name}`);
+  const suggestedCitiesImages = [
+    { slug: 'paris-france', fileName: 'paris.jpg', name: 'Paris' },
+    { slug: 'barcelona-espagne', fileName: 'barcelone.jpg', name: 'Barcelona' },
+    { slug: 'berlin-allemagne', fileName: 'berlin.jpg', name: 'Berlin' },
+    { slug: 'madrid-espagne', fileName: 'madrid.jpg', name: 'Madrid' },
+    { slug: 'lyon-france', fileName: 'lyon.jpg', name: 'Lyon' },
+    { slug: 'munich-allemagne', fileName: 'munich.jpg', name: 'Munich' },
+    { slug: 'nice-france', fileName: 'nice.jpg', name: 'Nice' },
+    { slug: 'seville-espagne', fileName: 'seville.jpg', name: 'Seville' },
+  ];
+
+  for (const cityImage of suggestedCitiesImages) {
+    try {
+      const city = await prisma.city.findUnique({ where: { slug: cityImage.slug } });
+
+      if (!city) {
+        console.warn(`⚠️ Ville non trouvée: ${cityImage.slug}`);
+        continue;
+      }
+
+      const imagePath = path.join(__dirname, 'assets', cityImage.fileName);
+
+      if (fs.existsSync(imagePath)) {
+        const imageBuffer = fs.readFileSync(imagePath);
+        const fileName = `cities/${city.id}.jpg`;
+
+        const uploadResult = await minioService.uploadFile(
+          BucketName.LOCOTRIP,
+          fileName,
+          imageBuffer,
+          'image/jpeg',
+          {
+            cityId: city.id,
+            uploadedBy: 'seeder',
+            mediaType: 'city_image',
+          }
+        );
+
+        await prisma.media.create({
+          data: {
+            url: uploadResult.url,
+            media_type: 'city_image',
+            entity_type: 'city',
+            entity_id: city.id,
+            city_id: city.id,
+            description: `Image de ${cityImage.name}`,
+          },
+        });
+        console.log(`✅ Image de ${cityImage.name} uploadée (${cityImage.fileName})`);
+      } else {
+        console.warn(`⚠️ Fichier image non trouvé: ${cityImage.fileName}`);
+      }
+    } catch (error) {
+      console.error(`❌ Erreur upload image ${cityImage.name}:`, error.message);
+    }
+  }
+
+  console.log('✅ Images des villes suggérées uploadées');
 
   // Créer des catégories
   console.log('📂 Création des catégories...');

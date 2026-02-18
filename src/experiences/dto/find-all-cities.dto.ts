@@ -12,7 +12,7 @@ export class FindAllCitiesDto extends PaginationDto {
   country?: string;
 
   @ApiPropertyOptional({
-    description: 'Recherche par nom de ville',
+    description: 'Recherche par nom de ville (commence par)',
     example: 'Paris',
   })
   @IsString()

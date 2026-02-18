@@ -51,6 +51,14 @@ export class FindAllExperiencesDto extends PaginationDto {
   cityId?: string;
 
   @ApiPropertyOptional({
+    description: 'Nom de la ville (commence par)',
+    example: 'Paris',
+  })
+  @IsString()
+  @IsOptional()
+  cityName?: string;
+
+  @ApiPropertyOptional({
     description: 'ID du guide',
   })
   @IsUUID()

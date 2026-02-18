@@ -9,6 +9,7 @@ export enum MinioFolder {
   EXPERIENCES = 'experiences',
   MESSAGES = 'messages',
   REVIEWS = 'reviews',
+  CITIES = 'cities',
 }
 
 export enum AllowedMimeType {
