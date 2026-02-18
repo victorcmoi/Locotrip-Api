@@ -5,6 +5,7 @@ import { AuthGuard } from './guards/authentification.guard';
 import { AuthentificationController } from './authentification.controller';
 import { AuthentificationService } from './authentification.service';
 import { UsersModule } from '../users/user.module';
+import { GuidesModule } from '../guides/guides.module';
 import { AppThrottlerGuard } from './guards/app-throttler.guard';
 
 @Module({
@@ -15,6 +16,7 @@ import { AppThrottlerGuard } from './guards/app-throttler.guard';
       signOptions: { expiresIn: '15m' },
     }),
     UsersModule,
+    GuidesModule,
   ],
   controllers: [AuthentificationController],
   providers: [

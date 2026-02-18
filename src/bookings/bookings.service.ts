@@ -155,6 +155,7 @@ export class BookingsService {
               },
             },
             city: true,
+            medias: true,
           },
         },
         payments: true,

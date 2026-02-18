@@ -4,6 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from '../users/user.service';
+import { GuidesService } from '../guides/guides.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
@@ -16,6 +17,7 @@ import { userModel } from '../generated/prisma/models/user';
 export class AuthentificationService {
   constructor(
     private usersService: UsersService,
+    private guidesService: GuidesService,
     private jwtService: JwtService,
     private configService: ConfigService,
     private mailService: MailService,
@@ -49,6 +51,17 @@ export class AuthentificationService {
       role: user.role,
     };
 
+    // Fetch guide_id if user is a guide
+    let guideId: string | null = null;
+    if (user.role === 'guide') {
+      try {
+        const guide = await this.guidesService.findByUser(user.id);
+        guideId = guide?.id ?? null;
+      } catch {
+        guideId = null;
+      }
+    }
+
     return {
       token: await this.jwtService.signAsync(payload, {
         expiresIn: '8h',
@@ -59,6 +72,7 @@ export class AuthentificationService {
         firstName: user.first_name,
         lastName: user.last_name,
         role: user.role,
+        ...(guideId ? { guideId } : {}),
       },
     };
   }
