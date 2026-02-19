@@ -121,85 +121,21 @@ export class GuidesService {
       limit = 20,
       sort = 'created_at',
       order = 'desc',
-      minRating,
-      minReviews,
       country,
-      languages,
-      search,
-      minExperience,
-      startDate,
-      endDate,
-      cityName,
+      guide_status,
+      is_active = true,
     } = query;
 
     const where: guideWhereInput = {
-      is_active: true,
+      is_active,
     };
 
     if (country) {
       where.country = country;
     }
 
-    if (minExperience !== undefined) {
-      where.years_of_experience = {
-        gte: minExperience,
-      };
-    }
-
-    const orConditions: guideWhereInput[] = [];
-
-    if (languages) {
-      const languageList = languages.split(',').map((l) => l.trim());
-      languageList.forEach((lang) => {
-        orConditions.push({
-          languages: { contains: lang, mode: 'insensitive' },
-        });
-      });
-    }
-
-    if (search) {
-      orConditions.push(
-        { bio: { contains: search, mode: 'insensitive' } },
-        { user: { first_name: { contains: search, mode: 'insensitive' } } },
-        { user: { last_name: { contains: search, mode: 'insensitive' } } },
-      );
-    }
-
-    if (orConditions.length > 0) {
-      where.OR = orConditions;
-    }
-
-    // Filtrage par nom de ville et/ou dates sur les expériences
-    if (cityName || startDate || endDate) {
-      const experienceConditions: any = {};
-
-      // Condition de localisation par nom de ville
-      if (cityName) {
-        experienceConditions.city = {
-          name: {
-            startsWith: cityName,
-            mode: 'insensitive',
-          },
-        };
-      }
-
-      // Condition de dates
-      if (startDate || endDate) {
-        const searchStart = startDate || endDate;
-        const searchEnd = endDate || startDate;
-
-        experienceConditions.availabilities = {
-          some: {
-            status: 'available',
-            start_date: { lte: searchEnd },
-            end_date: { gte: searchStart },
-          },
-        };
-      }
-
-      where.experiences = {
-        some: experienceConditions,
-      };
+    if (guide_status) {
+      where.guide_status = guide_status;
     }
 
     const skip = (page - 1) * limit;
@@ -223,13 +159,6 @@ export class GuidesService {
           experiences: {
             include: {
               reviews: true,
-              availabilities: startDate || endDate ? {
-                where: {
-                  status: 'available',
-                  start_date: { lte: endDate || startDate },
-                  end_date: { gte: startDate || endDate },
-                },
-              } : true,
             },
           },
         },
@@ -240,26 +169,8 @@ export class GuidesService {
       this.prisma.guide.count({ where }),
     ]);
 
-    let filteredData = data;
-
-    // Filtrage par rating et reviews
-    if (minRating !== undefined || minReviews !== undefined) {
-      filteredData = data.filter((guide) => {
-        const allReviews = guide.experiences.flatMap((exp) => exp.reviews);
-        const reviewCount = allReviews.length;
-        const avgRating =
-          reviewCount > 0
-            ? allReviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
-            : 0;
-
-        if (minRating !== undefined && avgRating < minRating) return false;
-        if (minReviews !== undefined && reviewCount < minReviews) return false;
-        return true;
-      });
-    }
-
     // Ajouter reviewCount et prix des expériences à chaque guide
-    const dataWithReviewCount = filteredData.map((guide) => {
+    const dataWithReviewCount = data.map((guide) => {
       const reviewCount = guide.experiences.reduce(
         (total, exp) => total + exp.reviews.length,
         0,

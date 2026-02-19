@@ -40,24 +40,15 @@ export class ExperiencesService {
       limit = 20,
       sort = 'created_at',
       order = 'desc',
-      minRating,
-      minPrice,
-      maxPrice,
       cityId,
-      cityName,
       guideId,
-      categories,
-      search,
-      minDuration,
-      maxDuration,
-      maxParticipants,
-      available,
+      is_published = true,
     } = query;
 
     // Construction des filtres WHERE
     const where: experienceWhereInput = {
       is_active: true,
-      is_published: true,
+      is_published,
       guide: {
         is_active: true,
       },
@@ -67,59 +58,8 @@ export class ExperiencesService {
       where.city_id = cityId;
     }
 
-    if (cityName) {
-      where.city = {
-        name: {
-          startsWith: cityName,
-          mode: 'insensitive',
-        },
-      };
-    }
-
     if (guideId) {
       where.guide_id = guideId;
-    }
-
-    if (minPrice !== undefined || maxPrice !== undefined) {
-      where.price = {};
-      if (minPrice !== undefined) where.price.gte = minPrice;
-      if (maxPrice !== undefined) where.price.lte = maxPrice;
-    }
-
-    if (minDuration !== undefined || maxDuration !== undefined) {
-      where.duration = {};
-      if (minDuration !== undefined) where.duration.gte = minDuration;
-      if (maxDuration !== undefined) where.duration.lte = maxDuration;
-    }
-
-    if (maxParticipants !== undefined) {
-      where.max_capacity = {
-        gte: maxParticipants,
-      };
-    }
-
-    if (available !== undefined && available) {
-      where.is_published = true;
-    }
-
-    // Filtre par catégories
-    if (categories) {
-      const categoryIds = categories.split(',').map((c) => c.trim());
-      where.categories = {
-        some: {
-          category_id: {
-            in: categoryIds,
-          },
-        },
-      };
-    }
-
-    // Recherche textuelle
-    if (search) {
-      where.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
-      ];
     }
 
     // Calcul de la pagination
@@ -155,21 +95,8 @@ export class ExperiencesService {
       this.prisma.experience.count({ where }),
     ]);
 
-    // Filtrage post-requête pour minRating
-    let filteredData = data;
-    if (minRating !== undefined) {
-      filteredData = data.filter((experience) => {
-        const reviews = experience.reviews;
-        const avgRating =
-          reviews.length > 0
-            ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-            : 0;
-        return avgRating >= minRating;
-      });
-    }
-
     return {
-      data: filteredData,
+      data,
       meta: new PaginationMeta(page, limit, total),
     };
   }

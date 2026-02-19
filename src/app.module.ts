@@ -15,6 +15,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { MailModule } from './mail/mail.module';
 import { MinioModule } from './minio/minio.module';
 import { StatisticsModule } from './statistics/statistics.module';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { StatisticsModule } from './statistics/statistics.module';
     AuthentificationModule,
     StripeModule,
     StatisticsModule,
+    SearchModule,
     ThrottlerModule.forRoot([
       {
         name: 'short',
@@ -55,4 +57,4 @@ import { StatisticsModule } from './statistics/statistics.module';
     ]),
   ],
 })
-export class AppModule {}
+export class AppModule { }
