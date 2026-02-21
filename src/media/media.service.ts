@@ -29,14 +29,15 @@ export class MediaService {
     entityId: string,
     mediaType: MediaType,
     bucket: BucketName = BucketName.LOCOTRIP,
+    description?: string,
   ) {
     try {
       // Génère un nom de fichier unique
       const uniqueFileName = this.minioService.generateUniqueFileName(file.originalname);
       
-      // Génère un chemin organisé par date
-      const datePath = this.minioService.generateDatePath(entityType);
-      const fullPath = `${datePath}/${uniqueFileName}`;
+      // Stocke dans un dossier par type + ID : experiences/{experienceId}/, profiles/guides/images/{guideId}/, etc.
+      const folder = `${entityType}s`;
+      const fullPath = `${folder}/${entityId}/${uniqueFileName}`;
 
       // Upload vers MinIO
       const uploadResult = await this.minioService.uploadFile(
@@ -52,13 +53,26 @@ export class MediaService {
       );
 
       // Crée l'entrée dans la base de données
+      // Set the FK columns based on entity_type so Prisma relations work
+      const relationData: Record<string, string> = {};
+      if (entityType === 'experience') {
+        relationData.experience_id = entityId;
+      } else if (entityType === 'guide') {
+        relationData.guide_id = entityId;
+      } else if (entityType === 'city') {
+        relationData.city_id = entityId;
+      } else if (entityType === 'review') {
+        relationData.review_id = entityId;
+      }
+
       const media = await this.prisma.media.create({
         data: {
           url: uploadResult.url,
           media_type: mediaType,
           entity_type: entityType,
           entity_id: entityId,
-          description: file.originalname,
+          description: description || file.originalname,
+          ...relationData,
         },
       });
 
@@ -80,9 +94,10 @@ export class MediaService {
     entityId: string,
     mediaType: MediaType,
     bucket: BucketName = BucketName.LOCOTRIP,
+    descriptions?: string[],
   ) {
-    const uploadPromises = files.map((file) =>
-      this.uploadFile(file, entityType, entityId, mediaType, bucket),
+    const uploadPromises = files.map((file, index) =>
+      this.uploadFile(file, entityType, entityId, mediaType, bucket, descriptions?.[index]),
     );
 
     return Promise.all(uploadPromises);

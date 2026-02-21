@@ -21,6 +21,7 @@ import { CitiesService } from './cities.service';
 import { ExperiencesService } from './experiences.service';
 import { CategoriesService } from './categories.service';
 import { ExperienceAvailabilityService } from './experience-availability.service';
+import { ExperienceCategoriesService } from './experience-categories.service';
 import { CreateCityDto } from './dto/create-city.dto';
 import { UpdateCityDto } from './dto/update-city.dto';
 import { CreateExperienceDto } from './dto/create-experience.dto';
@@ -107,6 +108,7 @@ export class ExperiencesController {
   constructor(
     private readonly experiencesService: ExperiencesService,
     private readonly experienceAvailabilityService: ExperienceAvailabilityService,
+    private readonly experienceCategoriesService: ExperienceCategoriesService,
   ) { }
 
   @Post()
@@ -133,6 +135,19 @@ export class ExperiencesController {
   @ApiGetOneResponse(ExperienceEntity)
   findOne(@Param('id') id: string) {
     return this.experiencesService.findOne(id);
+  }
+
+  @Get(':id/guide/:guideId')
+  @Roles(UserRole.GUIDE)
+  @ApiOperation({ summary: "Récupérer une expérience en tant que guide (y compris brouillons)" })
+  @ApiParam({ name: 'id', description: "ID de l'expérience" })
+  @ApiParam({ name: 'guideId', description: "ID du guide" })
+  @ApiGetOneResponse(ExperienceEntity)
+  findOneForGuide(
+    @Param('id') id: string,
+    @Param('guideId') guideId: string,
+  ) {
+    return this.experiencesService.findOneForGuide(id, guideId);
   }
 
   @Get('city/:cityId')
@@ -243,6 +258,34 @@ export class ExperiencesController {
   @ApiGetManyResponse(ExperienceEntity)
   findDraftsByGuide(@Param('guideId') guideId: string) {
     return this.experiencesService.findDraftsByGuide(guideId);
+  }
+
+  // === CATÉGORIES D'EXPÉRIENCE ===
+  @Post(':id/categories')
+  @Roles(UserRole.GUIDE)
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: "Lier une catégorie à une expérience" })
+  @ApiParam({ name: 'id', description: "ID de l'expérience (UUID)" })
+  @ApiCreateResponse(Object)
+  addCategory(
+    @Param('id') id: string,
+    @Body('category_id') categoryId: string,
+  ) {
+    return this.experienceCategoriesService.create(id, categoryId);
+  }
+
+  @Delete(':id/categories/:categoryId')
+  @Roles(UserRole.GUIDE)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: "Supprimer la liaison catégorie-expérience" })
+  @ApiParam({ name: 'id', description: "ID de l'expérience (UUID)" })
+  @ApiParam({ name: 'categoryId', description: 'ID de la catégorie (UUID)' })
+  @ApiDeleteResponse()
+  removeCategory(
+    @Param('id') id: string,
+    @Param('categoryId') categoryId: string,
+  ) {
+    return this.experienceCategoriesService.delete(id, categoryId);
   }
 
   // === DISPONIBILITÉS ===

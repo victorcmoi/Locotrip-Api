@@ -6,7 +6,10 @@ import {
   IsUUID,
   IsOptional,
   Min,
+  Max,
   IsDecimal,
+  IsNumber,
+  MaxLength,
 } from 'class-validator';
 
 export class CreateExperienceDto {
@@ -70,4 +73,38 @@ export class CreateExperienceDto {
   @Min(1)
   @IsOptional()
   max_capacity?: number;
+
+  @ApiPropertyOptional({
+    description: 'Point de rencontre',
+    example: "Devant l'entrée principale du Louvre",
+    maxLength: 255,
+  })
+  @IsString()
+  @MaxLength(255)
+  @IsOptional()
+  meeting_point?: string;
+
+  @ApiPropertyOptional({
+    description: 'Latitude du point de rencontre',
+    example: 48.8606,
+    minimum: -90,
+    maximum: 90,
+  })
+  @IsNumber()
+  @Min(-90)
+  @Max(90)
+  @IsOptional()
+  meeting_latitude?: number;
+
+  @ApiPropertyOptional({
+    description: 'Longitude du point de rencontre',
+    example: 2.3376,
+    minimum: -180,
+    maximum: 180,
+  })
+  @IsNumber()
+  @Min(-180)
+  @Max(180)
+  @IsOptional()
+  meeting_longitude?: number;
 }

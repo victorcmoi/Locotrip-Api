@@ -107,10 +107,16 @@ export class MediaUploadController {
     @Body('entityId') entityId: string,
     @Body('mediaType') mediaType: MediaType,
     @Body('bucket') bucket?: BucketName,
+    @Body('descriptions') descriptionsRaw?: string | string[],
   ) {
     if (!files || files.length === 0) {
       throw new BadRequestException('Aucun fichier fourni');
     }
+
+    // descriptions can come as a single string or an array from form-data
+    const descriptions = descriptionsRaw
+      ? Array.isArray(descriptionsRaw) ? descriptionsRaw : [descriptionsRaw]
+      : undefined;
 
     return this.mediaService.uploadMultipleFiles(
       files,
@@ -118,6 +124,7 @@ export class MediaUploadController {
       entityId,
       mediaType,
       bucket || BucketName.LOCOTRIP,
+      descriptions,
     );
   }
 

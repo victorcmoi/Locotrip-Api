@@ -24,6 +24,9 @@ export class ExperiencesService {
         price: createExperienceDto.price,
         duration: createExperienceDto.duration,
         max_capacity: createExperienceDto.max_capacity,
+        meeting_point: createExperienceDto.meeting_point,
+        meeting_latitude: createExperienceDto.meeting_latitude,
+        meeting_longitude: createExperienceDto.meeting_longitude,
         city: {
           connect: { id: createExperienceDto.city_id },
         },
@@ -135,6 +138,52 @@ export class ExperiencesService {
       throw new NotFoundException(
         `Expérience avec l'ID ${id} n'est plus disponible`,
       );
+    }
+
+    return experience;
+  }
+
+  async findOneForGuide(id: string, guideId: string) {
+    const experience = await this.prisma.experience.findUnique({
+      where: { id },
+      include: {
+        city: true,
+        guide: {
+          include: {
+            user: true,
+          },
+        },
+        bookings: true,
+        reviews: {
+          include: {
+            user: true,
+          },
+        },
+        medias: true,
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+        currency_prices: {
+          include: {
+            currency: true,
+          },
+        },
+        availabilities: {
+          orderBy: {
+            start_date: 'asc',
+          },
+        },
+      },
+    });
+
+    if (!experience) {
+      throw new NotFoundException(`Expérience avec l'ID ${id} introuvable`);
+    }
+
+    if (experience.guide_id !== guideId) {
+      throw new NotFoundException(`Expérience avec l'ID ${id} introuvable`);
     }
 
     return experience;
