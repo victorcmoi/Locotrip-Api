@@ -205,7 +205,9 @@ export class GuidesService {
       },
       include: {
         user: true,
-        medias: true,
+        medias: {
+          orderBy: { upload_date: 'desc' },
+        },
         documents: true,
         hobbies: {
           include: {
@@ -333,7 +335,9 @@ export class GuidesService {
       },
       include: {
         user: true,
-        medias: true,
+        medias: {
+          orderBy: { upload_date: 'desc' },
+        },
         documents: true,
         hobbies: {
           include: {

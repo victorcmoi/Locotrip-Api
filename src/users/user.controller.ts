@@ -71,8 +71,8 @@ export class UsersController {
     return this.usersService.findByEmail(email);
   }
 
+  // TODO: Ajouter roles pour la mise à jour du compte
   @Put(':id')
-  @Roles(UserRole.CLIENT)
   @ApiOperation({ summary: 'Mettre à jour un utilisateur' })
   @ApiParam({ name: 'id', description: "ID de l'utilisateur (UUID)" })
   @ApiUpdateResponse(UserEntity)
