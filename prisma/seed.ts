@@ -1767,31 +1767,49 @@ async function main() {
     },
   });
 
-  // Créer une conversation
-  console.log("💬 Création d'une conversation...");
-  const conversation = await prisma.conversation.create({
-    data: {
-      booking_id: booking1.id,
-    },
-  });
+  // Créer des conversations et des messages
+  console.log("💬 Création des conversations et des messages...");
+  
+  // Booking 1 (client1, guideUser1) - Confirmé
+  const conv1 = await prisma.conversation.create({ data: { booking_id: booking1.id } });
+  await prisma.message.create({ data: { conversation_id: conv1.id, author_id: client1.id, content: "Bonjour, j'ai une question sur le point de rendez-vous." } });
+  await prisma.message.create({ data: { conversation_id: conv1.id, author_id: guideUser1.id, content: 'Bonjour ! Le point de rendez-vous est devant la pyramide du Louvre.' } });
 
-  // Créer des messages
-  await prisma.message.create({
-    data: {
-      conversation_id: conversation.id,
-      author_id: client1.id,
-      content: "Bonjour, j'ai une question sur le point de rendez-vous.",
-    },
-  });
+  // Booking 2 (client2, guideUser2) - Complété
+  const conv2 = await prisma.conversation.create({ data: { booking_id: booking2.id } });
+  await prisma.message.create({ data: { conversation_id: conv2.id, author_id: client2.id, content: "Bonjour Thomas, nous avons hâte de faire ce tour gastronomique !" } });
+  await prisma.message.create({ data: { conversation_id: conv2.id, author_id: guideUser2.id, content: "Bonjour Marie, préparez votre appétit, ça va être délicieux. À demain !" } });
+  await prisma.message.create({ data: { conversation_id: conv2.id, author_id: client2.id, content: "Merci beaucoup pour cette excellente visite, c'était parfait." } });
 
-  await prisma.message.create({
-    data: {
-      conversation_id: conversation.id,
-      author_id: guideUser1.id,
-      content:
-        'Bonjour ! Le point de rendez-vous est devant la pyramide du Louvre.',
-    },
-  });
+  // Booking 3 (client3, guideUser4) - Annulé
+  const conv3 = await prisma.conversation.create({ data: { booking_id: booking3.id } });
+  await prisma.message.create({ data: { conversation_id: conv3.id, author_id: client3.id, content: "Bonjour Alexandre, est-ce que la randonnée est maintenue malgré la pluie annoncée ?" } });
+  await prisma.message.create({ data: { conversation_id: conv3.id, author_id: guideUser4.id, content: "Malheureusement, les conditions ne sont pas sûres. Je préfère annuler pour notre sécurité." } });
+
+  // Booking 4 (client5, guideUser5) - Confirmé
+  const conv4 = await prisma.conversation.create({ data: { booking_id: booking4.id } });
+  await prisma.message.create({ data: { conversation_id: conv4.id, author_id: client5.id, content: "Salut Emma, est-ce qu'on marchera beaucoup pendant le tour de street art ?" } });
+  await prisma.message.create({ data: { conversation_id: conv4.id, author_id: guideUser5.id, content: "Salut Lucas ! On marchera environ 2km. Prends des chaussures confortables !" } });
+
+  // Booking 5 (client6, guideUser1) - Complété (avec dispute)
+  const conv5 = await prisma.conversation.create({ data: { booking_id: booking5.id } });
+  await prisma.message.create({ data: { conversation_id: conv5.id, author_id: client6.id, content: "Bonjour Sophie, vous êtes bien au point de RDV ? Je ne vous vois pas." } });
+  await prisma.message.create({ data: { conversation_id: conv5.id, author_id: guideUser1.id, content: "Je suis désolée, j'ai eu un problème de transport. J'arrive dans 20 minutes." } });
+  await prisma.message.create({ data: { conversation_id: conv5.id, author_id: client6.id, content: "Ça fait 30 minutes, c'est inacceptable. Je vais demander un remboursement." } });
+
+  // Booking 6 (client7, guideUser2) - Complété
+  const conv6 = await prisma.conversation.create({ data: { booking_id: booking6.id } });
+  await prisma.message.create({ data: { conversation_id: conv6.id, author_id: client7.id, content: "Bonjour, est-ce qu'il y aura des options végétariennes pendant la dégustation ?" } });
+  await prisma.message.create({ data: { conversation_id: conv6.id, author_id: guideUser2.id, content: "Absolument Antoine, j'ai prévu des fromages et des accompagnements adaptés." } });
+
+  // Booking 7 (client8, guideUser3) - En attente
+  const conv7 = await prisma.conversation.create({ data: { booking_id: booking7.id } });
+  await prisma.message.create({ data: { conversation_id: conv7.id, author_id: client8.id, content: "Bonjour Camille, j'aimerais savoir si la balade inclut la visite interne des bâtiments." } });
+
+  // Booking 8 (client9, guideUser1) - Complété
+  const conv8 = await prisma.conversation.create({ data: { booking_id: booking8.id } });
+  await prisma.message.create({ data: { conversation_id: conv8.id, author_id: client9.id, content: "Bonjour Sophie, nous serons 5 personnes. Pouvons-nous avoir un tarif de groupe ?" } });
+  await prisma.message.create({ data: { conversation_id: conv8.id, author_id: guideUser1.id, content: "Bonjour Hugo, le tarif appliqué est déjà dégressif pour 5 personnes." } });
 
   // Créer des notifications
   console.log('🔔 Création de notifications...');

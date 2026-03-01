@@ -2,9 +2,11 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Delete,
   Body,
   Param,
+  Req,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
@@ -78,6 +80,15 @@ export class ConversationsController {
   @ApiDeleteResponse()
   delete(@Param('id') id: string) {
     return this.conversationsService.delete(id);
+  }
+
+  @Patch(':id/read')
+  @Roles(UserRole.CLIENT, UserRole.GUIDE)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Marquer les messages reçus comme lus' })
+  @ApiParam({ name: 'id', description: 'ID de la conversation' })
+  markAsRead(@Param('id') id: string, @Req() req: any) {
+    return this.messagesService.markAsRead(id, req.user.sub);
   }
 
   // Messages

@@ -64,4 +64,17 @@ export class MessagesService {
       throw new NotFoundException(`Message avec l'ID ${id} introuvable`);
     }
   }
+
+  async markAsRead(conversationId: string, userId: string) {
+    return this.prisma.message.updateMany({
+      where: {
+        conversation_id: conversationId,
+        author_id: { not: userId },
+        is_read: false,
+      },
+      data: {
+        is_read: true,
+      },
+    });
+  }
 }

@@ -500,6 +500,7 @@ model message {
   conversation_id String   @db.Uuid
   author_id       String   @db.Uuid
   content         String   @db.Text
+  is_read         Boolean  @default(false)
   sent_at         DateTime @default(now()) @db.Timestamp(6)
 
   conversation conversation @relation(fields: [conversation_id], references: [id])
