@@ -91,7 +91,7 @@ export class BookingsController {
   }
 
   @Put(':id')
-  @Roles(UserRole.CLIENT)
+  // @Roles(UserRole.CLIENT)
   @ApiOperation({ summary: 'Mettre à jour une réservation' })
   @ApiParam({ name: 'id', description: 'ID de la réservation' })
   @ApiUpdateResponse(BookingEntity)
@@ -131,7 +131,7 @@ export class BookingsController {
 
   // Disputes
   @Post(':bookingId/disputes')
-  @Roles(UserRole.CLIENT)
+  // @Roles(UserRole.CLIENT)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Créer un litige' })
   @ApiParam({ name: 'bookingId', description: 'ID de la réservation' })
