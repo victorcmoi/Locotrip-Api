@@ -16,6 +16,7 @@ import { MailModule } from './mail/mail.module';
 import { MinioModule } from './minio/minio.module';
 import { StatisticsModule } from './statistics/statistics.module';
 import { SearchModule } from './search/search.module';
+import { VideoModule } from './video/video.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { SearchModule } from './search/search.module';
     StripeModule,
     StatisticsModule,
     SearchModule,
+    VideoModule,
     ThrottlerModule.forRoot([
       {
         name: 'short',
