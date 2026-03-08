@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateGuideDto } from './dto/create-guide.dto';
 import { UpdateGuideDto } from './dto/update-guide.dto';
@@ -466,5 +466,83 @@ export class GuidesService {
       },
     });
     return guides;
+  }
+
+  /**
+   * Demande de passage en guide pro
+   * Vérifie les conditions puis crée des guide_document avec les URLs des fichiers
+   */
+  async requestProCard(
+    guideId: string,
+    documents?: { document_type: string; document_url: string }[],
+  ) {
+    const guide = await this.prisma.guide.findUnique({
+      where: { id: guideId },
+      include: { documents: true },
+    });
+
+    if (!guide) {
+      throw new NotFoundException(`Guide avec l'ID ${guideId} introuvable`);
+    }
+
+    // Déjà pro
+    if (guide.guide_status === GuideStatus.PRO) {
+      throw new BadRequestException('Vous êtes déjà un guide professionnel');
+    }
+
+    // Vérifier s'il y a une demande en cours (document guide_card avec status pending)
+    const pendingRequest = guide.documents.find(
+      (doc) =>
+        doc.document_type === 'guide_card' &&
+        doc.verification_status === 'pending',
+    );
+
+    if (pendingRequest) {
+      throw new ConflictException(
+        'Une demande de passage en guide pro est déjà en attente de validation',
+      );
+    }
+
+    // Créer les documents et mettre à jour card_request_date dans une transaction
+    const operations: any[] = [];
+
+    // Créer le document principal guide_card
+    operations.push(
+      this.prisma.guide_document.create({
+        data: {
+          guide_id: guideId,
+          document_type: 'guide_card',
+          verification_status: 'pending',
+        },
+      }),
+    );
+
+    // Créer un guide_document pour chaque fichier uploadé
+    if (documents && documents.length > 0) {
+      for (const doc of documents) {
+        operations.push(
+          this.prisma.guide_document.create({
+            data: {
+              guide_id: guideId,
+              document_type: doc.document_type as any,
+              document_url: doc.document_url,
+              verification_status: 'pending',
+            },
+          }),
+        );
+      }
+    }
+
+    // Mettre à jour card_request_date
+    operations.push(
+      this.prisma.guide.update({
+        where: { id: guideId },
+        data: { card_request_date: new Date() },
+      }),
+    );
+
+    const results = await this.prisma.$transaction(operations);
+
+    return results.slice(0, -1); // Retourner les documents créés (sans le guide update)
   }
 }

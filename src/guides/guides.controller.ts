@@ -31,6 +31,7 @@ import { CreateGuideBoostDto } from './dto/create-guide-boost.dto';
 import { CreateBoostOfferDto } from './dto/create-boost-offer.dto';
 import { UpdateBoostOfferDto } from './dto/update-boost-offer.dto';
 import { FindAllGuidesDto } from './dto/find-all-guides.dto';
+import { RequestProDto } from './dto/request-pro.dto';
 import { GuideEntity } from './entities/guide.entity';
 import {
   ApiCreateResponse,
@@ -200,9 +201,23 @@ export class GuidesController {
     return this.guidesService.findAllIncludingDeleted();
   }
 
+  // === PRO CARD REQUEST ===
+  @Post(':guideId/request-pro')
+  // @Roles(UserRole.GUIDE)
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Soumettre une demande de passage en guide pro' })
+  @ApiParam({ name: 'guideId', description: 'ID du guide' })
+  @ApiCreateResponse(Object)
+  requestProCard(
+    @Param('guideId') guideId: string,
+    @Body() requestProDto: RequestProDto,
+  ) {
+    return this.guidesService.requestProCard(guideId, requestProDto.documents);
+  }
+
   // === DOCUMENTS ===
   @Post(':guideId/documents')
-  @Roles(UserRole.GUIDE)
+  // @Roles(UserRole.GUIDE)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Ajouter un document au guide' })
   @ApiParam({ name: 'guideId', description: 'ID du guide' })

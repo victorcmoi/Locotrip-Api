@@ -21,4 +21,12 @@ export class UpdateGuideDocumentDto {
   @IsOptional()
   @IsString()
   verification_comment?: string | null;
+
+  @ApiProperty({
+    description: 'URL du document sur MinIO',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  document_url?: string;
 }
