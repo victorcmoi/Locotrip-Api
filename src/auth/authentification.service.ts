@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   UnauthorizedException,
+  BadRequestException,
 } from '@nestjs/common';
 import { UsersService } from '../users/user.service';
 import { GuidesService } from '../guides/guides.service';
@@ -80,7 +81,25 @@ export class AuthentificationService {
   async register(
     registerDto: RegisterDto,
   ): Promise<{ user: userModel; accessToken: string; refreshToken: string }> {
-    const user = await this.usersService.create(registerDto);
+    const birthDate = new Date(registerDto.birth_date);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+
+    if (age < 18) {
+      throw new BadRequestException("Vous devez avoir au moins 18 ans pour vous inscrire.");
+    }
+
+    const user = await this.usersService.create({
+      ...registerDto,
+      ...(registerDto.birth_date && {
+        birth_date: new Date(registerDto.birth_date).toISOString(),
+      }),
+    });
 
     const tokens = await this.generateTokens(user.id, user.email, user.role);
 

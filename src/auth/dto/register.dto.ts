@@ -5,6 +5,8 @@ import {
   IsNotEmpty,
   IsString,
   MinLength,
+  IsOptional,
+  IsDateString,
 } from 'class-validator';
 import { UserRole } from '../../users/enums/user.enum';
 
@@ -57,4 +59,21 @@ export class RegisterDto {
   })
   @IsNotEmpty()
   role: UserRole.CLIENT | UserRole.GUIDE;
+
+  @ApiProperty({
+    description: "Numéro de téléphone de l'utilisateur",
+    example: '+33612345678',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  phone?: string;
+
+  @ApiProperty({
+    description: "Date de naissance de l'utilisateur",
+    example: '1990-01-01',
+  })
+  @IsDateString()
+  @IsNotEmpty()
+  birth_date: string;
 }
