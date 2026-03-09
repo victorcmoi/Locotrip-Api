@@ -112,6 +112,7 @@ export class ExperiencesService {
         guide: {
           include: {
             user: true,
+            medias: true,
           },
         },
         bookings: true,
@@ -140,7 +141,32 @@ export class ExperiencesService {
       );
     }
 
-    return experience;
+    // Calculer le reviewCount du guide
+    const guideExperiences = await this.prisma.experience.findMany({
+      where: {
+        guide_id: experience.guide_id,
+      },
+      select: {
+        reviews: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+
+    const reviewCount = guideExperiences.reduce(
+      (total, exp) => total + exp.reviews.length,
+      0,
+    );
+
+    return {
+      ...experience,
+      guide: {
+        ...experience.guide,
+        reviewCount,
+      },
+    };
   }
 
   async findOneForGuide(id: string, guideId: string) {
@@ -151,6 +177,7 @@ export class ExperiencesService {
         guide: {
           include: {
             user: true,
+            medias: true,
           },
         },
         bookings: true,
@@ -186,7 +213,32 @@ export class ExperiencesService {
       throw new NotFoundException(`Expérience avec l'ID ${id} introuvable`);
     }
 
-    return experience;
+    // Calculer le reviewCount du guide
+    const guideExperiences = await this.prisma.experience.findMany({
+      where: {
+        guide_id: experience.guide_id,
+      },
+      select: {
+        reviews: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+
+    const reviewCount = guideExperiences.reduce(
+      (total, exp) => total + exp.reviews.length,
+      0,
+    );
+
+    return {
+      ...experience,
+      guide: {
+        ...experience.guide,
+        reviewCount,
+      },
+    };
   }
 
   async findByVille(villeId: string) {
