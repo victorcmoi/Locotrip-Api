@@ -10,9 +10,12 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './dto/register.dto';
+import { RegisterGuideDto } from './dto/register-guide.dto';
 import { ConfigService } from '@nestjs/config';
 import { MailService } from '../mail/mail.service';
 import { userModel } from '../generated/prisma/models/user';
+import { UserRole } from '../users/enums/user.enum';
+import { GuideStatus } from '../guides/enums/guide.enum';
 
 @Injectable()
 export class AuthentificationService {
@@ -117,6 +120,66 @@ export class AuthentificationService {
 
     return {
       user,
+      ...tokens,
+    };
+  }
+
+  async registerGuide(
+    registerGuideDto: RegisterGuideDto,
+  ): Promise<{ user: userModel; guide: any; accessToken: string; refreshToken: string }> {
+    // Validation de l'âge (18+)
+    const birthDate = new Date(registerGuideDto.birth_date);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+
+    if (age < 18) {
+      throw new BadRequestException("Vous devez avoir au moins 18 ans pour vous inscrire.");
+    }
+
+    // 1. Créer le user avec rôle guide
+    const user = await this.usersService.create({
+      first_name: registerGuideDto.first_name,
+      last_name: registerGuideDto.last_name,
+      email: registerGuideDto.email,
+      password: registerGuideDto.password,
+      role: UserRole.GUIDE,
+      birth_date: new Date(registerGuideDto.birth_date).toISOString(),
+      ...(registerGuideDto.phone ? { phone: registerGuideDto.phone } : {}),
+    });
+
+    // 2. Créer le profil guide (statut local par défaut)
+    const guide = await this.guidesService.create({
+      user_id: user.id,
+      bio: registerGuideDto.bio,
+      country: registerGuideDto.country,
+      languages: registerGuideDto.languages,
+      years_of_experience: registerGuideDto.years_of_experience,
+      guide_status: GuideStatus.LOCAL,
+    });
+
+    // 3. Générer les tokens
+    const tokens = await this.generateTokens(user.id, user.email, user.role);
+
+    // 4. Sauvegarder le refresh token
+    await this.usersService.update(user.id, {
+      refresh_token: tokens.refreshToken,
+    });
+
+    // 5. Envoyer l'email de bienvenue
+    this.mailService
+      .sendWelcomeEmail(user.email, `${user.first_name} ${user.last_name}`)
+      .catch((error) =>
+        console.error("Erreur lors de l'envoi de l'email de bienvenue:", error),
+      );
+
+    return {
+      user,
+      guide,
       ...tokens,
     };
   }
