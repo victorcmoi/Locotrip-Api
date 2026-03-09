@@ -304,6 +304,7 @@ export class SearchService {
                     guide: {
                         include: {
                             user: true,
+                            medias: true,
                         },
                     },
                     categories: {
@@ -344,8 +345,42 @@ export class SearchService {
             });
         }
 
+        // Ajouter reviewCount au guide de chaque expérience
+        const guideIds = [...new Set(filteredData.map((exp) => exp.guide_id))];
+
+        // Récupérer toutes les expériences de ces guides avec leurs reviews en une seule requête
+        const guidesExperiences = await this.prisma.experience.findMany({
+            where: {
+                guide_id: { in: guideIds },
+            },
+            select: {
+                guide_id: true,
+                reviews: {
+                    select: {
+                        id: true,
+                    },
+                },
+            },
+        });
+
+        // Créer un Map avec le reviewCount par guide
+        const reviewCountByGuide = new Map<string, number>();
+        guidesExperiences.forEach((exp) => {
+            const currentCount = reviewCountByGuide.get(exp.guide_id) || 0;
+            reviewCountByGuide.set(exp.guide_id, currentCount + exp.reviews.length);
+        });
+
+        // Ajouter le reviewCount à chaque guide
+        const dataWithGuideReviewCount = filteredData.map((experience) => ({
+            ...experience,
+            guide: {
+                ...experience.guide,
+                reviewCount: reviewCountByGuide.get(experience.guide_id) || 0,
+            },
+        }));
+
         return {
-            data: filteredData,
+            data: dataWithGuideReviewCount,
             meta: new PaginationMeta(page, limit, total),
         };
     }

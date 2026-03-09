@@ -725,6 +725,19 @@ async function main() {
 
   console.log(`✅ Villes françaises récupérées pour les expériences: ${paris.name}, ${lyon.name}, ${marseille.name}, ${bordeaux.name}, ${nice.name}, ${strasbourg.name}`);
 
+  // Récupérer les villes internationales
+  const barcelona = await prisma.city.findUnique({ where: { slug: 'barcelona-espagne' } });
+  const madrid = await prisma.city.findUnique({ where: { slug: 'madrid-espagne' } });
+  const berlin = await prisma.city.findUnique({ where: { slug: 'berlin-allemagne' } });
+  const munich = await prisma.city.findUnique({ where: { slug: 'munich-allemagne' } });
+  const seville = await prisma.city.findUnique({ where: { slug: 'seville-espagne' } });
+
+  if (!barcelona || !madrid || !berlin || !munich || !seville) {
+    throw new Error('❌ Erreur: Les villes internationales n\'ont pas été trouvées dans la base de données');
+  }
+
+  console.log(`✅ Villes internationales récupérées: ${barcelona.name}, ${madrid.name}, ${berlin.name}, ${munich.name}, ${seville.name}`);
+
   // Upload des images des villes suggérées vers MinIO
   console.log('📸 Upload des images des villes suggérées vers MinIO...');
 
@@ -1114,6 +1127,316 @@ async function main() {
 
   console.log('✅ 7 expériences créées pour 5 guides');
 
+  // Créer 15 expériences supplémentaires dans différentes villes
+  console.log('🎨 Création de 15 expériences supplémentaires...');
+
+  const exp8 = await prisma.experience.create({
+    data: {
+      title: 'Découverte des Calanques de Marseille',
+      description: 'Randonnée guidée dans les calanques avec vues spectaculaires',
+      price: 55.0,
+      duration: 240,
+      city_id: marseille.id,
+      guide_id: guide1.id,
+      max_capacity: 12,
+      meeting_point: 'Port de Cassis',
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp9 = await prisma.experience.create({
+    data: {
+      title: 'Visite des vignobles bordelais',
+      description: 'Découvrez les châteaux viticoles de Bordeaux et dégustez les meilleurs crus',
+      price: 89.99,
+      duration: 300,
+      city_id: bordeaux.id,
+      guide_id: guide2.id,
+      max_capacity: 10,
+      meeting_point: 'Place de la Bourse',
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp10 = await prisma.experience.create({
+    data: {
+      title: 'Promenade des Anglais à vélo',
+      description: 'Balade à vélo le long de la magnifique Promenade des Anglais',
+      price: 35.0,
+      duration: 120,
+      city_id: nice.id,
+      guide_id: guide3.id,
+      max_capacity: 15,
+      meeting_point: 'Promenade des Anglais',
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp11 = await prisma.experience.create({
+    data: {
+      title: 'Architecture alsacienne à Strasbourg',
+      description: 'Explorez la Petite France et la cathédrale avec un guide passionné',
+      price: 42.0,
+      duration: 150,
+      city_id: strasbourg.id,
+      guide_id: guide4.id,
+      max_capacity: 18,
+      meeting_point: 'Place de la Cathédrale',
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp12 = await prisma.experience.create({
+    data: {
+      title: 'Sagrada Familia et Gaudí',
+      description: 'Visite guidée des chefs-d\'œuvre de Gaudí à Barcelone',
+      price: 59.99,
+      duration: 180,
+      city_id: barcelona.id,
+      guide_id: guide5.id,
+      max_capacity: 20,
+      meeting_point: 'Sagrada Familia',
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp13 = await prisma.experience.create({
+    data: {
+      title: 'Tapas Tour à Madrid',
+      description: 'Découvrez les meilleurs bars à tapas de Madrid avec un local',
+      price: 49.0,
+      duration: 180,
+      city_id: madrid.id,
+      guide_id: guide1.id,
+      max_capacity: 12,
+      meeting_point: 'Puerta del Sol',
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp14 = await prisma.experience.create({
+    data: {
+      title: 'Histoire du Mur de Berlin',
+      description: 'Parcourez les vestiges du Mur de Berlin et découvrez son histoire',
+      price: 38.0,
+      duration: 150,
+      city_id: berlin.id,
+      guide_id: guide2.id,
+      max_capacity: 25,
+      meeting_point: 'East Side Gallery',
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp15 = await prisma.experience.create({
+    data: {
+      title: 'Oktoberfest et brasseries munichoises',
+      description: 'Plongez dans la culture de la bière bavaroise',
+      price: 69.0,
+      duration: 210,
+      city_id: munich.id,
+      guide_id: guide3.id,
+      max_capacity: 15,
+      meeting_point: 'Marienplatz',
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp16 = await prisma.experience.create({
+    data: {
+      title: 'Flamenco et culture andalouse',
+      description: 'Découvrez l\'art du flamenco à Séville avec spectacle en direct',
+      price: 75.0,
+      duration: 180,
+      city_id: seville.id,
+      guide_id: guide4.id,
+      max_capacity: 20,
+      meeting_point: 'Plaza de España',
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp17 = await prisma.experience.create({
+    data: {
+      title: 'Cours de cuisine lyonnaise',
+      description: 'Apprenez à cuisiner les spécialités lyonnaises avec un chef',
+      price: 95.0,
+      duration: 240,
+      city_id: lyon.id,
+      guide_id: guide5.id,
+      max_capacity: 8,
+      meeting_point: 'Les Halles de Lyon Paul Bocuse',
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp18 = await prisma.experience.create({
+    data: {
+      title: 'Paris la nuit - Tour nocturne',
+      description: 'Découvrez Paris illuminée avec une croisière sur la Seine',
+      price: 52.0,
+      duration: 150,
+      city_id: paris.id,
+      guide_id: guide1.id,
+      max_capacity: 30,
+      meeting_point: 'Pont Neuf',
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp19 = await prisma.experience.create({
+    data: {
+      title: 'Marché provençal et senteurs de Nice',
+      description: 'Visite du marché Cours Saleya et dégustation de produits locaux',
+      price: 45.0,
+      duration: 120,
+      city_id: nice.id,
+      guide_id: guide2.id,
+      max_capacity: 12,
+      meeting_point: 'Cours Saleya',
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp20 = await prisma.experience.create({
+    data: {
+      title: 'Atelier de photographie urbaine',
+      description: 'Apprenez la photographie de rue dans les quartiers de Marseille',
+      price: 48.0,
+      duration: 180,
+      city_id: marseille.id,
+      guide_id: guide3.id,
+      max_capacity: 10,
+      meeting_point: 'Vieux-Port',
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp21 = await prisma.experience.create({
+    data: {
+      title: 'Vélo électrique à Barcelone',
+      description: 'Parcourez Barcelone en vélo électrique, du Barri Gòtic à la plage',
+      price: 44.0,
+      duration: 150,
+      city_id: barcelona.id,
+      guide_id: guide4.id,
+      max_capacity: 12,
+      meeting_point: 'Gothic Quarter',
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp22 = await prisma.experience.create({
+    data: {
+      title: 'Musées et art contemporain à Berlin',
+      description: 'Visite guidée des musées de l\'île aux musées',
+      price: 46.0,
+      duration: 180,
+      city_id: berlin.id,
+      guide_id: guide5.id,
+      max_capacity: 18,
+      meeting_point: 'Museum Island',
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  console.log('✅ 15 expériences supplémentaires créées (total: 22 expériences)');
+
+  // Upload des images des expériences vers MinIO
+  console.log('📸 Upload des images des expériences vers MinIO...');
+
+  const experiencesWithImages = [
+    { experience: exp1, images: ['exp1.png', 'exp2.png', 'exp3.png', 'exp4.png'] },
+    { experience: exp2, images: ['exp5.png', 'exp6.png', 'exp7.png'] },
+    { experience: exp3, images: ['exp8.png', 'exp9.png', 'exp10.png'] },
+    { experience: exp4, images: ['exp11.png', 'exp12.png', 'exp13.png'] },
+    { experience: exp5, images: ['exp14.png', 'exp1.png', 'exp2.png'] },
+    { experience: exp6, images: ['exp3.png', 'exp4.png', 'exp5.png', 'exp6.png'] },
+    { experience: exp7, images: ['exp7.png', 'exp8.png', 'exp9.png'] },
+    { experience: exp8, images: ['exp10.png', 'exp11.png', 'exp12.png', 'exp13.png'] },
+    { experience: exp9, images: ['exp14.png', 'exp1.png', 'exp2.png'] },
+    { experience: exp10, images: ['exp3.png', 'exp4.png', 'exp5.png'] },
+    { experience: exp11, images: ['exp6.png', 'exp7.png', 'exp8.png'] },
+    { experience: exp12, images: ['exp9.png', 'exp10.png', 'exp11.png', 'exp12.png'] },
+    { experience: exp13, images: ['exp13.png', 'exp14.png', 'exp1.png'] },
+    { experience: exp14, images: ['exp2.png', 'exp3.png', 'exp4.png', 'exp5.png'] },
+    { experience: exp15, images: ['exp6.png', 'exp7.png', 'exp8.png'] },
+    { experience: exp16, images: ['exp9.png', 'exp10.png', 'exp11.png'] },
+    { experience: exp17, images: ['exp12.png', 'exp13.png', 'exp14.png', 'exp1.png'] },
+    { experience: exp18, images: ['exp2.png', 'exp3.png', 'exp4.png'] },
+    { experience: exp19, images: ['exp5.png', 'exp6.png', 'exp7.png'] },
+    { experience: exp20, images: ['exp8.png', 'exp9.png', 'exp10.png', 'exp11.png'] },
+    { experience: exp21, images: ['exp12.png', 'exp13.png', 'exp14.png'] },
+    { experience: exp22, images: ['exp1.png', 'exp2.png', 'exp3.png'] },
+  ];
+
+  for (const { experience, images } of experiencesWithImages) {
+    for (let i = 0; i < images.length; i++) {
+      try {
+        const imageName = images[i];
+        const imagePath = path.join(__dirname, 'assets', imageName);
+
+        if (fs.existsSync(imagePath)) {
+          const imageBuffer = fs.readFileSync(imagePath);
+          const isProfilePicture = i === 0; // La première image est la photo principale
+          const mediaType = isProfilePicture ? 'profile_picture' : 'pictures';
+          const fileName = `experiences/${experience.id}/${mediaType}/${imageName}`;
+
+          const uploadResult = await minioService.uploadFile(
+            BucketName.LOCOTRIP,
+            fileName,
+            imageBuffer,
+            'image/png',
+            {
+              experienceId: experience.id,
+              uploadedBy: 'seeder',
+              mediaType,
+            }
+          );
+
+          await prisma.media.create({
+            data: {
+              url: uploadResult.url,
+              media_type: mediaType,
+              entity_type: 'experience',
+              entity_id: experience.id,
+              experience_id: experience.id,
+              description: isProfilePicture
+                ? `Image principale de ${experience.title}`
+                : `Image ${i} de ${experience.title}`,
+            },
+          });
+
+          console.log(
+            `✅ Image ${isProfilePicture ? 'principale' : i} de "${experience.title}" uploadée (${imageName})`
+          );
+        }
+      } catch (error) {
+        console.error(
+          `❌ Erreur upload image ${images[i]} pour "${experience.title}":`,
+          error.message
+        );
+      }
+    }
+  }
+
+  console.log('✅ Images des expériences créées');
+
   // Créer des disponibilités pour les expériences
   console.log('📅 Création des disponibilités d\'expériences...');
 
@@ -1261,6 +1584,318 @@ async function main() {
     ],
   });
 
+  // Disponibilités pour exp8 (Calanques Marseille)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp8.id,
+        start_date: new Date('2026-04-05T08:00:00Z'),
+        end_date: new Date('2026-04-05T12:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp8.id,
+        start_date: new Date('2026-05-12T08:00:00Z'),
+        end_date: new Date('2026-05-12T12:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp8.id,
+        start_date: new Date('2026-06-20T08:00:00Z'),
+        end_date: new Date('2026-06-20T12:00:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp9 (Vignobles Bordeaux)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp9.id,
+        start_date: new Date('2026-03-15T10:00:00Z'),
+        end_date: new Date('2026-03-15T15:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp9.id,
+        start_date: new Date('2026-09-10T10:00:00Z'),
+        end_date: new Date('2026-09-10T15:00:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp10 (Vélo Nice)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp10.id,
+        start_date: new Date('2026-05-20T09:00:00Z'),
+        end_date: new Date('2026-05-20T11:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp10.id,
+        start_date: new Date('2026-07-08T09:00:00Z'),
+        end_date: new Date('2026-07-08T11:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp10.id,
+        start_date: new Date('2026-08-15T09:00:00Z'),
+        end_date: new Date('2026-08-15T11:00:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp11 (Architecture Strasbourg)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp11.id,
+        start_date: new Date('2026-04-18T10:00:00Z'),
+        end_date: new Date('2026-04-18T12:30:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp11.id,
+        start_date: new Date('2026-10-05T10:00:00Z'),
+        end_date: new Date('2026-10-05T12:30:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp12 (Gaudí Barcelone)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp12.id,
+        start_date: new Date('2026-03-22T11:00:00Z'),
+        end_date: new Date('2026-03-22T14:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp12.id,
+        start_date: new Date('2026-06-14T11:00:00Z'),
+        end_date: new Date('2026-06-14T14:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp12.id,
+        start_date: new Date('2026-09-25T11:00:00Z'),
+        end_date: new Date('2026-09-25T14:00:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp13 (Tapas Madrid)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp13.id,
+        start_date: new Date('2026-04-10T19:00:00Z'),
+        end_date: new Date('2026-04-10T22:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp13.id,
+        start_date: new Date('2026-07-18T19:00:00Z'),
+        end_date: new Date('2026-07-18T22:00:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp14 (Mur de Berlin)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp14.id,
+        start_date: new Date('2026-05-03T10:00:00Z'),
+        end_date: new Date('2026-05-03T12:30:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp14.id,
+        start_date: new Date('2026-08-20T10:00:00Z'),
+        end_date: new Date('2026-08-20T12:30:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp14.id,
+        start_date: new Date('2026-11-09T10:00:00Z'),
+        end_date: new Date('2026-11-09T12:30:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp15 (Brasseries Munich)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp15.id,
+        start_date: new Date('2026-06-25T17:00:00Z'),
+        end_date: new Date('2026-06-25T20:30:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp15.id,
+        start_date: new Date('2026-09-18T17:00:00Z'),
+        end_date: new Date('2026-09-18T20:30:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp16 (Flamenco Séville)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp16.id,
+        start_date: new Date('2026-04-25T20:00:00Z'),
+        end_date: new Date('2026-04-25T23:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp16.id,
+        start_date: new Date('2026-05-30T20:00:00Z'),
+        end_date: new Date('2026-05-30T23:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp16.id,
+        start_date: new Date('2026-10-15T20:00:00Z'),
+        end_date: new Date('2026-10-15T23:00:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp17 (Cuisine Lyon)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp17.id,
+        start_date: new Date('2026-03-28T14:00:00Z'),
+        end_date: new Date('2026-03-28T18:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp17.id,
+        start_date: new Date('2026-06-05T14:00:00Z'),
+        end_date: new Date('2026-06-05T18:00:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp18 (Paris la nuit)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp18.id,
+        start_date: new Date('2026-05-15T20:30:00Z'),
+        end_date: new Date('2026-05-15T23:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp18.id,
+        start_date: new Date('2026-07-22T20:30:00Z'),
+        end_date: new Date('2026-07-22T23:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp18.id,
+        start_date: new Date('2026-12-31T20:30:00Z'),
+        end_date: new Date('2026-12-31T23:00:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp19 (Marché Nice)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp19.id,
+        start_date: new Date('2026-04-12T08:00:00Z'),
+        end_date: new Date('2026-04-12T10:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp19.id,
+        start_date: new Date('2026-06-28T08:00:00Z'),
+        end_date: new Date('2026-06-28T10:00:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp20 (Photographie Marseille)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp20.id,
+        start_date: new Date('2026-05-08T09:00:00Z'),
+        end_date: new Date('2026-05-08T12:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp20.id,
+        start_date: new Date('2026-09-12T09:00:00Z'),
+        end_date: new Date('2026-09-12T12:00:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp21 (Vélo électrique Barcelone)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp21.id,
+        start_date: new Date('2026-04-20T10:00:00Z'),
+        end_date: new Date('2026-04-20T12:30:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp21.id,
+        start_date: new Date('2026-08-05T10:00:00Z'),
+        end_date: new Date('2026-08-05T12:30:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp22 (Musées Berlin)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp22.id,
+        start_date: new Date('2026-06-10T10:00:00Z'),
+        end_date: new Date('2026-06-10T13:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp22.id,
+        start_date: new Date('2026-10-22T10:00:00Z'),
+        end_date: new Date('2026-10-22T13:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp22.id,
+        start_date: new Date('2026-12-15T10:00:00Z'),
+        end_date: new Date('2026-12-15T13:00:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
   console.log('✅ Disponibilités d\'expériences créées');
 
   // Lier les expériences aux catégories
@@ -1277,6 +1912,148 @@ async function main() {
       category_id: gastronomie.id,
     },
   });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp3.id,
+      category_id: culture.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp4.id,
+      category_id: culture.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp5.id,
+      category_id: art.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp6.id,
+      category_id: culture.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp7.id,
+      category_id: gastronomie.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp8.id,
+      category_id: nature.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp9.id,
+      category_id: gastronomie.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp10.id,
+      category_id: sport.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp11.id,
+      category_id: culture.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp12.id,
+      category_id: culture.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp13.id,
+      category_id: gastronomie.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp14.id,
+      category_id: culture.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp15.id,
+      category_id: gastronomie.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp16.id,
+      category_id: musique.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp17.id,
+      category_id: gastronomie.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp18.id,
+      category_id: culture.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp19.id,
+      category_id: gastronomie.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp20.id,
+      category_id: photographie.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp21.id,
+      category_id: sport.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp22.id,
+      category_id: art.id,
+    },
+  });
+
+  console.log('✅ Catégories associées aux expériences');
 
   // Ajouter des price en différentes currencies
   console.log('💰 Ajout des price multi-currencies...');
@@ -1769,7 +2546,7 @@ async function main() {
 
   // Créer des conversations et des messages
   console.log("💬 Création des conversations et des messages...");
-  
+
   // Booking 1 (client1, guideUser1) - Confirmé
   const conv1 = await prisma.conversation.create({ data: { booking_id: booking1.id } });
   await prisma.message.create({ data: { conversation_id: conv1.id, author_id: client1.id, content: "Bonjour, j'ai une question sur le point de rendez-vous." } });
