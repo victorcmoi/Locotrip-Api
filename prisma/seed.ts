@@ -290,6 +290,48 @@ async function main() {
     },
   });
 
+  const guideUser6 = await prisma.user.create({
+    data: {
+      last_name: 'Durand',
+      first_name: 'Julien',
+      email: 'julien.durand@example.com',
+      phone: '+33687654326',
+      birth_date: new Date('1989-04-10'),
+      password: '$2a$10$abcdefghijklmnopqrstuv',
+      role: 'guide',
+      is_active: true,
+      is_verified: true,
+    },
+  });
+
+  const guideUser7 = await prisma.user.create({
+    data: {
+      last_name: 'Girard',
+      first_name: 'Isabelle',
+      email: 'isabelle.girard@example.com',
+      phone: '+33687654327',
+      birth_date: new Date('1991-06-25'),
+      password: '$2a$10$abcdefghijklmnopqrstuv',
+      role: 'guide',
+      is_active: true,
+      is_verified: true,
+    },
+  });
+
+  const guideUser8 = await prisma.user.create({
+    data: {
+      last_name: 'Morel',
+      first_name: 'François',
+      email: 'francois.morel@example.com',
+      phone: '+33687654328',
+      birth_date: new Date('1984-12-03'),
+      password: '$2a$10$abcdefghijklmnopqrstuv',
+      role: 'guide',
+      is_active: true,
+      is_verified: true,
+    },
+  });
+
   console.log(
     `✅ Utilisateurs créés: ${client1.email}, ${guideUser1.email}, etc.`,
   );
@@ -440,7 +482,46 @@ async function main() {
     },
   });
 
-  console.log('✅ 5 guides créés');
+  const guide6 = await prisma.guide.create({
+    data: {
+      user_id: guideUser6.id,
+      bio: "Guide spécialisé dans l'histoire médiévale et les quartiers historiques de Paris. 6 ans d'expérience.",
+      languages: 'Français, Anglais, Allemand',
+      years_of_experience: 6,
+      guide_status: 'pro',
+      pro_card: true,
+      country: 'France',
+      response_time_hours: 2.5,
+    },
+  });
+
+  const guide7 = await prisma.guide.create({
+    data: {
+      user_id: guideUser7.id,
+      bio: "Passionnée de mode et de design parisien. 4 ans à guider dans les boutiques et ateliers emblématiques de Paris.",
+      languages: 'Français, Anglais, Italien',
+      years_of_experience: 4,
+      guide_status: 'pro',
+      pro_card: true,
+      country: 'France',
+      response_time_hours: 1.5,
+    },
+  });
+
+  const guide8 = await prisma.guide.create({
+    data: {
+      user_id: guideUser8.id,
+      bio: "Expert en œnologie et gastronomie parisienne. 12 ans d'expérience dans les meilleures tables de la capitale.",
+      languages: 'Français, Anglais, Espagnol',
+      years_of_experience: 12,
+      guide_status: 'pro',
+      pro_card: true,
+      country: 'France',
+      response_time_hours: 3.0,
+    },
+  });
+
+  console.log('✅ 8 guides créés');
 
   // Créer des images de profil pour les guides
   console.log('📸 Upload des images de profil des guides vers MinIO...');
@@ -451,6 +532,9 @@ async function main() {
     { guide: guide3, name: 'Camille Rousseau', userId: guideUser3.id },
     { guide: guide4, name: 'Alexandre Laurent', userId: guideUser4.id },
     { guide: guide5, name: 'Emma Leroy', userId: guideUser5.id },
+    { guide: guide6, name: 'Julien Durand', userId: guideUser6.id },
+    { guide: guide7, name: 'Isabelle Girard', userId: guideUser7.id },
+    { guide: guide8, name: 'François Morel', userId: guideUser8.id },
   ];
 
   // Upload des photos de profil (profile_picture)
@@ -1005,6 +1089,54 @@ async function main() {
     ],
   });
 
+  // Guide 6 - Julien Durand (Histoire médiévale)
+  await prisma.guide_hobby.createMany({
+    data: [
+      { guide_id: guide6.id, category_id: culture.id },
+      { guide_id: guide6.id, category_id: lecture.id },
+      { guide_id: guide6.id, category_id: art.id },
+      { guide_id: guide6.id, category_id: cinema.id },
+      { guide_id: guide6.id, category_id: voyage.id },
+      { guide_id: guide6.id, category_id: photographie.id },
+      { guide_id: guide6.id, category_id: musique.id },
+      { guide_id: guide6.id, category_id: jardinage.id },
+      { guide_id: guide6.id, category_id: gastronomie.id },
+      { guide_id: guide6.id, category_id: artisanat.id },
+    ],
+  });
+
+  // Guide 7 - Isabelle Girard (Mode & Design)
+  await prisma.guide_hobby.createMany({
+    data: [
+      { guide_id: guide7.id, category_id: mode.id },
+      { guide_id: guide7.id, category_id: art.id },
+      { guide_id: guide7.id, category_id: artisanat.id },
+      { guide_id: guide7.id, category_id: photographie.id },
+      { guide_id: guide7.id, category_id: cinema.id },
+      { guide_id: guide7.id, category_id: culture.id },
+      { guide_id: guide7.id, category_id: voyage.id },
+      { guide_id: guide7.id, category_id: musique.id },
+      { guide_id: guide7.id, category_id: danse.id },
+      { guide_id: guide7.id, category_id: lecture.id },
+    ],
+  });
+
+  // Guide 8 - François Morel (Œnologie & Gastronomie)
+  await prisma.guide_hobby.createMany({
+    data: [
+      { guide_id: guide8.id, category_id: gastronomie.id },
+      { guide_id: guide8.id, category_id: cuisine.id },
+      { guide_id: guide8.id, category_id: artisanat.id },
+      { guide_id: guide8.id, category_id: culture.id },
+      { guide_id: guide8.id, category_id: voyage.id },
+      { guide_id: guide8.id, category_id: nature.id },
+      { guide_id: guide8.id, category_id: lecture.id },
+      { guide_id: guide8.id, category_id: musique.id },
+      { guide_id: guide8.id, category_id: photographie.id },
+      { guide_id: guide8.id, category_id: jardinage.id },
+    ],
+  });
+
   console.log('✅ Hobbies associés aux guides (10 par guide)');
 
   // Créer des expériences pour chaque guide
@@ -1355,7 +1487,263 @@ async function main() {
     },
   });
 
-  console.log('✅ 15 expériences supplémentaires créées (total: 22 expériences)');
+  // Nouvelles expériences à Paris
+  const exp23 = await prisma.experience.create({
+    data: {
+      title: 'Quartier Latin et Sorbonne',
+      description: 'Découvrez l\'histoire universitaire de Paris et flânez dans les ruelles du Quartier Latin',
+      price: 38.0,
+      duration: 120,
+      city_id: paris.id,
+      guide_id: guide6.id,
+      max_capacity: 15,
+      meeting_point: 'Fontaine Saint-Michel',
+      meeting_latitude: 48.8534,
+      meeting_longitude: 2.3437,
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp24 = await prisma.experience.create({
+    data: {
+      title: 'Shopping de luxe dans le Triangle d\'Or',
+      description: 'Visite des boutiques prestigieuses et ateliers de mode parisiens avec Isabelle',
+      price: 55.0,
+      duration: 150,
+      city_id: paris.id,
+      guide_id: guide7.id,
+      max_capacity: 8,
+      meeting_point: 'Avenue Montaigne',
+      meeting_latitude: 48.8662,
+      meeting_longitude: 2.3044,
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp25 = await prisma.experience.create({
+    data: {
+      title: 'Dégustation de vins et fromages français',
+      description: 'Initiation à l\'œnologie avec François, expert sommelier, dans une cave parisienne',
+      price: 89.0,
+      duration: 180,
+      city_id: paris.id,
+      guide_id: guide8.id,
+      max_capacity: 10,
+      meeting_point: 'Rue des Canettes',
+      meeting_latitude: 48.8516,
+      meeting_longitude: 2.3328,
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp26 = await prisma.experience.create({
+    data: {
+      title: 'Le Marais médiéval et ses secrets',
+      description: 'Plongez dans le Paris médiéval avec Julien, spécialiste de l\'histoire ancienne',
+      price: 42.0,
+      duration: 135,
+      city_id: paris.id,
+      guide_id: guide6.id,
+      max_capacity: 12,
+      meeting_point: 'Place des Vosges',
+      meeting_latitude: 48.8556,
+      meeting_longitude: 2.3659,
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp27 = await prisma.experience.create({
+    data: {
+      title: 'Balade gastronomique à Saint-Germain',
+      description: 'Découvrez les meilleures adresses gourmandes de Saint-Germain-des-Prés',
+      price: 75.0,
+      duration: 180,
+      city_id: paris.id,
+      guide_id: guide8.id,
+      max_capacity: 10,
+      meeting_point: 'Église Saint-Germain-des-Prés',
+      meeting_latitude: 48.8541,
+      meeting_longitude: 2.3336,
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp28 = await prisma.experience.create({
+    data: {
+      title: 'Musée d\'Orsay et impressionnisme',
+      description: 'Visite guidée des chefs-d\'œuvre impressionnistes avec Sophie',
+      price: 52.0,
+      duration: 150,
+      city_id: paris.id,
+      guide_id: guide1.id,
+      max_capacity: 15,
+      meeting_point: 'Musée d\'Orsay',
+      meeting_latitude: 48.8599,
+      meeting_longitude: 2.3265,
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp29 = await prisma.experience.create({
+    data: {
+      title: 'Les coulisses de l\'Opéra Garnier',
+      description: 'Visite exclusive de l\'Opéra Garnier et de ses secrets architecturaux',
+      price: 48.0,
+      duration: 120,
+      city_id: paris.id,
+      guide_id: guide3.id,
+      max_capacity: 20,
+      meeting_point: 'Place de l\'Opéra',
+      meeting_latitude: 48.8711,
+      meeting_longitude: 2.3314,
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp30 = await prisma.experience.create({
+    data: {
+      title: 'Canal Saint-Martin et République',
+      description: 'Explorez les quartiers branchés du nord de Paris avec Emma',
+      price: 32.0,
+      duration: 120,
+      city_id: paris.id,
+      guide_id: guide5.id,
+      max_capacity: 15,
+      meeting_point: 'Écluse du Canal Saint-Martin',
+      meeting_latitude: 48.8725,
+      meeting_longitude: 2.3642,
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp31 = await prisma.experience.create({
+    data: {
+      title: 'Versailles et ses jardins',
+      description: 'Journée complète au château de Versailles avec visite guidée et jardins',
+      price: 95.0,
+      duration: 360,
+      city_id: paris.id,
+      guide_id: guide6.id,
+      max_capacity: 20,
+      meeting_point: 'Gare RER Versailles',
+      meeting_latitude: 48.8015,
+      meeting_longitude: 2.1301,
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp32 = await prisma.experience.create({
+    data: {
+      title: 'Ateliers d\'artistes à Montparnasse',
+      description: 'Découvrez les ateliers d\'artistes et l\'histoire bohème de Montparnasse',
+      price: 40.0,
+      duration: 135,
+      city_id: paris.id,
+      guide_id: guide1.id,
+      max_capacity: 12,
+      meeting_point: 'La Rotonde',
+      meeting_latitude: 48.8420,
+      meeting_longitude: 2.3289,
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp33 = await prisma.experience.create({
+    data: {
+      title: 'Mode et tendances au Marais',
+      description: 'Tour des créateurs émergents et boutiques vintage avec Isabelle',
+      price: 45.0,
+      duration: 150,
+      city_id: paris.id,
+      guide_id: guide7.id,
+      max_capacity: 10,
+      meeting_point: 'Rue des Francs-Bourgeois',
+      meeting_latitude: 48.8579,
+      meeting_longitude: 2.3611,
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp34 = await prisma.experience.create({
+    data: {
+      title: 'Île de la Cité et Sainte-Chapelle',
+      description: 'Découvrez le berceau de Paris et les vitraux de la Sainte-Chapelle',
+      price: 46.0,
+      duration: 120,
+      city_id: paris.id,
+      guide_id: guide6.id,
+      max_capacity: 18,
+      meeting_point: 'Parvis Notre-Dame',
+      meeting_latitude: 48.8533,
+      meeting_longitude: 2.3488,
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp35 = await prisma.experience.create({
+    data: {
+      title: 'Apéro parisien et terrasses secrètes',
+      description: 'Soirée apéro dans les meilleurs rooftops et terrasses cachées de Paris',
+      price: 68.0,
+      duration: 180,
+      city_id: paris.id,
+      guide_id: guide5.id,
+      max_capacity: 12,
+      meeting_point: 'Place du Châtelet',
+      meeting_latitude: 48.8583,
+      meeting_longitude: 2.3472,
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp36 = await prisma.experience.create({
+    data: {
+      title: 'Boulangeries et pâtisseries parisiennes',
+      description: 'Tournée des meilleures boulangeries avec dégustation de viennoiseries',
+      price: 58.0,
+      duration: 150,
+      city_id: paris.id,
+      guide_id: guide8.id,
+      max_capacity: 10,
+      meeting_point: 'Rue Montorgueil',
+      meeting_latitude: 48.8644,
+      meeting_longitude: 2.3469,
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  const exp37 = await prisma.experience.create({
+    data: {
+      title: 'Paris romantique au coucher du soleil',
+      description: 'Balade romantique dans les lieux les plus charmants de Paris au crépuscule',
+      price: 44.0,
+      duration: 120,
+      city_id: paris.id,
+      guide_id: guide1.id,
+      max_capacity: 14,
+      meeting_point: 'Pont des Arts',
+      meeting_latitude: 48.8583,
+      meeting_longitude: 2.3376,
+      is_active: true,
+      is_published: true,
+    },
+  });
+
+  console.log('✅ 15 expériences supplémentaires créées (total: 37 expériences)');
 
   // Upload des images des expériences vers MinIO
   console.log('📸 Upload des images des expériences vers MinIO...');
@@ -1383,6 +1771,21 @@ async function main() {
     { experience: exp20, images: ['exp8.png', 'exp9.png', 'exp10.png', 'exp11.png'] },
     { experience: exp21, images: ['exp12.png', 'exp13.png', 'exp14.png'] },
     { experience: exp22, images: ['exp1.png', 'exp2.png', 'exp3.png'] },
+    { experience: exp23, images: ['exp4.png', 'exp5.png', 'exp6.png'] },
+    { experience: exp24, images: ['exp7.png', 'exp8.png', 'exp9.png', 'exp10.png'] },
+    { experience: exp25, images: ['exp11.png', 'exp12.png', 'exp13.png'] },
+    { experience: exp26, images: ['exp14.png', 'exp1.png', 'exp2.png', 'exp3.png'] },
+    { experience: exp27, images: ['exp4.png', 'exp5.png', 'exp6.png'] },
+    { experience: exp28, images: ['exp7.png', 'exp8.png', 'exp9.png'] },
+    { experience: exp29, images: ['exp10.png', 'exp11.png', 'exp12.png', 'exp13.png'] },
+    { experience: exp30, images: ['exp14.png', 'exp1.png', 'exp2.png'] },
+    { experience: exp31, images: ['exp3.png', 'exp4.png', 'exp5.png', 'exp6.png'] },
+    { experience: exp32, images: ['exp7.png', 'exp8.png', 'exp9.png'] },
+    { experience: exp33, images: ['exp10.png', 'exp11.png', 'exp12.png'] },
+    { experience: exp34, images: ['exp13.png', 'exp14.png', 'exp1.png', 'exp2.png'] },
+    { experience: exp35, images: ['exp3.png', 'exp4.png', 'exp5.png'] },
+    { experience: exp36, images: ['exp6.png', 'exp7.png', 'exp8.png', 'exp9.png'] },
+    { experience: exp37, images: ['exp10.png', 'exp11.png', 'exp12.png'] },
   ];
 
   for (const { experience, images } of experiencesWithImages) {
@@ -1896,6 +2299,366 @@ async function main() {
     ],
   });
 
+  // Disponibilités pour exp23 (Quartier Latin)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp23.id,
+        start_date: new Date('2026-03-12T14:00:00Z'),
+        end_date: new Date('2026-03-12T16:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp23.id,
+        start_date: new Date('2026-03-15T10:00:00Z'),
+        end_date: new Date('2026-03-15T12:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp23.id,
+        start_date: new Date('2026-03-18T14:30:00Z'),
+        end_date: new Date('2026-03-18T16:30:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp24 (Shopping Triangle d'Or)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp24.id,
+        start_date: new Date('2026-03-11T10:00:00Z'),
+        end_date: new Date('2026-03-11T12:30:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp24.id,
+        start_date: new Date('2026-03-14T14:00:00Z'),
+        end_date: new Date('2026-03-14T16:30:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp24.id,
+        start_date: new Date('2026-03-17T11:00:00Z'),
+        end_date: new Date('2026-03-17T13:30:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp25 (Dégustation vins et fromages)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp25.id,
+        start_date: new Date('2026-03-13T18:00:00Z'),
+        end_date: new Date('2026-03-13T21:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp25.id,
+        start_date: new Date('2026-03-16T19:00:00Z'),
+        end_date: new Date('2026-03-16T22:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp25.id,
+        start_date: new Date('2026-03-20T18:30:00Z'),
+        end_date: new Date('2026-03-20T21:30:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp26 (Marais médiéval)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp26.id,
+        start_date: new Date('2026-03-12T09:30:00Z'),
+        end_date: new Date('2026-03-12T11:45:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp26.id,
+        start_date: new Date('2026-03-15T15:00:00Z'),
+        end_date: new Date('2026-03-15T17:15:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp26.id,
+        start_date: new Date('2026-03-19T10:00:00Z'),
+        end_date: new Date('2026-03-19T12:15:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp27 (Balade gastronomique Saint-Germain)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp27.id,
+        start_date: new Date('2026-03-11T11:00:00Z'),
+        end_date: new Date('2026-03-11T14:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp27.id,
+        start_date: new Date('2026-03-14T12:00:00Z'),
+        end_date: new Date('2026-03-14T15:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp27.id,
+        start_date: new Date('2026-03-18T11:30:00Z'),
+        end_date: new Date('2026-03-18T14:30:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp28 (Musée d'Orsay)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp28.id,
+        start_date: new Date('2026-03-13T09:00:00Z'),
+        end_date: new Date('2026-03-13T11:30:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp28.id,
+        start_date: new Date('2026-03-16T14:00:00Z'),
+        end_date: new Date('2026-03-16T16:30:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp28.id,
+        start_date: new Date('2026-03-20T10:00:00Z'),
+        end_date: new Date('2026-03-20T12:30:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp29 (Opéra Garnier)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp29.id,
+        start_date: new Date('2026-03-12T10:00:00Z'),
+        end_date: new Date('2026-03-12T12:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp29.id,
+        start_date: new Date('2026-03-15T14:00:00Z'),
+        end_date: new Date('2026-03-15T16:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp29.id,
+        start_date: new Date('2026-03-19T11:00:00Z'),
+        end_date: new Date('2026-03-19T13:00:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp30 (Canal Saint-Martin)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp30.id,
+        start_date: new Date('2026-03-11T15:00:00Z'),
+        end_date: new Date('2026-03-11T17:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp30.id,
+        start_date: new Date('2026-03-14T10:00:00Z'),
+        end_date: new Date('2026-03-14T12:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp30.id,
+        start_date: new Date('2026-03-17T15:30:00Z'),
+        end_date: new Date('2026-03-17T17:30:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp31 (Versailles)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp31.id,
+        start_date: new Date('2026-03-13T08:00:00Z'),
+        end_date: new Date('2026-03-13T14:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp31.id,
+        start_date: new Date('2026-03-16T08:00:00Z'),
+        end_date: new Date('2026-03-16T14:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp31.id,
+        start_date: new Date('2026-03-20T08:30:00Z'),
+        end_date: new Date('2026-03-20T14:30:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp32 (Ateliers Montparnasse)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp32.id,
+        start_date: new Date('2026-03-12T14:30:00Z'),
+        end_date: new Date('2026-03-12T16:45:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp32.id,
+        start_date: new Date('2026-03-15T10:30:00Z'),
+        end_date: new Date('2026-03-15T12:45:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp32.id,
+        start_date: new Date('2026-03-19T15:00:00Z'),
+        end_date: new Date('2026-03-19T17:15:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp33 (Mode Marais)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp33.id,
+        start_date: new Date('2026-03-11T13:00:00Z'),
+        end_date: new Date('2026-03-11T15:30:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp33.id,
+        start_date: new Date('2026-03-14T11:00:00Z'),
+        end_date: new Date('2026-03-14T13:30:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp33.id,
+        start_date: new Date('2026-03-18T14:00:00Z'),
+        end_date: new Date('2026-03-18T16:30:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp34 (Île de la Cité)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp34.id,
+        start_date: new Date('2026-03-13T09:30:00Z'),
+        end_date: new Date('2026-03-13T11:30:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp34.id,
+        start_date: new Date('2026-03-16T14:30:00Z'),
+        end_date: new Date('2026-03-16T16:30:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp34.id,
+        start_date: new Date('2026-03-20T10:30:00Z'),
+        end_date: new Date('2026-03-20T12:30:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp35 (Apéro parisien)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp35.id,
+        start_date: new Date('2026-03-12T18:00:00Z'),
+        end_date: new Date('2026-03-12T21:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp35.id,
+        start_date: new Date('2026-03-15T17:30:00Z'),
+        end_date: new Date('2026-03-15T20:30:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp35.id,
+        start_date: new Date('2026-03-19T18:30:00Z'),
+        end_date: new Date('2026-03-19T21:30:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp36 (Boulangeries)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp36.id,
+        start_date: new Date('2026-03-11T08:00:00Z'),
+        end_date: new Date('2026-03-11T10:30:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp36.id,
+        start_date: new Date('2026-03-14T08:30:00Z'),
+        end_date: new Date('2026-03-14T11:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp36.id,
+        start_date: new Date('2026-03-18T07:30:00Z'),
+        end_date: new Date('2026-03-18T10:00:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
+  // Disponibilités pour exp37 (Paris romantique)
+  await prisma.experience_availability.createMany({
+    data: [
+      {
+        experience_id: exp37.id,
+        start_date: new Date('2026-03-13T17:00:00Z'),
+        end_date: new Date('2026-03-13T19:00:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp37.id,
+        start_date: new Date('2026-03-16T17:30:00Z'),
+        end_date: new Date('2026-03-16T19:30:00Z'),
+        status: 'available',
+      },
+      {
+        experience_id: exp37.id,
+        start_date: new Date('2026-03-20T17:00:00Z'),
+        end_date: new Date('2026-03-20T19:00:00Z'),
+        status: 'available',
+      },
+    ],
+  });
+
   console.log('✅ Disponibilités d\'expériences créées');
 
   // Lier les expériences aux catégories
@@ -2050,6 +2813,112 @@ async function main() {
     data: {
       experience_id: exp22.id,
       category_id: art.id,
+    },
+  });
+
+  // Catégories pour les nouvelles expériences à Paris
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp23.id,
+      category_id: culture.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp24.id,
+      category_id: mode.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp25.id,
+      category_id: gastronomie.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp26.id,
+      category_id: culture.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp27.id,
+      category_id: gastronomie.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp28.id,
+      category_id: art.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp29.id,
+      category_id: culture.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp30.id,
+      category_id: art.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp31.id,
+      category_id: culture.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp32.id,
+      category_id: art.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp33.id,
+      category_id: mode.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp34.id,
+      category_id: culture.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp35.id,
+      category_id: nightlife.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp36.id,
+      category_id: gastronomie.id,
+    },
+  });
+
+  await prisma.experience_category.create({
+    data: {
+      experience_id: exp37.id,
+      category_id: culture.id,
     },
   });
 
