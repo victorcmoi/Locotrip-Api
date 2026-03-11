@@ -260,6 +260,19 @@ export class ExperiencesController {
     return this.experiencesService.findDraftsByGuide(guideId);
   }
 
+  // === ÉTAPES D'EXPÉRIENCE ===
+  @Put(':id/steps')
+  @Roles(UserRole.GUIDE)
+  @ApiOperation({ summary: "Remplacer les étapes d'une expérience" })
+  @ApiParam({ name: 'id', description: "ID de l'expérience (UUID)" })
+  @ApiUpdateResponse(Object)
+  replaceSteps(
+    @Param('id') id: string,
+    @Body() steps: { step_number: number; title: string; description?: string }[],
+  ) {
+    return this.experiencesService.replaceSteps(id, steps);
+  }
+
   // === CATÉGORIES D'EXPÉRIENCE ===
   @Post(':id/categories')
   @Roles(UserRole.GUIDE)

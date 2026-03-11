@@ -21,6 +21,8 @@ export class ExperiencesService {
       data: {
         title: createExperienceDto.title,
         description: createExperienceDto.description,
+        additional_info: createExperienceDto.additional_info,
+        is_accessible: createExperienceDto.is_accessible ?? false,
         price: createExperienceDto.price,
         duration: createExperienceDto.duration,
         max_capacity: createExperienceDto.max_capacity,
@@ -90,6 +92,9 @@ export class ExperiencesService {
           },
           medias: true,
           reviews: true,
+          steps: {
+            orderBy: { step_number: 'asc' },
+          },
         },
         orderBy,
         skip,
@@ -127,6 +132,9 @@ export class ExperiencesService {
           include: {
             currency: true,
           },
+        },
+        steps: {
+          orderBy: { step_number: 'asc' },
         },
       },
     });
@@ -201,6 +209,9 @@ export class ExperiencesService {
           orderBy: {
             start_date: 'asc',
           },
+        },
+        steps: {
+          orderBy: { step_number: 'asc' },
         },
       },
     });
@@ -455,6 +466,9 @@ export class ExperiencesService {
             currency: true,
           },
         },
+        steps: {
+          orderBy: { step_number: 'asc' },
+        },
       },
     });
 
@@ -463,5 +477,32 @@ export class ExperiencesService {
     }
 
     return experience;
+  }
+
+  async replaceSteps(
+    experienceId: string,
+    steps: { step_number: number; title: string; description?: string }[],
+  ) {
+    return this.prisma.$transaction(async (tx) => {
+      await tx.experience_step.deleteMany({
+        where: { experience_id: experienceId },
+      });
+
+      if (steps.length > 0) {
+        await tx.experience_step.createMany({
+          data: steps.map((s) => ({
+            experience_id: experienceId,
+            step_number: s.step_number,
+            title: s.title,
+            description: s.description,
+          })),
+        });
+      }
+
+      return tx.experience_step.findMany({
+        where: { experience_id: experienceId },
+        orderBy: { step_number: 'asc' },
+      });
+    });
   }
 }

@@ -299,6 +299,7 @@ model experience {
   id                String  @id @default(uuid()) @db.Uuid
   title             String  @db.VarChar(150)
   description       String? @db.Text
+  additional_info   String? @db.Text
   price             Decimal @db.Decimal(10, 2)
   duration          Int
   city_id           String  @db.Uuid
@@ -307,6 +308,7 @@ model experience {
   meeting_point     String? @db.VarChar(255)
   meeting_latitude  Float?
   meeting_longitude Float?
+  is_accessible     Boolean @default(false)
 
   is_active    Boolean   @default(true)
   is_published Boolean   @default(false)
@@ -323,6 +325,7 @@ model experience {
   currency_prices experience_price[]
   medias          media[]                   @relation("ExperienceMedias")
   availabilities  experience_availability[]
+  steps           experience_step[]
 
   @@index([city_id])
   @@index([guide_id])
@@ -352,6 +355,19 @@ model experience_category {
   @@index([experience_id])
   @@index([category_id])
   @@map("experience_category")
+}
+
+model experience_step {
+  id            String  @id @default(uuid()) @db.Uuid
+  experience_id String  @db.Uuid
+  step_number   Int
+  title         String  @db.VarChar(150)
+  description   String? @db.Text
+
+  experience experience @relation(fields: [experience_id], references: [id], onDelete: Cascade)
+
+  @@index([experience_id])
+  @@map("experience_step")
 }
 
 model guide_hobby {

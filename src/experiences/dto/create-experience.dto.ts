@@ -9,6 +9,7 @@ import {
   Max,
   IsDecimal,
   IsNumber,
+  IsBoolean,
   MaxLength,
 } from 'class-validator';
 
@@ -107,4 +108,20 @@ export class CreateExperienceDto {
   @Max(180)
   @IsOptional()
   meeting_longitude?: number;
+
+  @ApiPropertyOptional({
+    description: "Informations complémentaires (HTML)",
+    example: "<p>Pensez à porter des chaussures confortables.</p>",
+  })
+  @IsString()
+  @IsOptional()
+  additional_info?: string;
+
+  @ApiPropertyOptional({
+    description: "Accessibilité PMR",
+    example: true,
+  })
+  @IsBoolean()
+  @IsOptional()
+  is_accessible?: boolean;
 }
