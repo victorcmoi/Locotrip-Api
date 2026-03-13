@@ -16,6 +16,33 @@ import {
 export class ExperiencesService {
   constructor(private prisma: PrismaService) { }
 
+  private attachExperienceMetrics<T extends { reviews?: { rating: number }[]; bookings?: unknown[] }>(experience: T) {
+    const reviews = experience.reviews ?? [];
+    const reviewCount = reviews.length;
+    const avgRating =
+      reviewCount > 0
+        ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount
+        : 0;
+    const bookingsCount = experience.bookings?.length ?? 0;
+
+    return {
+      ...experience,
+      reviewCount,
+      avgRating,
+      bookingsCount,
+    };
+  }
+
+  private async getGuideReviewCount(guideId: string) {
+    return this.prisma.review.count({
+      where: {
+        experience: {
+          guide_id: guideId,
+        },
+      },
+    });
+  }
+
   async create(createExperienceDto: CreateExperienceDto) {
     return this.prisma.experience.create({
       data: {
@@ -104,7 +131,7 @@ export class ExperiencesService {
     ]);
 
     return {
-      data,
+      data: data.map((experience) => this.attachExperienceMetrics(experience)),
       meta: new PaginationMeta(page, limit, total),
     };
   }
@@ -121,7 +148,14 @@ export class ExperiencesService {
           },
         },
         bookings: true,
-        reviews: true,
+        reviews: {
+          include: {
+            user: true,
+          },
+          orderBy: {
+            review_date: 'desc',
+          },
+        },
         medias: true,
         categories: {
           include: {
@@ -131,6 +165,11 @@ export class ExperiencesService {
         currency_prices: {
           include: {
             currency: true,
+          },
+        },
+        availabilities: {
+          orderBy: {
+            start_date: 'asc',
           },
         },
         steps: {
@@ -149,30 +188,14 @@ export class ExperiencesService {
       );
     }
 
-    // Calculer le reviewCount du guide
-    const guideExperiences = await this.prisma.experience.findMany({
-      where: {
-        guide_id: experience.guide_id,
-      },
-      select: {
-        reviews: {
-          select: {
-            id: true,
-          },
-        },
-      },
-    });
-
-    const reviewCount = guideExperiences.reduce(
-      (total, exp) => total + exp.reviews.length,
-      0,
-    );
+    const guideReviewCount = await this.getGuideReviewCount(experience.guide_id);
+    const experienceWithMetrics = this.attachExperienceMetrics(experience);
 
     return {
-      ...experience,
+      ...experienceWithMetrics,
       guide: {
         ...experience.guide,
-        reviewCount,
+        reviewCount: guideReviewCount,
       },
     };
   }
@@ -224,30 +247,14 @@ export class ExperiencesService {
       throw new NotFoundException(`Expérience avec l'ID ${id} introuvable`);
     }
 
-    // Calculer le reviewCount du guide
-    const guideExperiences = await this.prisma.experience.findMany({
-      where: {
-        guide_id: experience.guide_id,
-      },
-      select: {
-        reviews: {
-          select: {
-            id: true,
-          },
-        },
-      },
-    });
-
-    const reviewCount = guideExperiences.reduce(
-      (total, exp) => total + exp.reviews.length,
-      0,
-    );
+    const guideReviewCount = await this.getGuideReviewCount(experience.guide_id);
+    const experienceWithMetrics = this.attachExperienceMetrics(experience);
 
     return {
-      ...experience,
+      ...experienceWithMetrics,
       guide: {
         ...experience.guide,
-        reviewCount,
+        reviewCount: guideReviewCount,
       },
     };
   }
@@ -279,7 +286,7 @@ export class ExperiencesService {
   }
 
   async findByGuide(guideId: string) {
-    return this.prisma.experience.findMany({
+    const experiences = await this.prisma.experience.findMany({
       where: {
         guide_id: guideId,
         is_active: true,
@@ -305,6 +312,8 @@ export class ExperiencesService {
         },
       },
     });
+
+    return experiences.map((experience) => this.attachExperienceMetrics(experience));
   }
 
   async update(id: string, updateExperienceDto: UpdateExperienceDto) {
@@ -385,7 +394,7 @@ export class ExperiencesService {
   }
 
   async findAllIncludingDeleted() {
-    return this.prisma.experience.findMany({
+    const experiences = await this.prisma.experience.findMany({
       include: {
         city: true,
         guide: {
@@ -405,6 +414,8 @@ export class ExperiencesService {
         created_at: 'desc',
       },
     });
+
+    return experiences.map((experience) => this.attachExperienceMetrics(experience));
   }
 
   async findDraftsByGuide(guideId: string) {
@@ -476,7 +487,7 @@ export class ExperiencesService {
       throw new NotFoundException(`Expérience avec l'ID ${id} introuvable`);
     }
 
-    return experience;
+    return this.attachExperienceMetrics(experience);
   }
 
   async replaceSteps(

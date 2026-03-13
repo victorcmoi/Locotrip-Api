@@ -175,6 +175,11 @@ export class GuidesService {
         (total, exp) => total + exp.reviews.length,
         0,
       );
+      const allReviews = guide.experiences.flatMap((exp) => exp.reviews);
+      const avgRating =
+        allReviews.length > 0
+          ? allReviews.reduce((sum, review) => sum + review.rating, 0) / allReviews.length
+          : 0;
 
       // Calculer le prix minimum et maximum des expériences du guide
       const experiencePrices = guide.experiences
@@ -187,6 +192,7 @@ export class GuidesService {
       return {
         ...guide,
         reviewCount,
+        avgRating,
         minExperiencePrice: minPrice,
         maxExperiencePrice: maxPrice,
       };
@@ -239,6 +245,11 @@ export class GuidesService {
       (total, exp) => total + exp.reviews.length,
       0,
     );
+    const allReviews = guide.experiences.flatMap((exp) => exp.reviews);
+    const avgRating =
+      allReviews.length > 0
+        ? allReviews.reduce((sum, review) => sum + review.rating, 0) / allReviews.length
+        : 0;
 
     const experiencesCount = guide.experiences.length;
 
@@ -259,6 +270,7 @@ export class GuidesService {
     return {
       ...guide,
       reviewCount,
+      avgRating,
       experiencesCount,
       response_time_hours: responseTime,
       response_time_range: responseTimeRange,

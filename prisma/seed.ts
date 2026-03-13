@@ -1743,6 +1743,75 @@ async function main() {
     },
   });
 
+  const allExperiences = [
+    exp1, exp2, exp3, exp4, exp5, exp6, exp7, exp8, exp9, exp10,
+    exp11, exp12, exp13, exp14, exp15, exp16, exp17, exp18, exp19, exp20,
+    exp21, exp22, exp23, exp24, exp25, exp26, exp27, exp28, exp29, exp30,
+    exp31, exp32, exp33, exp34, exp35, exp36, exp37,
+  ];
+
+  const experiencesWithPartialData = new Set([exp30.id, exp35.id]);
+  const lessAccessibleExperiences = new Set([exp8.id, exp10.id, exp16.id, exp31.id]);
+
+  const buildAdditionalInfo = (title: string) => {
+    if (title.includes('Louvre')) {
+      return 'Entrée coupe-file incluse. Prévoir des chaussures confortables et une pièce d\'identité.';
+    }
+    if (title.includes('gastronomique') || title.includes('Dégustation') || title.includes('Boulangeries')) {
+      return 'Dégustations incluses. Merci de signaler vos allergies alimentaires 48h avant la visite.';
+    }
+    if (title.includes('vélo')) {
+      return 'Casque fourni. Taille minimum requise: 145 cm. Parcours adapté à un niveau débutant.';
+    }
+    if (title.includes('nuit') || title.includes('Flamenco') || title.includes('Apéro')) {
+      return 'Activité en soirée. Merci d\'arriver 10 minutes en avance pour le briefing de départ.';
+    }
+
+    return 'Prévoir des chaussures adaptées et une bouteille d\'eau. Activité maintenue sauf conditions extrêmes.';
+  };
+
+  console.log('🧩 Enrichissement des expériences (champs additionnels et accessibilité)...');
+  for (const experience of allExperiences) {
+    const shouldStayPartial = experiencesWithPartialData.has(experience.id);
+
+    await prisma.experience.update({
+      where: { id: experience.id },
+      data: {
+        additional_info: shouldStayPartial ? null : buildAdditionalInfo(experience.title),
+        is_accessible: !lessAccessibleExperiences.has(experience.id),
+      },
+    });
+  }
+
+  console.log('🪜 Création des étapes des expériences...');
+  const experiencesWithoutSteps = new Set([exp35.id]);
+  await prisma.experience_step.createMany({
+    data: allExperiences
+      .filter((experience) => !experiencesWithoutSteps.has(experience.id))
+      .flatMap((experience) => [
+        {
+          experience_id: experience.id,
+          step_number: 1,
+          title: 'Accueil et présentation',
+          description: `Rencontre du groupe et rappel du déroulé pour "${experience.title}".`,
+        },
+        {
+          experience_id: experience.id,
+          step_number: 2,
+          title: 'Parcours principal',
+          description: 'Immersion guidée avec explications, anecdotes locales et temps d\'échange.',
+        },
+        {
+          experience_id: experience.id,
+          step_number: 3,
+          title: 'Clôture de l\'expérience',
+          description: 'Questions-réponses, recommandations personnalisées et conseils pour la suite du séjour.',
+        },
+      ]),
+  });
+
+  console.log('✅ Expériences enrichies avec champs crédibles et steps (sauf cas de test ciblés)');
+
   console.log('✅ 15 expériences supplémentaires créées (total: 37 expériences)');
 
   // Upload des images des expériences vers MinIO
@@ -2924,30 +2993,41 @@ async function main() {
 
   console.log('✅ Catégories associées aux expériences');
 
-  // Ajouter des price en différentes currencies
   console.log('💰 Ajout des price multi-currencies...');
-  await prisma.experience_price.create({
-    data: {
-      experience_id: exp1.id,
-      currency_code: 'EUR',
-      price: 49.99,
-    },
-  });
+  const experiencesWithoutPriceRows = new Set([exp35.id]);
+  const experiencesWithOnlyEurPrice = new Set([exp30.id]);
 
-  await prisma.experience_price.create({
-    data: {
-      experience_id: exp1.id,
-      currency_code: 'USD',
-      price: 54.99,
-    },
-  });
+  await prisma.experience_price.createMany({
+    data: allExperiences
+      .filter((experience) => !experiencesWithoutPriceRows.has(experience.id))
+      .flatMap((experience) => {
+        const basePrice = Number(experience.price);
+        const usdPrice = Number((basePrice * Number(usd.exchange_rate)).toFixed(2));
 
-  await prisma.experience_price.create({
-    data: {
-      experience_id: exp2.id,
-      currency_code: 'EUR',
-      price: 79.99,
-    },
+        if (experiencesWithOnlyEurPrice.has(experience.id)) {
+          return [
+            {
+              experience_id: experience.id,
+              currency_code: 'EUR',
+              price: basePrice,
+            },
+          ];
+        }
+
+        return [
+          {
+            experience_id: experience.id,
+            currency_code: 'EUR',
+            price: basePrice,
+          },
+          {
+            experience_id: experience.id,
+            currency_code: 'USD',
+            price: usdPrice,
+          },
+        ];
+      }),
+    skipDuplicates: true,
   });
 
   // Créer une réservation
@@ -3152,12 +3232,80 @@ async function main() {
     },
   });
 
-  console.log('✅ 8 réservations créées avec leurs paiements');
+  const booking9 = await prisma.booking.create({
+    data: {
+      user_id: client10.id,
+      experience_id: exp24.id,
+      booking_date: new Date('2026-02-12T10:30:00Z'),
+      status: 'completed',
+      number_of_participants: 2,
+      total_price: 110.0,
+    },
+  });
+
+  await prisma.payment.create({
+    data: {
+      booking_id: booking9.id,
+      amount: 110.0,
+      currency: 'eur',
+      method: 'carte_bancaire',
+      status: 'completed',
+      stripe_payment_intent_id: 'pi_test_923456789',
+      metadata: { booking_reference: 'BOOK-009', payment_method: 'visa' },
+    },
+  });
+
+  const booking10 = await prisma.booking.create({
+    data: {
+      user_id: client4.id,
+      experience_id: exp25.id,
+      booking_date: new Date('2026-02-18T18:00:00Z'),
+      status: 'confirmed',
+      number_of_participants: 3,
+      total_price: 267.0,
+    },
+  });
+
+  await prisma.payment.create({
+    data: {
+      booking_id: booking10.id,
+      amount: 267.0,
+      currency: 'eur',
+      method: 'carte_bancaire',
+      status: 'completed',
+      stripe_payment_intent_id: 'pi_test_1023456789',
+      metadata: { booking_reference: 'BOOK-010', payment_method: 'mastercard' },
+    },
+  });
+
+  const booking11 = await prisma.booking.create({
+    data: {
+      user_id: client8.id,
+      experience_id: exp37.id,
+      booking_date: new Date('2026-03-06T17:45:00Z'),
+      status: 'completed',
+      number_of_participants: 2,
+      total_price: 88.0,
+    },
+  });
+
+  await prisma.payment.create({
+    data: {
+      booking_id: booking11.id,
+      amount: 88.0,
+      currency: 'eur',
+      method: 'carte_bancaire',
+      status: 'completed',
+      stripe_payment_intent_id: 'pi_test_1123456789',
+      metadata: { booking_reference: 'BOOK-011', payment_method: 'visa' },
+    },
+  });
+
+  console.log('✅ 11 réservations créées avec leurs paiements');
 
   // Créer des disputes
   console.log('⚖️ Création des disputes...');
 
-  // Dispute 1 - Ouverte, client mécontent du guide
   await prisma.dispute.create({
     data: {
       booking_id: booking5.id,
@@ -3167,7 +3315,6 @@ async function main() {
     },
   });
 
-  // Dispute 2 - En attente, problème de description de l'expérience
   await prisma.dispute.create({
     data: {
       booking_id: booking6.id,
@@ -3177,7 +3324,6 @@ async function main() {
     },
   });
 
-  // Dispute 3 - Résolue en faveur du client
   await prisma.dispute.create({
     data: {
       booking_id: booking8.id,
@@ -3189,7 +3335,6 @@ async function main() {
     },
   });
 
-  // Dispute 4 - Rejetée, réclamation non fondée
   await prisma.dispute.create({
     data: {
       booking_id: booking2.id,
@@ -3399,7 +3544,73 @@ async function main() {
     },
   });
 
-  console.log('✅ 18 avis créés pour les différentes expériences');
+  await prisma.review.create({
+    data: {
+      user_id: client10.id,
+      experience_id: exp24.id,
+      rating: 5,
+      title: 'Parfait pour découvrir les maisons de luxe',
+      comment:
+        'Isabelle connaît très bien les boutiques et partage de vrais conseils mode. Très belle expérience.',
+    },
+  });
+
+  await prisma.review.create({
+    data: {
+      user_id: client6.id,
+      experience_id: exp24.id,
+      rating: 4,
+      title: 'Circuit premium bien rythmé',
+      comment:
+        'Parcours fluide, bonnes adresses et ambiance agréable. Petit groupe appréciable.',
+    },
+  });
+
+  await prisma.review.create({
+    data: {
+      user_id: client5.id,
+      experience_id: exp25.id,
+      rating: 5,
+      title: 'Très belle initiation œnologique',
+      comment:
+        'Atelier très pédagogique, excellents accords vins/fromages et format convivial.',
+    },
+  });
+
+  await prisma.review.create({
+    data: {
+      user_id: client8.id,
+      experience_id: exp31.id,
+      rating: 4,
+      title: 'Versailles bien organisé',
+      comment:
+        'Très bon accompagnement sur la journée complète, timing respecté et explications claires.',
+    },
+  });
+
+  await prisma.review.create({
+    data: {
+      user_id: client7.id,
+      experience_id: exp37.id,
+      rating: 5,
+      title: 'Balade parisienne parfaite en amoureux',
+      comment:
+        'Très belle promenade au coucher du soleil. Le guide a choisi des spots magnifiques et a su garder un rythme doux et agréable.',
+    },
+  });
+
+  await prisma.review.create({
+    data: {
+      user_id: client9.id,
+      experience_id: exp37.id,
+      rating: 4,
+      title: 'Expérience romantique réussie',
+      comment:
+        'Le parcours est très bien pensé et les anecdotes sur Paris ajoutent une vraie valeur. Un peu plus de temps sur les quais aurait été parfait.',
+    },
+  });
+
+  console.log('✅ 24 avis créés pour les différentes expériences');
 
   // Créer un subscription
   console.log("🎫 Création d'un subscription...");

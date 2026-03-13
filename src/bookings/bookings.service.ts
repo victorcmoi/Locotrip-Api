@@ -193,6 +193,12 @@ export class BookingsService {
     });
   }
 
+  async countByExperience(experienceId: string) {
+    return this.prisma.booking.count({
+      where: { experience_id: experienceId },
+    });
+  }
+
   async update(id: string, updateBookingDto: UpdateBookingDto) {
     try {
       const data: bookingUncheckedUpdateInput = { ...updateBookingDto };

@@ -37,6 +37,7 @@ import {
 import { DisputeStatus } from './enums/dispute.enum';
 import { Roles } from '../common/decorators/role.decorator';
 import { UserRole } from '../users/enums/user.enum';
+import { Public } from '../common/decorators/authentification-decorator';
 
 @ApiTags('Réservations')
 @ApiBearerAuth('JWT-auth')
@@ -71,6 +72,15 @@ export class BookingsController {
   @ApiGetManyResponse(BookingEntity)
   findByGuide(@Param('guideId') guideId: string) {
     return this.bookingsService.findByGuide(guideId);
+  }
+
+  @Get('experience/:experienceId/count')
+  @Public()
+  @ApiOperation({ summary: "Compter les réservations d'une expérience" })
+  @ApiParam({ name: 'experienceId', description: "ID de l'expérience" })
+  async countByExperience(@Param('experienceId') experienceId: string) {
+    const count = await this.bookingsService.countByExperience(experienceId);
+    return { count };
   }
 
   @Get(':id')
