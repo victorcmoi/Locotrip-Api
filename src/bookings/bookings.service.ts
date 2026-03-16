@@ -6,6 +6,7 @@ import { FindAllBookingsDto } from './dto/find-all-bookings.dto';
 import { BookingStatus } from './enums/booking.enum';
 import { NotificationsService } from '../support/notifications.service';
 import { NotificationType } from '../support/enums/notification.enum';
+import { MailService } from '../mail/mail.service';
 import {
   bookingUncheckedUpdateInput,
   bookingWhereInput,
@@ -20,6 +21,7 @@ export class BookingsService {
   constructor(
     private prisma: PrismaService,
     private notificationsService: NotificationsService,
+    private mailService: MailService,
   ) {}
 
   async create(createBookingDto: CreateBookingDto) {
@@ -63,6 +65,18 @@ export class BookingsService {
       type: NotificationType.BOOKING_REMINDER,
       content: `Nouvelle réservation : ${booking.experience.title} le ${dateFormatted} à ${timeFormatted} par ${booking.user.first_name} ${booking.user.last_name}`,
     });
+
+    await this.mailService
+      .sendNewBookingForGuideEmail(booking.experience.guide.user.email, {
+        guideName: booking.experience.guide.user.first_name,
+        clientName: `${booking.user.first_name} ${booking.user.last_name}`,
+        experienceName: booking.experience.title,
+        date: dateFormatted,
+        bookingId: booking.id,
+      })
+      .catch((e) =>
+        console.error('Failed to send new booking email to guide', e),
+      );
 
     return booking;
   }
@@ -260,6 +274,35 @@ export class BookingsService {
             type: NotificationType.BOOKING_REMINDER,
             content: content,
           });
+
+          if (updateBookingDto.status === BookingStatus.CONFIRMED) {
+            const bookingDate = new Date(booking.booking_date);
+            const dateFormatted = bookingDate.toLocaleDateString('fr-FR');
+
+            await this.mailService
+              .sendBookingConfirmationEmail(booking.user.email, {
+                userName: booking.user.first_name,
+                experienceName: booking.experience.title,
+                date: dateFormatted,
+                price: `${booking.total_price}€`,
+                bookingId: booking.id,
+              })
+              .catch((e) =>
+                console.error('Failed to send confirmation email', e),
+              );
+          } else if (updateBookingDto.status === BookingStatus.CANCELLED) {
+            const bookingDate = new Date(booking.booking_date);
+            const dateFormatted = bookingDate.toLocaleDateString('fr-FR');
+
+            await this.mailService
+              .sendBookingCancelledEmail(booking.user.email, {
+                userName: booking.user.first_name,
+                experienceName: booking.experience.title,
+                date: dateFormatted,
+                bookingId: booking.id,
+              })
+              .catch((e) => console.error('Failed to send cancellation email', e));
+          }
         }
       }
 

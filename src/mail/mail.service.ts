@@ -136,10 +136,10 @@ export class MailService {
       <h2>Nouveau message</h2>
       <p>Bonjour,</p>
       <p>Vous avez reçu un nouveau message de <strong>${details.senderName}</strong> à <strong>${details.timestamp}</strong>.</p>
-      <div style="background-color: #f9f9f9; padding: 15px; border-left: 4px solid #4CAF50; margin: 20px 0;">
+      <div style="background-color: #f9f9f9; padding: 15px; border-left: 4px solid #327A78; margin: 20px 0;">
         <p style="font-style: italic; margin: 0;">"${details.messageContent}"</p>
       </div>
-      <p><a href="${process.env.FRONTEND_URL || 'https://www.loco-trip.com'}/me/messages" style="background-color: #4CAF50; color: white; padding: 12px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">Voir le message</a></p>
+      <p><a href="${process.env.FRONTEND_URL || 'https://www.loco-trip.com'}/me/messages" style="background-color: #327A78; color: white; padding: 12px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">Voir le message</a></p>
       <p>Cordialement,<br/>L'équipe Locotrip</p>
     `;
 
@@ -197,7 +197,7 @@ export class MailService {
         <li><strong>Date :</strong> ${bookingDetails.date}</li>
         <li><strong>Numéro de réservation :</strong> ${bookingDetails.bookingId}</li>
       </ul>
-      <p><a href="${process.env.FRONTEND_URL || 'https://www.loco-trip.com'}/me/experiences" style="background-color: #4CAF50; color: white; padding: 12px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">Gérer mes réservations</a></p>
+      <p><a href="${process.env.FRONTEND_URL || 'https://www.loco-trip.com'}/me/experiences" style="background-color: #327A78; color: white; padding: 12px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">Gérer mes réservations</a></p>
       <p>Cordialement,<br/>L'équipe Locotrip</p>
     `;
 
