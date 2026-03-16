@@ -246,8 +246,67 @@ export class BookingsService {
     });
   }
 
-  async update(id: string, updateBookingDto: UpdateBookingDto) {
+  async update(
+    id: string,
+    updateBookingDto: UpdateBookingDto,
+    userId?: string,
+  ) {
     try {
+      const existingBooking = await this.prisma.booking.findUnique({
+        where: { id },
+        include: {
+          experience: true,
+          user: true,
+        },
+      });
+
+      if (!existingBooking) {
+        throw new NotFoundException(`Réservation avec l'ID ${id} introuvable`);
+      }
+
+      // 1. Permission Check: Only the guide can update the booking status/details
+      if (userId && existingBooking.experience.guide_id) {
+        const guide = await this.prisma.guide.findUnique({
+          where: { id: existingBooking.experience.guide_id },
+        });
+
+        if (!guide || guide.user_id !== userId) {
+          throw new NotFoundException(
+            "Seul le guide de cette expérience peut modifier la réservation",
+          );
+        }
+      }
+
+      // 2. Status Transition Validation
+      if (updateBookingDto.status) {
+        const currentStatus = existingBooking.status;
+        const newStatus = updateBookingDto.status as BookingStatus;
+
+        const allowedTransitions: Record<string, BookingStatus[]> = {
+          [BookingStatus.PENDING]: [
+            BookingStatus.CONFIRMED,
+            BookingStatus.CANCELLED,
+          ],
+          [BookingStatus.CONFIRMED]: [
+            BookingStatus.COMPLETED,
+            BookingStatus.CANCELLED,
+          ],
+          [BookingStatus.COMPLETED]: [],
+          [BookingStatus.CANCELLED]: [],
+        };
+
+        const possibleTransitions = allowedTransitions[currentStatus] || [];
+
+        if (
+          currentStatus !== newStatus &&
+          !possibleTransitions.includes(newStatus)
+        ) {
+          throw new NotFoundException(
+            `Transition de statut invalide : ${currentStatus} -> ${newStatus}`,
+          );
+        }
+      }
+
       const data: bookingUncheckedUpdateInput = { ...updateBookingDto };
 
       const booking = await this.prisma.booking.update({
@@ -307,8 +366,11 @@ export class BookingsService {
       }
 
       return booking;
-    } catch {
-      throw new NotFoundException(`Réservation avec l'ID ${id} introuvable`);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new NotFoundException(`Erreur lors de la mise à jour : ${error.message}`);
     }
   }
 

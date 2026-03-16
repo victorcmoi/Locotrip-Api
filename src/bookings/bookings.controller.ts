@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   Query,
+  Request as Req,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -101,12 +102,16 @@ export class BookingsController {
   }
 
   @Put(':id')
-  // @Roles(UserRole.CLIENT)
+  @Roles(UserRole.GUIDE, UserRole.ADMIN)
   @ApiOperation({ summary: 'Mettre à jour une réservation' })
   @ApiParam({ name: 'id', description: 'ID de la réservation' })
   @ApiUpdateResponse(BookingEntity)
-  update(@Param('id') id: string, @Body() updateBookingDto: UpdateBookingDto) {
-    return this.bookingsService.update(id, updateBookingDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateBookingDto: UpdateBookingDto,
+    @Req() req: { user: { sub: string } },
+  ) {
+    return this.bookingsService.update(id, updateBookingDto, req.user.sub);
   }
 
   @Delete(':id')
