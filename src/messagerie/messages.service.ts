@@ -3,12 +3,14 @@ import { PrismaService } from '../prisma.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { NotificationsService } from '../support/notifications.service';
 import { NotificationType } from '../support/enums/notification.enum';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class MessagesService {
   constructor(
     private prisma: PrismaService,
     private notificationsService: NotificationsService,
+    private mailService: MailService,
   ) {}
 
   async create(createMessageDto: CreateMessageDto) {
@@ -29,9 +31,14 @@ export class MessagesService {
       include: {
         booking: {
           include: {
+            user: true,
             experience: {
               include: {
-                guide: true,
+                guide: {
+                  include: {
+                    user: true,
+                  },
+                },
               },
             },
           },
@@ -45,20 +52,33 @@ export class MessagesService {
     });
 
     if (conversationDetails && authorDoc) {
-      const clientUserId = conversationDetails.booking.user_id;
-      const guideUserId = conversationDetails.booking.experience.guide.user_id;
+      const clientUser = conversationDetails.booking.user;
+      const guideUser = conversationDetails.booking.experience.guide.user;
 
-      const recipientId =
-        message.author_id === clientUserId ? guideUserId : clientUserId;
+      const recipient =
+        message.author_id === clientUser.id ? guideUser : clientUser;
 
-      if (recipientId) {
+      if (recipient) {
+        // App-level notification
         this.notificationsService
           .create({
-            user_id: recipientId,
+            user_id: recipient.id,
             type: NotificationType.NEW_MESSAGE,
             content: `Vous avez reçu un nouveau message de ${authorDoc.first_name}`,
           })
           .catch((e) => console.error('Failed to create notification', e));
+
+        // Email notification
+        const now = new Date();
+        const timestamp = `${now.toLocaleDateString('fr-FR')} à ${now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+
+        this.mailService
+          .sendNewMessageEmail(recipient.email, {
+            senderName: authorDoc.first_name,
+            messageContent: message.content,
+            timestamp: timestamp,
+          })
+          .catch((e) => console.error('Failed to send new message email', e));
       }
     }
 

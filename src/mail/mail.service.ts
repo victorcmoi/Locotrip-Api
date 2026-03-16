@@ -54,7 +54,7 @@ export class MailService {
    * Envoie un email de réinitialisation de mot de passe
    */
   async sendPasswordResetEmail(to: string, resetToken: string) {
-    const resetUrl = `${process.env.FRONTEND_URL || 'https://loco-trip.com'}/reset-password?token=${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL || 'https://www.loco-trip.com'}/reset-password?token=${resetToken}`;
     const subject = 'Réinitialisation de votre mot de passe';
     const text = `Bonjour,\n\nVous avez demandé à réinitialiser votre mot de passe.\n\nCliquez sur ce lien : ${resetUrl}\n\nCe lien expire dans 1 heure.\n\nSi vous n'avez pas demandé cette réinitialisation, ignorez cet email.\n\nCordialement,\nL'équipe Locotrip`;
     const html = `
@@ -113,6 +113,91 @@ export class MailService {
       <h2>${title}</h2>
       <p>Bonjour,</p>
       <p>${message}</p>
+      <p>Cordialement,<br/>L'équipe Locotrip</p>
+    `;
+
+    return this.sendEmail(to, subject, text, html);
+  }
+
+  /**
+   * Envoie un email pour un nouveau message
+   */
+  async sendNewMessageEmail(
+    to: string,
+    details: {
+      senderName: string;
+      messageContent: string;
+      timestamp: string;
+    },
+  ) {
+    const subject = `Nouveau message de ${details.senderName}`;
+    const text = `Bonjour,\n\nVous avez reçu un nouveau message de ${details.senderName} à ${details.timestamp}.\n\nMessage :\n${details.messageContent}\n\nConnectez-vous à Locotrip pour répondre.\n\nCordialement,\nL'équipe Locotrip`;
+    const html = `
+      <h2>Nouveau message</h2>
+      <p>Bonjour,</p>
+      <p>Vous avez reçu un nouveau message de <strong>${details.senderName}</strong> à <strong>${details.timestamp}</strong>.</p>
+      <div style="background-color: #f9f9f9; padding: 15px; border-left: 4px solid #327A78; margin: 20px 0;">
+        <p style="font-style: italic; margin: 0;">"${details.messageContent}"</p>
+      </div>
+      <p><a href="${process.env.FRONTEND_URL || 'https://www.loco-trip.com'}/me/messages" style="background-color: #327A78; color: white; padding: 12px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">Voir le message</a></p>
+      <p>Cordialement,<br/>L'équipe Locotrip</p>
+    `;
+
+    return this.sendEmail(to, subject, text, html);
+  }
+
+  /**
+   * Envoie un email de confirmation d'annulation de réservation
+   */
+  async sendBookingCancelledEmail(
+    to: string,
+    bookingDetails: {
+      userName: string;
+      experienceName: string;
+      date: string;
+      bookingId: string;
+    },
+  ) {
+    const subject = `Annulation de réservation - ${bookingDetails.experienceName}`;
+    const text = `Bonjour ${bookingDetails.userName},\n\nVotre réservation pour l'expérience "${bookingDetails.experienceName}" prévue le ${bookingDetails.date} a été annulée.\n\nNuméro de réservation : ${bookingDetails.bookingId}\n\nSi vous avez des questions, n'hésitez pas à nous contacter.\n\nCordialement,\nL'équipe Locotrip`;
+    const html = `
+      <h2>Annulation de réservation</h2>
+      <p>Bonjour <strong>${bookingDetails.userName}</strong>,</p>
+      <p>Votre réservation pour l'expérience "<strong>${bookingDetails.experienceName}</strong>" prévue le <strong>${bookingDetails.date}</strong> a été annulée.</p>
+      <p><strong>Numéro de réservation :</strong> ${bookingDetails.bookingId}</p>
+      <p>Si vous avez des questions, n'hésitez pas à nous contacter.</p>
+      <p>Cordialement,<br/>L'équipe Locotrip</p>
+    `;
+
+    return this.sendEmail(to, subject, text, html);
+  }
+
+  /**
+   * Envoie un email de notification de nouvelle réservation pour le guide
+   */
+  async sendNewBookingForGuideEmail(
+    to: string,
+    bookingDetails: {
+      guideName: string;
+      clientName: string;
+      experienceName: string;
+      date: string;
+      bookingId: string;
+    },
+  ) {
+    const subject = `Nouvelle réservation reçue - ${bookingDetails.experienceName}`;
+    const text = `Bonjour ${bookingDetails.guideName},\n\nBonne nouvelle ! Vous avez reçu une nouvelle réservation pour votre expérience "${bookingDetails.experienceName}".\n\nDétails de la réservation :\n- Client : ${bookingDetails.clientName}\n- Date : ${bookingDetails.date}\n- Numéro de réservation : ${bookingDetails.bookingId}\n\nVous pouvez consulter les détails dans votre espace guide.\n\nCordialement,\nL'équipe Locotrip`;
+    const html = `
+      <h2>Nouvelle réservation reçue !</h2>
+      <p>Bonjour <strong>${bookingDetails.guideName}</strong>,</p>
+      <p>Bonne nouvelle ! Vous avez reçu une nouvelle réservation pour votre expérience "<strong>${bookingDetails.experienceName}</strong>".</p>
+      <h3>Détails de la réservation :</h3>
+      <ul>
+        <li><strong>Client :</strong> ${bookingDetails.clientName}</li>
+        <li><strong>Date :</strong> ${bookingDetails.date}</li>
+        <li><strong>Numéro de réservation :</strong> ${bookingDetails.bookingId}</li>
+      </ul>
+      <p><a href="${process.env.FRONTEND_URL || 'https://www.loco-trip.com'}/me/experiences" style="background-color: #327A78; color: white; padding: 12px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">Gérer mes réservations</a></p>
       <p>Cordialement,<br/>L'équipe Locotrip</p>
     `;
 

@@ -4,6 +4,9 @@ import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { FindAllBookingsDto } from './dto/find-all-bookings.dto';
 import { BookingStatus } from './enums/booking.enum';
+import { NotificationsService } from '../support/notifications.service';
+import { NotificationType } from '../support/enums/notification.enum';
+import { MailService } from '../mail/mail.service';
 import {
   bookingUncheckedUpdateInput,
   bookingWhereInput,
@@ -15,10 +18,14 @@ import {
 
 @Injectable()
 export class BookingsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationsService: NotificationsService,
+    private mailService: MailService,
+  ) {}
 
   async create(createBookingDto: CreateBookingDto) {
-    return this.prisma.booking.create({
+    const booking = await this.prisma.booking.create({
       data: {
         booking_date: createBookingDto.booking_date,
         number_of_participants: createBookingDto.number_of_participants,
@@ -31,7 +38,47 @@ export class BookingsService {
           connect: { id: createBookingDto.experience_id },
         },
       },
+      include: {
+        user: true,
+        experience: {
+          include: {
+            guide: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        },
+      },
     });
+
+    // Notify guide
+    const bookingDate = new Date(booking.booking_date);
+    const dateFormatted = bookingDate.toLocaleDateString('fr-FR');
+    const timeFormatted = bookingDate.toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    await this.notificationsService.create({
+      user_id: booking.experience.guide.user_id,
+      type: NotificationType.BOOKING_REMINDER,
+      content: `Nouvelle réservation : ${booking.experience.title} le ${dateFormatted} à ${timeFormatted} par ${booking.user.first_name} ${booking.user.last_name}`,
+    });
+
+    await this.mailService
+      .sendNewBookingForGuideEmail(booking.experience.guide.user.email, {
+        guideName: booking.experience.guide.user.first_name,
+        clientName: `${booking.user.first_name} ${booking.user.last_name}`,
+        experienceName: booking.experience.title,
+        date: dateFormatted,
+        bookingId: booking.id,
+      })
+      .catch((e) =>
+        console.error('Failed to send new booking email to guide', e),
+      );
+
+    return booking;
   }
 
   async findAll(query: FindAllBookingsDto): Promise<PaginatedResponse<any>> {
@@ -203,10 +250,63 @@ export class BookingsService {
     try {
       const data: bookingUncheckedUpdateInput = { ...updateBookingDto };
 
-      return await this.prisma.booking.update({
+      const booking = await this.prisma.booking.update({
         where: { id },
         data,
+        include: {
+          experience: true,
+          user: true,
+        },
       });
+
+      // Notify user if status changed
+      if (updateBookingDto.status) {
+        let content = '';
+        if (updateBookingDto.status === BookingStatus.CONFIRMED) {
+          content = `Votre réservation pour ${booking.experience.title} a été acceptée`;
+        } else if (updateBookingDto.status === BookingStatus.CANCELLED) {
+          content = `Votre réservation pour ${booking.experience.title} a été annulée`;
+        }
+
+        if (content) {
+          await this.notificationsService.create({
+            user_id: booking.user_id,
+            type: NotificationType.BOOKING_REMINDER,
+            content: content,
+          });
+
+          if (updateBookingDto.status === BookingStatus.CONFIRMED) {
+            const bookingDate = new Date(booking.booking_date);
+            const dateFormatted = bookingDate.toLocaleDateString('fr-FR');
+
+            await this.mailService
+              .sendBookingConfirmationEmail(booking.user.email, {
+                userName: booking.user.first_name,
+                experienceName: booking.experience.title,
+                date: dateFormatted,
+                price: `${booking.total_price}€`,
+                bookingId: booking.id,
+              })
+              .catch((e) =>
+                console.error('Failed to send confirmation email', e),
+              );
+          } else if (updateBookingDto.status === BookingStatus.CANCELLED) {
+            const bookingDate = new Date(booking.booking_date);
+            const dateFormatted = bookingDate.toLocaleDateString('fr-FR');
+
+            await this.mailService
+              .sendBookingCancelledEmail(booking.user.email, {
+                userName: booking.user.first_name,
+                experienceName: booking.experience.title,
+                date: dateFormatted,
+                bookingId: booking.id,
+              })
+              .catch((e) => console.error('Failed to send cancellation email', e));
+          }
+        }
+      }
+
+      return booking;
     } catch {
       throw new NotFoundException(`Réservation avec l'ID ${id} introuvable`);
     }
