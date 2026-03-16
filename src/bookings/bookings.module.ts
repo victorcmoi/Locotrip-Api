@@ -9,9 +9,10 @@ import { PaymentsService } from './payments.service';
 import { DisputesService } from './disputes.service';
 import { PrismaService } from '../prisma.service';
 import { StripeModule } from '../stripe/stripe.module';
+import { SupportModule } from '../support/support.module';
 
 @Module({
-  imports: [StripeModule],
+  imports: [StripeModule, SupportModule],
   controllers: [BookingsController, PaiementsController, DisputesController],
   providers: [BookingsService, PaymentsService, DisputesService, PrismaService],
   exports: [BookingsService, PaymentsService, DisputesService],
