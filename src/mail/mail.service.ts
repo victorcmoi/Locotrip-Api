@@ -203,4 +203,34 @@ export class MailService {
 
     return this.sendEmail(to, subject, text, html);
   }
+
+  /**
+   * Envoie un email de notification quand un nouveau commentaire est laissé sur une expérience
+   */
+  async sendNewReviewEmail(
+    to: string,
+    details: {
+      clientName: string;
+      rating: number;
+      comment: string;
+      experienceName: string;
+    },
+  ) {
+    const starRating = '⭐️'.repeat(details.rating) + '☆'.repeat(5 - details.rating);
+    const subject = `Nouvel avis sur votre expérience - ${details.experienceName}`;
+    const text = `Bonjour,\n\nVous avez reçu un nouvel avis de la part de ${details.clientName} pour votre expérience "${details.experienceName}".\n\nNote : ${details.rating}/5\nCommentaire : ${details.comment}\n\nConnectez-vous à Locotrip pour gérer vos avis.\n\nCordialement,\nL'équipe Locotrip`;
+    const html = `
+      <h2>Nouvel avis reçu !</h2>
+      <p>Bonjour,</p>
+      <p>Vous avez reçu un nouvel avis de la part de <strong>${details.clientName}</strong> pour votre expérience "<strong>${details.experienceName}</strong>".</p>
+      <div style="background-color: #f9f9f9; padding: 15px; border-left: 4px solid #327A78; margin: 20px 0;">
+        <p style="font-size: 18px; margin-top: 0;"><strong>Note :</strong> ${starRating} (${details.rating}/5)</p>
+        <p style="font-style: italic; margin-bottom: 0;">"${details.comment || 'Aucun commentaire'}"</p>
+      </div>
+      <p><a href="${process.env.FRONTEND_URL || 'https://www.loco-trip.com'}/me/experiences" style="background-color: #327A78; color: white; padding: 12px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">Voir mes expériences</a></p>
+      <p>Cordialement,<br/>L'équipe Locotrip</p>
+    `;
+
+    return this.sendEmail(to, subject, text, html);
+  }
 }

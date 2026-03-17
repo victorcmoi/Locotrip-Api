@@ -97,6 +97,7 @@ enum SupportTicketStatus {
 enum NotificationType {
   booking_reminder
   new_message
+  new_review
 }
 
 // ============================================
