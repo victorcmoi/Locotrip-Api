@@ -33,6 +33,14 @@ export class SearchDto extends PaginationDto {
     location?: string;
 
     @ApiPropertyOptional({
+        description: 'Pays (pour les expériences)',
+        example: 'France',
+    })
+    @IsString()
+    @IsOptional()
+    country?: string;
+
+    @ApiPropertyOptional({
         description: 'Date de début de disponibilité (format ISO 8601)',
         example: '2026-02-18T23:00:00.000Z',
     })

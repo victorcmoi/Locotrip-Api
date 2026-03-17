@@ -174,6 +174,12 @@ export class SearchService {
                 0,
             );
 
+            const totalRating = guide.experiences.reduce(
+                (sum, exp) => sum + exp.reviews.reduce((reviewSum, review) => reviewSum + review.rating, 0),
+                0,
+            );
+            const avgRating = reviewCount > 0 ? totalRating / reviewCount : 0;
+
             const experiencePrices = guide.experiences
                 .filter((exp) => exp.is_active && exp.is_published)
                 .map((exp) => exp.price.toNumber());
@@ -186,6 +192,7 @@ export class SearchService {
             return {
                 ...guide,
                 reviewCount,
+                avgRating,
                 minExperiencePrice: minPrice,
                 maxExperiencePrice: maxPrice,
             };
@@ -209,6 +216,7 @@ export class SearchService {
             minPrice,
             maxPrice,
             location,
+            country,
             startDate,
             endDate,
             categories,
@@ -226,14 +234,34 @@ export class SearchService {
             },
         };
 
-        // Filtrage par localisation
-        if (location) {
-            where.city = {
-                name: {
+        // Filtrage par localisation / pays
+        if (location || country) {
+            const cityFilter: experienceWhereInput['city'] = {};
+
+            if (location) {
+                cityFilter.name = {
                     startsWith: location,
                     mode: 'insensitive',
-                },
-            };
+                };
+            }
+
+            if (country) {
+                const normalizedCountry = country.trim().toLowerCase();
+
+                if (normalizedCountry === 'spain' || normalizedCountry === 'espagne') {
+                    cityFilter.OR = [
+                        { country: { equals: 'Spain', mode: 'insensitive' } },
+                        { country: { equals: 'Espagne', mode: 'insensitive' } },
+                    ];
+                } else {
+                    cityFilter.country = {
+                        equals: country,
+                        mode: 'insensitive',
+                    };
+                }
+            }
+
+            where.city = cityFilter;
         }
 
         // Filtrage par dates de disponibilité
