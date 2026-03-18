@@ -113,7 +113,7 @@ export class CitiesService {
       where: {
         is_suggested: true,
         is_active: true,
-      } as any,
+      },
       include: {
         image: true,
       },
