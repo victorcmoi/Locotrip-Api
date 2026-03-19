@@ -12,11 +12,16 @@ const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 const minioService = new MinioService(new ConfigService());
 
-const GUIDE_FIRST_NAMES = [
-  'Sophie', 'Thomas', 'Camille', 'Alexandre', 'Emma', 'Julien', 'Isabelle', 'Francois',
-  'Clara', 'Antoine', 'Lea', 'Maxime', 'Nathalie', 'Olivier', 'Audrey', 'Vincent',
-  'Marion', 'Hugo', 'Lucie', 'Nicolas', 'Sarah', 'Baptiste', 'Pauline', 'Mathieu',
-  'Elsa', 'Loic', 'Ines', 'Romain', 'Marine', 'Jeremy',
+const MALE_FIRST_NAMES = [
+  'Thomas', 'Alexandre', 'Julien', 'Francois', 'Antoine', 'Maxime',
+  'Olivier', 'Vincent', 'Hugo', 'Nicolas', 'Baptiste', 'Mathieu',
+  'Loic', 'Romain', 'Jeremy',
+];
+
+const FEMALE_FIRST_NAMES = [
+  'Sophie', 'Camille', 'Emma', 'Isabelle', 'Clara', 'Lea', 'Nathalie',
+  'Audrey', 'Marion', 'Lucie', 'Sarah', 'Pauline', 'Elsa', 'Ines',
+  'Marine',
 ];
 
 const GUIDE_LAST_NAMES = [
@@ -37,75 +42,75 @@ const TRAVELER_LAST_NAMES = [
 
 const CATEGORY_NAMES = [
   'Culture', 'Histoire', 'Gastronomie', 'Aventure', 'Nature', 'Photo', 'Art',
-  'Sport', 'Bien-etre', 'Architecture', 'Mode', 'Musique', 'Street food',
+  'Sport', 'Bien-être', 'Architecture', 'Mode', 'Musique', 'Street food',
   'Famille', 'Nocturne', 'Patrimoine', 'Randonnée', 'Atelier',
 ];
 
 const EXPERIENCE_TITLES = [
   'Balade historique du centre ancien',
-  'Tour street food et specialites locales',
-  'Atelier cuisine regionale',
+  'Tour street food et spécialités locales',
+  'Atelier cuisine régionale',
   'Visite photo des meilleurs points de vue',
-  'Randonnee panoramique facile',
+  'Randonnée panoramique facile',
   'Parcours art et galeries',
-  'Tour velo des quartiers iconiques',
-  'Experience coucher de soleil en ville',
-  'Circuit patrimoine et legendes',
-  'Matinee bien-etre et marche local',
-  'Nocturne culturelle et adresses cachees',
+  'Tour vélo des quartiers iconiques',
+  'Expérience coucher de soleil en ville',
+  'Circuit patrimoine et légendes',
+  'Matinée bien-être et marché local',
+  'Nocturne culturelle et adresses cachées',
   'Immersion artisanat et savoir-faire',
 ];
 
 const EXPERIENCE_DESCRIPTIONS = [
-  'Une experience immersive menee en petit groupe pour decouvrir la ville autrement, avec des anecdotes locales et des conseils pratiques.',
-  'Parcours vivant et accessible, ideal pour les voyageurs qui veulent comprendre la culture locale en peu de temps.',
-  'Activite conviviale avec un rythme adapte, des pauses, et des points d interet soigneusement selectionnes.',
-  'Sortie complete avec un guide experimente, un programme clair, et un niveau de confort adapte a tous.',
-  'Decouverte authentique combinee a des rencontres locales et des recommandations personnalisees pour la suite du sejour.',
+  'Une expérience immersive menée en petit groupe pour découvrir la ville autrement, avec des anecdotes locales et des conseils pratiques.',
+  'Parcours vivant et accessible, idéal pour les voyageurs qui veulent comprendre la culture locale en peu de temps.',
+  'Activité conviviale avec un rythme adapté, des pauses, et des points d\'intérêt soigneusement sélectionnés.',
+  'Sortie complète avec un guide expérimenté, un programme clair, et un niveau de confort adapté à tous.',
+  'Découverte authentique combinée à des rencontres locales et des recommandations personnalisées pour la suite du séjour.',
 ];
 
 const EXPERIENCE_STEPS = [
-  { title: 'Accueil et briefing', description: 'Presentation du groupe, verification des attentes et rappel du programme.' },
-  { title: 'Parcours principal', description: 'Immersion guidee sur les points forts avec explications detaillees.' },
-  { title: 'Pause et echanges', description: 'Questions, retours d experience et conseils pratiques du guide.' },
-  { title: 'Cloture', description: 'Recapitulatif, bonnes adresses, et recommandations pour continuer la decouverte.' },
+  { title: 'Accueil et briefing', description: 'Présentation du groupe, vérification des attentes et rappel du programme.' },
+  { title: 'Parcours principal', description: 'Immersion guidée sur les points forts avec explications détaillées.' },
+  { title: 'Pause et échanges', description: 'Questions, retours d\'expérience et conseils pratiques du guide.' },
+  { title: 'Clôture', description: 'Récapitulatif, bonnes adresses, et recommandations pour continuer la découverte.' },
 ];
 
 const REVIEW_TITLES = [
-  'Superbe experience', 'Tres bonne visite', 'Guide passionne', 'A refaire',
-  'Excellent rapport qualite prix', 'Organisation parfaite',
+  'Superbe expérience', 'Très bonne visite', 'Guide passionné', 'À refaire',
+  'Excellent rapport qualité-prix', 'Organisation parfaite',
 ];
 
 const REVIEW_COMMENTS = [
-  'Nous avons passe un excellent moment, tout etait fluide et bien organise.',
-  'Le guide etait ponctuel, tres clair, et tres agreable avec le groupe.',
-  'Programme complet, rythme ideal, et tres bonnes recommandations locales.',
-  'Experience realiste, humaine, et vraiment utile pour decouvrir la ville.',
-  'Nous recommandons sans hesitation, surtout pour un premier sejour.',
+  'Nous avons passé un excellent moment, tout était fluide et bien organisé.',
+  'Le guide était ponctuel, très clair, et très agréable avec le groupe.',
+  'Programme complet, rythme idéal, et très bonnes recommandations locales.',
+  'Expérience réaliste, humaine, et vraiment utile pour découvrir la ville.',
+  'Nous recommandons sans hésitation, surtout pour un premier séjour.',
 ];
 
 const DISPUTE_REASONS = [
-  'Le programme annonce etait incomplet par rapport a la description.',
-  'Le point de rendez-vous n etait pas assez clair dans le message de confirmation.',
-  'Retard important au demarrage de l activite.',
-  'Des prestations prevues n ont pas pu etre assurees.',
-  'Demande de remboursement partiel suite a une annulation de segment.',
+  'Le programme annoncé était incomplet par rapport à la description.',
+  'Le point de rendez-vous n\'était pas assez clair dans le message de confirmation.',
+  'Retard important au démarrage de l\'activité.',
+  'Des prestations prévues n\'ont pas pu être assurées.',
+  'Demande de remboursement partiel suite à une annulation de segment.',
 ];
 
 const MESSAGE_TEMPLATES_CLIENT = [
   'Bonjour, nous serons au point de rendez-vous 10 minutes avant.',
-  'Pouvez-vous confirmer le materiel a prevoir ?',
-  'Merci pour les informations, a demain.',
-  'Nous sommes un groupe avec un enfant, est-ce adapte ?',
-  'Est-ce possible de decalage de 15 minutes ?',
+  'Pouvez-vous confirmer le matériel à prévoir ?',
+  'Merci pour les informations, à demain.',
+  'Nous sommes un groupe avec un enfant, est-ce adapté ?',
+  'Est-ce possible de décaler de 15 minutes ?',
 ];
 
 const MESSAGE_TEMPLATES_GUIDE = [
-  'Bonjour, je vous confirme la disponibilite et le lieu exact.',
-  'Pensez a prendre des chaussures confortables et de l eau.',
+  'Bonjour, je vous confirme la disponibilité et le lieu exact.',
+  'Pensez à prendre des chaussures confortables et de l\'eau.',
   'Je resterai joignable en cas de retard.',
-  'Parfait pour votre groupe, je vous envoie le recapitulatif.',
-  'A demain, je vous attends au point indique.',
+  'Parfait pour votre groupe, je vous envoie le récapitulatif.',
+  'À demain, je vous attends au point indiqué.',
 ];
 
 const DEMO_PASSWORD = 'Locotrip123!';
@@ -120,6 +125,19 @@ function randomInt(min: number, max: number): number {
 
 function pickOne<T>(items: T[]): T {
   return items[randomInt(0, items.length - 1)];
+}
+
+const generatedEmails = new Set<string>();
+function generateUniqueEmail(first: string, last: string): string {
+  const base = `${first.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")}.${last.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s/g, "")}`;
+  let email = `${base}@gmail.com`;
+  let counter = 1;
+  while (generatedEmails.has(email)) {
+    counter++;
+    email = `${base}${counter}@gmail.com`;
+  }
+  generatedEmails.add(email);
+  return email;
 }
 
 function pickMany<T>(items: T[], count: number): T[] {
@@ -242,7 +260,7 @@ async function main() {
         email: 'admin@locotrip.com',
         phone: '+33611111111',
         birth_date: new Date('1990-01-01'),
-        password: '$2b$10$MW4ryE5jmOcqbKEn97xcHOPIUIK2TJiy.EjAf/338FY.ibPcsCQsi',
+        password: hashedDemoPassword,
         role: 'admin',
         is_active: true,
         is_verified: true,
@@ -258,7 +276,7 @@ async function main() {
         data: {
           first_name: first,
           last_name: last,
-          email: `voyageur${i}@locotrip.com`,
+          email: generateUniqueEmail(first, last),
           phone: `+336${String(10000000 + i).padStart(8, '0')}`,
           birth_date: new Date(randomInt(1970, 2003), randomInt(0, 11), randomInt(1, 28)),
           password: hashedDemoPassword,
@@ -272,109 +290,13 @@ async function main() {
       travelers.push({ id: user.id, email: user.email });
     }
 
-    const guideUsers: Array<{ userId: string; guideId: string; firstName: string; lastName: string }> = [];
-    for (let i = 1; i <= 40; i++) {
-      const first = GUIDE_FIRST_NAMES[(i - 1) % GUIDE_FIRST_NAMES.length];
-      const last = GUIDE_LAST_NAMES[(i - 1) % GUIDE_LAST_NAMES.length];
-
-      const user = await prisma.user.create({
-        data: {
-          first_name: first,
-          last_name: last,
-          email: `guide${i}@locotrip.com`,
-          phone: `+337${String(20000000 + i).padStart(8, '0')}`,
-          birth_date: new Date(randomInt(1972, 1998), randomInt(0, 11), randomInt(1, 28)),
-          password: hashedDemoPassword,
-          role: 'guide',
-          is_active: true,
-          is_verified: true,
-          marketing_consent: true,
-          marketing_consent_date: new Date(),
-        },
-      });
-
-      const guide = await prisma.guide.create({
-        data: {
-          user_id: user.id,
-          bio: `${first} ${last} accompagne des voyageurs avec une approche humaine et locale. Experience terrain et programme personnalise selon le groupe.`,
-          languages: pickMany(['Francais', 'Anglais', 'Espagnol', 'Italien', 'Allemand'], randomInt(2, 3)).join(', '),
-          years_of_experience: randomInt(2, 18),
-          guide_status: i % 3 === 0 ? 'pro' : 'local',
-          pro_card: i % 3 === 0,
-          country: 'France',
-          card_request_date: i % 3 === 0 ? addDays(new Date(), -randomInt(100, 600)) : null,
-          card_verification_date: i % 3 === 0 ? addDays(new Date(), -randomInt(30, 200)) : null,
-          response_time_hours: Number((Math.random() * 12 + 1).toFixed(2)),
-          is_active: true,
-        },
-      });
-
-      const imagePath = getGuideImagePath(((i - 1) % 15) + 1);
-      const profileUrl = await uploadAsset(
-        imagePath,
-        `profiles/guides/${guide.id}/profile${path.extname(imagePath)}`,
-        { entityType: 'guide', mediaType: 'profile_picture', guideId: guide.id },
-      );
-
-      if (profileUrl) {
-        await prisma.media.create({
-          data: {
-            entity_type: 'guide',
-            entity_id: guide.id,
-            url: profileUrl,
-            media_type: 'profile_picture',
-            description: `Photo de profil de ${first} ${last}`,
-            guide_id: guide.id,
-          },
-        });
-      }
-
-      const hobbies = pickMany(categories, randomInt(3, 5));
-      for (const hobby of hobbies) {
-        await prisma.guide_hobby.create({
-          data: { guide_id: guide.id, category_id: hobby.id },
-        });
-      }
-
-      await prisma.guide_document.createMany({
-        data: [
-          {
-            guide_id: guide.id,
-            document_type: 'CV',
-            verification_status: 'verified',
-            verification_comment: 'Profil professionnel valide',
-            document_url: `docs/guides/${guide.id}/cv.pdf`,
-            verification_date: addDays(new Date(), -randomInt(5, 150)),
-          },
-          {
-            guide_id: guide.id,
-            document_type: 'proof_of_residence',
-            verification_status: 'verified',
-            verification_comment: 'Justificatif conforme',
-            document_url: `docs/guides/${guide.id}/residence.pdf`,
-            verification_date: addDays(new Date(), -randomInt(5, 150)),
-          },
-          {
-            guide_id: guide.id,
-            document_type: 'diploma',
-            verification_status: i % 6 === 0 ? 'pending' : 'verified',
-            verification_comment: i % 6 === 0 ? null : 'Diplome valide',
-            document_url: `docs/guides/${guide.id}/diploma.pdf`,
-            verification_date: i % 6 === 0 ? null : addDays(new Date(), -randomInt(5, 150)),
-          },
-        ],
-      });
-
-      guideUsers.push({ userId: user.id, guideId: guide.id, firstName: first, lastName: last });
-    }
-
     const cityRaw = JSON.parse(fs.readFileSync(path.join(__dirname, 'assets', 'cities.json'), 'utf-8')) as Array<any>;
     const cityInputs = cityRaw;
     const cityCreateData = cityInputs.map((c) => ({
       name: c.name,
       country: c.country,
       slug: c.slug,
-      description: c.description || `Ville ${c.name} ideale pour des experiences authentiques.`,
+      description: c.description || `Ville ${c.name} idéale pour des expériences authentiques.`,
       latitude: typeof c.latitude === 'number' ? c.latitude : null,
       longitude: typeof c.longitude === 'number' ? c.longitude : null,
       is_active: true,
@@ -399,10 +321,11 @@ async function main() {
         country: true,
         latitude: true,
         longitude: true,
+        is_suggested: true,
       },
     });
 
-    const cities: Array<{ id: string; slug: string; name: string; country: string; latitude: number | null; longitude: number | null }> = insertedCities;
+    const cities: Array<{ id: string; slug: string; name: string; country: string; latitude: number | null; longitude: number | null; is_suggested: boolean }> = insertedCities;
 
     const cityImageMap: Record<string, string> = {
       'paris-france': 'paris.jpg',
@@ -437,6 +360,112 @@ async function main() {
       });
     }
 
+    const suggestedCities = cities.filter((city) => city.is_suggested);
+    const citiesToUse = suggestedCities.length > 0 ? suggestedCities : cities;
+
+    const guideUsers: Array<{ userId: string; guideId: string; firstName: string; lastName: string; assignedCity: typeof citiesToUse[0] }> = [];
+    for (let i = 1; i <= 40; i++) {
+      const assignedCity = citiesToUse[(i - 1) % citiesToUse.length];
+      const imgNum = ((i - 1) % 15) + 1;
+      const isMale = [1, 2, 3, 5, 7, 8, 9, 10, 11, 13].includes(imgNum);
+      const nameList = isMale ? MALE_FIRST_NAMES : FEMALE_FIRST_NAMES;
+
+      const first = nameList[(i - 1) % nameList.length];
+      const last = GUIDE_LAST_NAMES[(i - 1) % GUIDE_LAST_NAMES.length];
+
+      const user = await prisma.user.create({
+        data: {
+          first_name: first,
+          last_name: last,
+          email: generateUniqueEmail(first, last),
+          phone: `+337${String(20000000 + i).padStart(8, '0')}`,
+          birth_date: new Date(randomInt(1972, 1998), randomInt(0, 11), randomInt(1, 28)),
+          password: hashedDemoPassword,
+          role: 'guide',
+          is_active: true,
+          is_verified: true,
+          marketing_consent: true,
+          marketing_consent_date: new Date(),
+        },
+      });
+
+      const guide = await prisma.guide.create({
+        data: {
+          user_id: user.id,
+          bio: `${first} ${last} accompagne des voyageurs avec une approche humaine et locale. Expérience terrain et programme personnalisé selon le groupe.`,
+          languages: pickMany(['Français', 'Anglais', 'Espagnol', 'Italien', 'Allemand'], randomInt(2, 3)).join(', '),
+          years_of_experience: randomInt(2, 18),
+          guide_status: i % 3 === 0 ? 'pro' : 'local',
+          pro_card: i % 3 === 0,
+          country: assignedCity.country,
+          card_request_date: i % 3 === 0 ? addDays(new Date(), -randomInt(100, 600)) : null,
+          card_verification_date: i % 3 === 0 ? addDays(new Date(), -randomInt(30, 200)) : null,
+          response_time_hours: Number((Math.random() * 12 + 1).toFixed(2)),
+          is_active: true,
+        },
+      });
+
+      const imagePath = getGuideImagePath(imgNum);
+      const profileUrl = await uploadAsset(
+        imagePath,
+        `profiles/guides/${guide.id}/profile${path.extname(imagePath)}`,
+        { entityType: 'guide', mediaType: 'profile_picture', guideId: guide.id },
+      );
+
+      if (profileUrl) {
+        await prisma.media.create({
+          data: {
+            entity_type: 'guide',
+            entity_id: guide.id,
+            url: profileUrl,
+            media_type: 'profile_picture',
+            description: `Photo de profil de ${first} ${last}`,
+            guide_id: guide.id,
+          },
+        });
+      }
+
+      const hobbies = pickMany(categories, randomInt(3, 5));
+      for (const hobby of hobbies) {
+        await prisma.guide_hobby.create({
+          data: { guide_id: guide.id, category_id: hobby.id },
+        });
+      }
+
+      await prisma.guide_document.createMany({
+        data: [
+          {
+            guide_id: guide.id,
+            document_type: 'CV',
+            verification_status: 'verified',
+            verification_comment: 'Profil professionnel validé',
+            document_url: `docs/guides/${guide.id}/cv.pdf`,
+            verification_date: addDays(new Date(), -randomInt(5, 150)),
+          },
+          {
+            guide_id: guide.id,
+            document_type: 'proof_of_residence',
+            verification_status: 'verified',
+            verification_comment: 'Justificatif conforme',
+            document_url: `docs/guides/${guide.id}/residence.pdf`,
+            verification_date: addDays(new Date(), -randomInt(5, 150)),
+          },
+          {
+            guide_id: guide.id,
+            document_type: 'diploma',
+            verification_status: i % 6 === 0 ? 'pending' : 'verified',
+            verification_comment: i % 6 === 0 ? null : 'Diplôme validé',
+            document_url: `docs/guides/${guide.id}/diploma.pdf`,
+            verification_date: i % 6 === 0 ? null : addDays(new Date(), -randomInt(5, 150)),
+          },
+        ],
+      });
+
+      guideUsers.push({ userId: user.id, guideId: guide.id, firstName: first, lastName: last, assignedCity });
+    }
+
+    // Cities creation moved up
+
     const boostOffers = await Promise.all([
       prisma.boost_offer.create({
         data: { name: 'Boost Starter', description: 'Mise en avant 7 jours', duration_days: 7, discount_percentage: 0, price: 19.9 },
@@ -466,10 +495,9 @@ async function main() {
     }
 
     const experiences: Array<{ id: string; guideId: string; cityId: string; price: number; title: string }> = [];
-    const parisCity = cities.find((city) => city.slug === 'paris-france' || city.name.toLowerCase() === 'paris');
     for (let i = 1; i <= 120; i++) {
       const guide = guideUsers[(i - 1) % guideUsers.length];
-      const city = i <= 12 && parisCity ? parisCity : cities[(i - 1) % cities.length];
+      const city = guide.assignedCity;
       const title = `${pickOne(EXPERIENCE_TITLES)} - ${city.name}`;
       const price = Number((randomInt(25, 140) + Math.random()).toFixed(2));
 
@@ -715,8 +743,8 @@ async function main() {
           type: i % 2 === 0 ? 'booking_reminder' : 'new_message',
           content:
             i % 2 === 0
-              ? 'Rappel: votre reservation approche, verifiez les details pratiques.'
-              : 'Vous avez recu un nouveau message sur une conversation de reservation.',
+              ? 'Rappel : votre réservation approche, vérifiez les détails pratiques.'
+              : 'Vous avez reçu un nouveau message sur une conversation de réservation.',
           read: i % 4 === 0,
           sent_at: addDays(new Date(), -randomInt(0, 45)),
         };
@@ -730,9 +758,9 @@ async function main() {
           user_id: owner.id,
           subject:
             i % 3 === 0
-              ? 'Question sur une reservation'
+              ? 'Question sur une réservation'
               : i % 3 === 1
-                ? 'Probleme de paiement'
+                ? 'Problème de paiement'
                 : 'Aide sur mon profil',
           status: i % 3 === 0 ? 'open' : i % 3 === 1 ? 'in_progress' : 'closed',
           created_at: addDays(new Date(), -randomInt(0, 80)),
@@ -746,7 +774,7 @@ async function main() {
           {
             ticket_id: ticket.id,
             author_id: owner.id,
-            content: 'Bonjour, je vous contacte pour obtenir de l aide sur ce sujet.',
+            content: 'Bonjour, je vous contacte pour obtenir de l\'aide sur ce sujet.',
             sent_at: addDays(new Date(), -randomInt(0, 60)),
           },
           {
@@ -770,7 +798,7 @@ async function main() {
           entity_id: bookings[i % bookings.length]?.id || experiences[i % experiences.length].id,
           action: pickOne(['read', 'create', 'update']),
           ip_address: `192.168.${randomInt(0, 255)}.${randomInt(1, 254)}`,
-          reason: 'Consultation operationnelle et suivi qualite',
+          reason: 'Consultation opérationnelle et suivi qualité',
           access_date: addDays(new Date(), -randomInt(0, 90)),
         };
       }),
