@@ -501,13 +501,14 @@ async function main() {
       const title = `${pickOne(EXPERIENCE_TITLES)} - ${city.name}`;
       const price = Number((randomInt(25, 140) + Math.random()).toFixed(2));
 
+      const durationMinutes = randomInt(90, 360);
       const exp = await prisma.experience.create({
         data: {
           title,
           description: pickOne(EXPERIENCE_DESCRIPTIONS),
           additional_info: 'Petit groupe, materiel essentiel indique avant depart, confirmation envoyee 24h avant.',
           price,
-          duration: randomInt(90, 360),
+          duration: durationMinutes,
           city_id: city.id,
           guide_id: guide.guideId,
           max_capacity: randomInt(4, 20),
@@ -551,10 +552,12 @@ async function main() {
       await prisma.experience_availability.createMany({
         data: Array.from({ length: 2 }, (_, a) => {
           const start = addDays(availabilityBase, a * 7);
+          start.setHours(randomInt(8, 18), pickOne([0, 15, 30, 45]), 0, 0);
+          const end = new Date(start.getTime() + durationMinutes * 60 * 1000);
           return {
             experience_id: exp.id,
             start_date: start,
-            end_date: addDays(start, 1),
+            end_date: end,
             status: a % 5 === 0 ? 'unavailable' : 'available',
           };
         }),
