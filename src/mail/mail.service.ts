@@ -233,4 +233,32 @@ export class MailService {
 
     return this.sendEmail(to, subject, text, html);
   }
+
+  /**
+   * Envoie un email depuis le formulaire de contact
+   */
+  async sendContactEmail(name: string, email: string, subject: string, message: string) {
+    const targetEmail = process.env.CONTACT_TARGET_EMAIL || 'vlefloch@outlook.com';
+    const emailSubject = `Nouveau message de contact : ${subject}`;
+    const text = `Vous avez reçu un nouveau message via le formulaire de contact.\n\nNom: ${name}\nEmail: ${email}\nSujet: ${subject}\n\nMessage:\n${message}`;
+    const html = `
+      <h2>Nouveau message de contact</h2>
+      <p><strong>Nom :</strong> ${name}</p>
+      <p><strong>Email :</strong> ${email}</p>
+      <p><strong>Sujet :</strong> ${subject}</p>
+      <div style="background-color: #f9f9f9; padding: 15px; border-left: 4px solid #327A78; margin: 20px 0;">
+        <p style="white-space: pre-wrap;">${message}</p>
+      </div>
+      <p><em>Répondez directement à cet email pour recontacter l'utilisateur.</em></p>
+    `;
+
+    return this.mailgunService.createEmail(this.domain, {
+      from: this.fromEmail,
+      to: [targetEmail],
+      'h:Reply-To': email,
+      subject: emailSubject,
+      text,
+      html,
+    });
+  }
 }

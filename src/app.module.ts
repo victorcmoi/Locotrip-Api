@@ -17,6 +17,7 @@ import { MinioModule } from './minio/minio.module';
 import { StatisticsModule } from './statistics/statistics.module';
 import { SearchModule } from './search/search.module';
 import { VideoModule } from './video/video.module';
+import { ContactModule } from './contact/contact.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { VideoModule } from './video/video.module';
     StatisticsModule,
     SearchModule,
     VideoModule,
+    ContactModule,
     ThrottlerModule.forRoot([
       {
         name: 'short',
