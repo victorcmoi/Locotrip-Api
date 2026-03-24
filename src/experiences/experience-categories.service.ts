@@ -16,14 +16,14 @@ export class ExperienceCategoriesService {
 
   async update(
     experienceId: string,
-    oldCategoryId: string,
+    previousCategoryId: string,
     newCategoryId: string,
   ) {
     return this.prisma.experience_category.update({
       where: {
         experience_id_category_id: {
           experience_id: experienceId,
-          category_id: oldCategoryId,
+          category_id: previousCategoryId,
         },
       },
       data: {

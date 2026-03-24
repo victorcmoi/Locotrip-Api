@@ -5,6 +5,7 @@ import { PrismaService } from './prisma.service';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
+import csurf from 'csurf';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -78,14 +79,28 @@ async function bootstrap() {
     }),
   );
 
-  // Configurer CORS
+  // Configurer CORS avec restriction d'origines
+  const corsOrigin = process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',').map((origin) => origin.trim())
+    : ['http://localhost:3001', 'http://localhost:3000'];
+
   app.enableCors({
-    origin: '*',
+    origin: corsOrigin,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
   });
 
-  // TO DO : add CRSF protection for form
+  // Configuration CSRF protection
+  const csrfProtection = csurf({
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    },
+  });
+
+  app.use(csrfProtection);
 
   const prismaService = app.get(PrismaService);
   prismaService.enableShutdownHooks(app);
