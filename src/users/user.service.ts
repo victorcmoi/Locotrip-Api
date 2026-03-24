@@ -2,6 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { FindAllUsersDto } from './dto/find-all-users.dto';
+import { userWhereInput } from '../generated/prisma/models/user';
+import {
+  PaginatedResponse,
+  PaginationMeta,
+} from '../common/interfaces/paginated-response.interface';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -19,18 +25,73 @@ export class UsersService {
     });
   }
 
-  async findAll() {
-    return this.prisma.user.findMany({
-      where: {
-        is_active: true,
-      },
-      include: {
-        guides: true,
-        bookings: true,
-        reviews: true,
-        subscriptions: true,
-      },
-    });
+  async findAll(query: FindAllUsersDto): Promise<PaginatedResponse<any>> {
+    const {
+      page = 1,
+      limit = 20,
+      sort = 'created_at',
+      order = 'desc',
+      role,
+      search,
+      isActive,
+      isVerified,
+    } = query;
+
+    // Construction des filtres WHERE
+    const where: userWhereInput = {};
+
+    if (isActive !== undefined) {
+      where.is_active = isActive;
+    } else {
+      where.is_active = true;
+    }
+
+    if (role) {
+      where.role = role;
+    }
+
+    if (isVerified !== undefined) {
+      where.is_verified = isVerified;
+    }
+
+    // Recherche textuelle
+    if (search) {
+      where.OR = [
+        { first_name: { contains: search, mode: 'insensitive' } },
+        { last_name: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    // Calcul de la pagination
+    const skip = (page - 1) * limit;
+
+    // Construction du tri
+    const orderBy: Record<string, 'asc' | 'desc'> = {};
+    orderBy[sort] = order as 'asc' | 'desc';
+
+    // Requêtes parallèles
+    const [data, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        include: {
+          address: true,
+          guide: true,
+          bookings: true,
+          reviews: true,
+          subscriptions: true,
+        },
+        orderBy,
+        skip,
+        take: limit,
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+
+    return {
+      data,
+      meta: new PaginationMeta(page, limit, total),
+    };
   }
 
   async findOne(id: string) {
@@ -40,9 +101,42 @@ export class UsersService {
         is_active: true,
       },
       include: {
-        guides: true,
-        bookings: true,
-        reviews: true,
+        address: true,
+        guide: {
+          include: {
+            documents: true,
+            medias: true,
+          },
+        },
+        bookings: {
+          include: {
+            experience: {
+              include: {
+                city: true,
+                guide: {
+                  include: {
+                    user: true,
+                  },
+                },
+              },
+            },
+          },
+          orderBy: {
+            booking_date: 'desc',
+          },
+        },
+        reviews: {
+          include: {
+            experience: {
+              include: {
+                city: true,
+              },
+            },
+          },
+          orderBy: {
+            review_date: 'desc',
+          },
+        },
         subscriptions: true,
         support_tickets: true,
         notifications: true,
@@ -142,7 +236,7 @@ export class UsersService {
   async findAllIncludingDeleted() {
     return this.prisma.user.findMany({
       include: {
-        guides: true,
+        guide: true,
         bookings: true,
         reviews: true,
         subscriptions: true,

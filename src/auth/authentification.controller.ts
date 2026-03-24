@@ -17,6 +17,7 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { Body, Controller, Request } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
+import { RegisterGuideDto } from './dto/register-guide.dto';
 
 @ApiTags('Authentification')
 @ApiBearerAuth('JWT-auth')
@@ -33,6 +34,15 @@ export class AuthentificationController {
   @ApiCreateResponse(UserEntity)
   register(@Body() registerDto: RegisterDto) {
     return this.authentificationService.register(registerDto);
+  }
+
+  @Post('register-guide')
+  @Public()
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: "Inscription d'un nouveau guide (statut local par défaut)" })
+  @ApiCreateResponse(UserEntity)
+  registerGuide(@Body() registerGuideDto: RegisterGuideDto) {
+    return this.authentificationService.registerGuide(registerGuideDto);
   }
 
   @Post('login')
@@ -77,5 +87,16 @@ export class AuthentificationController {
   @ApiUpdateResponse(UserEntity)
   changePassword(@Body() changePasswordDto: ChangePasswordDto) {
     return this.authentificationService.changePassword(changePasswordDto);
+  }
+
+  @Post('me')
+  @Roles(UserRole.CLIENT, UserRole.GUIDE, UserRole.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: "Récupérer les informations de l'utilisateur connecté",
+  })
+  @ApiGetOneResponse(Object)
+  getProfile(@Request() req: { user: { sub: string } }) {
+    return this.authentificationService.getProfile(req.user.sub);
   }
 }

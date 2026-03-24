@@ -1,478 +1,846 @@
 import { PrismaClient } from '../src/generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import 'dotenv/config';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as bcrypt from 'bcrypt';
+import { MinioService } from '../src/minio/minio.service';
+import { ConfigService } from '@nestjs/config';
+import { BucketName } from '../src/minio/enums/minio.enum';
 
-const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL,
-});
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
+const minioService = new MinioService(new ConfigService());
 
-async function main() {
-  console.log('🌱 Début du seeding...');
+const MALE_FIRST_NAMES = [
+  'Thomas', 'Alexandre', 'Julien', 'Francois', 'Antoine', 'Maxime',
+  'Olivier', 'Vincent', 'Hugo', 'Nicolas', 'Baptiste', 'Mathieu',
+  'Loic', 'Romain', 'Jeremy',
+];
 
-  // Créer des currencies
-  console.log('💱 Création des currencies...');
-  const euro = await prisma.currency.upsert({
-    where: { code: 'EUR' },
-    update: {},
-    create: {
-      code: 'EUR',
-      name: 'Euro',
-      exchange_rate: 1.0,
-    },
-  });
+const FEMALE_FIRST_NAMES = [
+  'Sophie', 'Camille', 'Emma', 'Isabelle', 'Clara', 'Lea', 'Nathalie',
+  'Audrey', 'Marion', 'Lucie', 'Sarah', 'Pauline', 'Elsa', 'Ines',
+  'Marine',
+];
 
-  const usd = await prisma.currency.upsert({
-    where: { code: 'USD' },
-    update: {},
-    create: {
-      code: 'USD',
-      name: 'Dollar américain',
-      exchange_rate: 1.1,
-    },
-  });
+const GUIDE_LAST_NAMES = [
+  'Martin', 'Bernard', 'Dubois', 'Rousseau', 'Laurent', 'Simon', 'Mercier', 'Garcia',
+  'Lopez', 'Morel', 'Girard', 'Andre', 'Faure', 'Noel', 'Dupuis', 'Chevalier',
+  'Robin', 'Gauthier', 'Moulin', 'Renaud', 'Masson', 'Perrot', 'Leclerc', 'Arnaud',
+];
 
-  console.log(`✅ Devises créées: ${euro.code}, ${usd.code}`);
+const TRAVELER_FIRST_NAMES = [
+  'Jean', 'Marie', 'Pierre', 'Julie', 'Lucas', 'Camille', 'Lea', 'Hugo', 'Clara',
+  'Theo', 'Manon', 'Kevin', 'Nina', 'Valentin', 'Elise', 'Tom', 'Chloe', 'Yanis',
+];
 
-  // Créer des users
-  console.log('👥 Création des users...');
-  const client1 = await prisma.user.create({
-    data: {
-      last_name: 'Dupont',
-      first_name: 'Jean',
-      email: 'jean.dupont@example.com',
-      phone: '+33612345678',
-      birth_date: new Date('1990-05-15'),
-      password: '$2a$10$abcdefghijklmnopqrstuv', // Hash fictif
-      role: 'client',
-      is_active: true,
-      is_verified: true,
-    },
-  });
+const TRAVELER_LAST_NAMES = [
+  'Dupont', 'Petit', 'Moreau', 'Garcia', 'Lefebvre', 'Roux', 'Fournier', 'Vincent',
+  'Mercier', 'Lopez', 'Rossi', 'Bianchi', 'Ricci', 'Schmidt', 'Meyer',
+];
 
-  const guideUser = await prisma.user.create({
-    data: {
-      last_name: 'Martin',
-      first_name: 'Sophie',
-      email: 'sophie.martin@example.com',
-      phone: '+33687654321',
-      birth_date: new Date('1988-03-20'),
-      password: '$2a$10$abcdefghijklmnopqrstuv',
-      role: 'guide',
-      is_active: true,
-      is_verified: true,
-    },
-  });
+const CATEGORY_NAMES = [
+  'Culture', 'Histoire', 'Gastronomie', 'Aventure', 'Nature', 'Photo', 'Art',
+  'Sport', 'Bien-être', 'Architecture', 'Mode', 'Musique', 'Street food',
+  'Famille', 'Nocturne', 'Patrimoine', 'Randonnée', 'Atelier',
+];
 
-  const admin = await prisma.user.create({
-    data: {
-      last_name: 'Admin',
-      first_name: 'Système',
-      email: 'admin@locotrip.com',
-      password: '$2a$10$abcdefghijklmnopqrstuv',
-      role: 'admin',
-      is_active: true,
-      is_verified: true,
-    },
-  });
+const EXPERIENCE_TITLES = [
+  'Balade historique du centre ancien',
+  'Tour street food et spécialités locales',
+  'Atelier cuisine régionale',
+  'Visite photo des meilleurs points de vue',
+  'Randonnée panoramique facile',
+  'Parcours art et galeries',
+  'Tour vélo des quartiers iconiques',
+  'Expérience coucher de soleil en ville',
+  'Circuit patrimoine et légendes',
+  'Matinée bien-être et marché local',
+  'Nocturne culturelle et adresses cachées',
+  'Immersion artisanat et savoir-faire',
+];
 
-  // Créer un utilisateur inactif pour tester le soft delete
-  const inactiveUser = await prisma.user.create({
-    data: {
-      last_name: 'Inactive',
-      first_name: 'Test',
-      email: 'inactive@example.com',
-      password: '$2a$10$abcdefghijklmnopqrstuv',
-      role: 'client',
-      is_active: false,
-      is_verified: false,
-      deleted_at: new Date(),
-      deleted_reason: 'Test de soft delete',
-    },
-  });
+const EXPERIENCE_DESCRIPTIONS = [
+  'Une expérience immersive menée en petit groupe pour découvrir la ville autrement, avec des anecdotes locales et des conseils pratiques.',
+  'Parcours vivant et accessible, idéal pour les voyageurs qui veulent comprendre la culture locale en peu de temps.',
+  'Activité conviviale avec un rythme adapté, des pauses, et des points d\'intérêt soigneusement sélectionnés.',
+  'Sortie complète avec un guide expérimenté, un programme clair, et un niveau de confort adapté à tous.',
+  'Découverte authentique combinée à des rencontres locales et des recommandations personnalisées pour la suite du séjour.',
+];
 
-  console.log(
-    `✅ Utilisateurs créés: ${client1.email}, ${guideUser.email}, ${admin.email}, ${inactiveUser.email}`,
-  );
+const EXPERIENCE_STEPS = [
+  { title: 'Accueil et briefing', description: 'Présentation du groupe, vérification des attentes et rappel du programme.' },
+  { title: 'Parcours principal', description: 'Immersion guidée sur les points forts avec explications détaillées.' },
+  { title: 'Pause et échanges', description: 'Questions, retours d\'expérience et conseils pratiques du guide.' },
+  { title: 'Clôture', description: 'Récapitulatif, bonnes adresses, et recommandations pour continuer la découverte.' },
+];
 
-  // Créer des adresses
-  console.log('📍 Création des adresses...');
-  await prisma.address.create({
-    data: {
-      user_id: client1.id,
-      street: '123 Rue de la Paix',
-      city: 'Paris',
-      state: 'Île-de-France',
-      postal_code: '75002',
-      country: 'France',
-      longitude: 2.3522,
-      latitude: 48.8566,
-    },
-  });
+const REVIEW_TITLES = [
+  'Superbe expérience', 'Très bonne visite', 'Guide passionné', 'À refaire',
+  'Excellent rapport qualité-prix', 'Organisation parfaite',
+];
 
-  await prisma.address.create({
-    data: {
-      user_id: guideUser.id,
-      street: '45 Avenue des Champs-Élysées',
-      city: 'Paris',
-      state: 'Île-de-France',
-      postal_code: '75008',
-      country: 'France',
-      longitude: 2.3077,
-      latitude: 48.8698,
-    },
-  });
+const REVIEW_COMMENTS = [
+  'Nous avons passé un excellent moment, tout était fluide et bien organisé.',
+  'Le guide était ponctuel, très clair, et très agréable avec le groupe.',
+  'Programme complet, rythme idéal, et très bonnes recommandations locales.',
+  'Expérience réaliste, humaine, et vraiment utile pour découvrir la ville.',
+  'Nous recommandons sans hésitation, surtout pour un premier séjour.',
+];
 
-  console.log('✅ Adresses créées');
+const DISPUTE_REASONS = [
+  'Le programme annoncé était incomplet par rapport à la description.',
+  'Le point de rendez-vous n\'était pas assez clair dans le message de confirmation.',
+  'Retard important au démarrage de l\'activité.',
+  'Des prestations prévues n\'ont pas pu être assurées.',
+  'Demande de remboursement partiel suite à une annulation de segment.',
+];
 
-  // Créer un guide
-  console.log('🎯 Création du profil guide...');
-  const guide1 = await prisma.guide.create({
-    data: {
-      user_id: guideUser.id,
-      bio: "Guide passionnée avec 5 ans d'expérience à Paris",
-      languages: 'Français, Anglais, Espagnol',
-      years_of_experience: 5,
-      guide_status: 'pro',
-      pro_card: true,
-      country: 'France',
-    },
-  });
+const MESSAGE_TEMPLATES_CLIENT = [
+  'Bonjour, nous serons au point de rendez-vous 10 minutes avant.',
+  'Pouvez-vous confirmer le matériel à prévoir ?',
+  'Merci pour les informations, à demain.',
+  'Nous sommes un groupe avec un enfant, est-ce adapté ?',
+  'Est-ce possible de décaler de 15 minutes ?',
+];
 
-  console.log(`✅ Guide créé pour ${guideUser.first_name}`);
+const MESSAGE_TEMPLATES_GUIDE = [
+  'Bonjour, je vous confirme la disponibilité et le lieu exact.',
+  'Pensez à prendre des chaussures confortables et de l\'eau.',
+  'Je resterai joignable en cas de retard.',
+  'Parfait pour votre groupe, je vous envoie le récapitulatif.',
+  'À demain, je vous attends au point indiqué.',
+];
 
-  // Créer des cities
-  console.log('🌍 Création des cities...');
-  const paris = await prisma.city.create({
-    data: {
-      name: 'Paris',
-      country: 'France',
-      slug: 'paris-france',
-      description: 'La ville lumière, capitale de la France',
-      latitude: 48.8566,
-      longitude: 2.3522,
-      image_url: 'https://example.com/images/paris.jpg',
-      is_active: true,
-    },
-  });
+const DEMO_PASSWORD = 'Locotrip123!';
 
-  const lyon = await prisma.city.create({
-    data: {
-      name: 'Lyon',
-      country: 'France',
-      slug: 'lyon-france',
-      description: 'Capitale de la gastronomie française',
-      latitude: 45.764,
-      longitude: 4.8357,
-      image_url: 'https://example.com/images/lyon.jpg',
-      is_active: true,
-    },
-  });
-
-  console.log(`✅ Villes créées: ${paris.name}, ${lyon.name}`);
-
-  // Créer des catégories
-  console.log('📂 Création des catégories...');
-  const culture = await prisma.category.create({
-    data: {
-      name: 'Culture & Histoire',
-    },
-  });
-
-  const gastronomie = await prisma.category.create({
-    data: {
-      name: 'Gastronomie',
-    },
-  });
-
-  const aventure = await prisma.category.create({
-    data: {
-      name: 'Aventure',
-    },
-  });
-
-  console.log(
-    `✅ Catégories créées: ${culture.name}, ${gastronomie.name}, ${aventure.name}`,
-  );
-
-  // Créer des expériences
-  console.log('🎨 Création des expériences...');
-  const exp1 = await prisma.experience.create({
-    data: {
-      title: 'Visite guidée du Louvre',
-      description: "Découvrez les chefs-d'œuvre du plus grand musée du monde",
-      price: 49.99,
-      duration: 180, // 3 heures
-      city_id: paris.id,
-      guide_id: guide1.id,
-      max_capacity: 15,
-      meeting_point: 'Devant la Pyramide du Louvre',
-      meeting_latitude: 48.8606,
-      meeting_longitude: 2.3376,
-      is_active: true,
-      is_published: true,
-    },
-  });
-
-  const exp2 = await prisma.experience.create({
-    data: {
-      title: 'Tour gastronomique de Lyon',
-      description:
-        'Dégustez les spécialités lyonnaises dans les meilleurs bouchons',
-      price: 79.99,
-      duration: 240, // 4 heures
-      city_id: lyon.id,
-      guide_id: guide1.id,
-      max_capacity: 10,
-      meeting_point: 'Place Bellecour',
-      meeting_latitude: 45.7578,
-      meeting_longitude: 4.832,
-      is_active: true,
-      is_published: true,
-    },
-  });
-
-  // Créer une expérience brouillon pour tester
-  const exp3 = await prisma.experience.create({
-    data: {
-      title: 'Visite des catacombes (Brouillon)',
-      description: 'Explorez les souterrains mystérieux de Paris',
-      price: 35.0,
-      duration: 120,
-      city_id: paris.id,
-      guide_id: guide1.id,
-      max_capacity: 20,
-      is_active: true,
-      is_published: false, // Brouillon
-    },
-  });
-
-  console.log(
-    `✅ Expériences créées: ${exp1.title}, ${exp2.title}, ${exp3.title}`,
-  );
-
-  // Lier les expériences aux catégories
-  await prisma.experience_category.create({
-    data: {
-      experience_id: exp1.id,
-      category_id: culture.id,
-    },
-  });
-
-  await prisma.experience_category.create({
-    data: {
-      experience_id: exp2.id,
-      category_id: gastronomie.id,
-    },
-  });
-
-  // Ajouter des price en différentes currencies
-  console.log('💰 Ajout des price multi-currencies...');
-  await prisma.experience_price.create({
-    data: {
-      experience_id: exp1.id,
-      currency_code: 'EUR',
-      price: 49.99,
-    },
-  });
-
-  await prisma.experience_price.create({
-    data: {
-      experience_id: exp1.id,
-      currency_code: 'USD',
-      price: 54.99,
-    },
-  });
-
-  await prisma.experience_price.create({
-    data: {
-      experience_id: exp2.id,
-      currency_code: 'EUR',
-      price: 79.99,
-    },
-  });
-
-  // Créer une réservation
-  console.log("📅 Création d'une réservation...");
-  const booking1 = await prisma.booking.create({
-    data: {
-      user_id: client1.id,
-      experience_id: exp1.id,
-      booking_date: new Date('2025-11-15T10:00:00Z'),
-      status: 'confirmed',
-      number_of_participants: 2,
-      total_price: 99.98,
-    },
-  });
-
-  console.log(`✅ Réservation créée pour ${client1.first_name}`);
-
-  // Créer un payment
-  console.log("💳 Création d'un payment...");
-  await prisma.payment.create({
-    data: {
-      booking_id: booking1.id,
-      amount: 99.98,
-      currency: 'eur',
-      method: 'carte_bancaire',
-      status: 'completed',
-      stripe_payment_intent_id: 'pi_test_123456789',
-      stripe_charge_id: 'ch_test_123456789',
-      stripe_customer_id: 'cus_test_123456789',
-      metadata: {
-        booking_reference: 'BOOK-001',
-        payment_method: 'visa',
-      },
-    },
-  });
-
-  // Créer un review
-  console.log("⭐ Création d'un avis...");
-  await prisma.review.create({
-    data: {
-      user_id: client1.id,
-      experience_id: exp1.id,
-      rating: 5,
-      comment: 'Expérience exceptionnelle ! Guide très compétente et passionnée.',
-    },
-  });
-
-  // Créer un subscription
-  console.log("🎫 Création d'un subscription...");
-  await prisma.subscription.create({
-    data: {
-      user_id: client1.id,
-      subscription_type: 'loco_plus',
-      start_date: new Date(),
-      end_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // +1 an
-      status: 'active',
-    },
-  });
-
-  // Créer une conversation
-  console.log("💬 Création d'une conversation...");
-  const conversation = await prisma.conversation.create({
-    data: {
-      booking_id: booking1.id,
-    },
-  });
-
-  // Créer des messages
-  await prisma.message.create({
-    data: {
-      conversation_id: conversation.id,
-      author_id: client1.id,
-      content: "Bonjour, j'ai une question sur le point de rendez-vous.",
-    },
-  });
-
-  await prisma.message.create({
-    data: {
-      conversation_id: conversation.id,
-      author_id: guideUser.id,
-      content:
-        'Bonjour ! Le point de rendez-vous est devant la pyramide du Louvre.',
-    },
-  });
-
-  // Créer des notifications
-  console.log('🔔 Création de notifications...');
-  await prisma.notification.create({
-    data: {
-      user_id: client1.id,
-      type: 'booking_reminder',
-      content: 'Votre visite du Louvre a lieu demain à 10h',
-      read: false,
-    },
-  });
-
-  // Créer un ticket de support
-  console.log('🎫 Création d\'un ticket de support...');
-  const ticket = await prisma.support_ticket.create({
-    data: {
-      user_id: client1.id,
-      subject: 'Question sur le remboursement',
-      status: 'open',
-    },
-  });
-
-  await prisma.ticket_message.create({
-    data: {
-      ticket_id: ticket.id,
-      author_id: client1.id,
-      content:
-        "Bonjour, j'aimerais savoir comment fonctionne la politique de remboursement.",
-    },
-  });
-
-  // Créer des offres de boost
-  console.log("🚀 Création d'offres de boost...");
-  const boostBasic = await prisma.boost_offer.create({
-    data: {
-      name: 'Boost Basic',
-      description: 'Augmentez votre visibilité pendant 7 jours',
-      duration_days: 7,
-      discount_percentage: 0,
-      price: 19.99,
-    },
-  });
-
-  const boostPremium = await prisma.boost_offer.create({
-    data: {
-      name: 'Boost Premium',
-      description: 'Apparaissez en premier pendant 30 jours',
-      duration_days: 30,
-      discount_percentage: 20,
-      price: 79.99,
-    },
-  });
-
-  console.log(
-    `✅ Offres de boost créées: ${boostBasic.name}, ${boostPremium.name}`,
-  );
-
-  // Créer un boost actif pour le guide
-  await prisma.guide_boost.create({
-    data: {
-      guide_id: guide1.id,
-      boost_offer_id: boostPremium.id,
-      expiration_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // +30 jours
-      status: 'active',
-    },
-  });
-
-  // Créer des médias
-  console.log('📸 Ajout de médias...');
-  await prisma.media.create({
-    data: {
-      entity_type: 'experience',
-      entity_id: exp1.id,
-      url: 'https://example.com/images/louvre1.jpg',
-      media_type: 'photo',
-      description: 'Vue extérieure du Louvre',
-    },
-  });
-
-  await prisma.media.create({
-    data: {
-      entity_type: 'guide',
-      entity_id: guide1.id,
-      url: 'https://example.com/images/sophie-profile.jpg',
-      media_type: 'photo',
-      description: 'Photo de profil',
-    },
-  });
-
-  console.log('✅ Médias ajoutés');
-
-  console.log('\n🎉 Seeding terminé avec succès !');
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }
 
-main()
-  .catch((e) => {
-    console.error('❌ Erreur lors du seeding:', e);
-    process.exit(1);
-  })
-  .finally(async () => {
+function randomInt(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function pickOne<T>(items: T[]): T {
+  return items[randomInt(0, items.length - 1)];
+}
+
+const generatedEmails = new Set<string>();
+function generateUniqueEmail(first: string, last: string): string {
+  const base = `${first.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")}.${last.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s/g, "")}`;
+  let email = `${base}@gmail.com`;
+  let counter = 1;
+  while (generatedEmails.has(email)) {
+    counter++;
+    email = `${base}${counter}@gmail.com`;
+  }
+  generatedEmails.add(email);
+  return email;
+}
+
+function pickMany<T>(items: T[], count: number): T[] {
+  const shuffled = [...items].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, Math.min(count, items.length));
+}
+
+function addDays(date: Date, days: number): Date {
+  const d = new Date(date);
+  d.setDate(d.getDate() + days);
+  return d;
+}
+
+function getGuideImagePath(index: number): string {
+  const guidesDir = path.join(__dirname, 'assets', 'guides');
+  const candidates = [
+    path.join(guidesDir, `guide-${index}.avif`),
+    path.join(guidesDir, `guide-${index}.jpg`),
+    path.join(guidesDir, `guide-${index}.jpeg`),
+    path.join(guidesDir, `guide-${index}.png`),
+  ];
+  const found = candidates.find((p) => fs.existsSync(p));
+  if (found) return found;
+
+  const fallback = path.join(guidesDir, 'guide-default.avif');
+  if (fs.existsSync(fallback)) return fallback;
+
+  throw new Error('Aucune image guide trouvee et guide-default.avif manquant.');
+}
+
+function getMimeTypeFromPath(filePath: string): string {
+  const ext = path.extname(filePath).toLowerCase();
+  if (ext === '.avif') return 'image/avif';
+  if (ext === '.png') return 'image/png';
+  return 'image/jpeg';
+}
+
+async function uploadAsset(filePath: string, key: string, metadata?: Record<string, string>): Promise<string> {
+  if (!fs.existsSync(filePath)) return '';
+  const buffer = fs.readFileSync(filePath);
+  const uploaded = await minioService.uploadFile(
+    BucketName.LOCOTRIP,
+    key,
+    buffer,
+    getMimeTypeFromPath(filePath),
+    metadata,
+  );
+  return uploaded.url;
+}
+
+async function resetBuckets(): Promise<void> {
+  const existingBuckets = await minioService.listBuckets();
+  for (const bucket of existingBuckets) {
+    await minioService.deleteBucket(bucket);
+  }
+  for (const bucket of Object.values(BucketName)) {
+    await minioService.ensureBucketExists(bucket);
+  }
+}
+
+async function clearDatabase(): Promise<void> {
+  await prisma.ticket_message.deleteMany();
+  await prisma.support_ticket.deleteMany();
+  await prisma.notification.deleteMany();
+  await prisma.data_access_log.deleteMany();
+
+  await prisma.message.deleteMany();
+  await prisma.conversation.deleteMany();
+  await prisma.dispute.deleteMany();
+  await prisma.payment.deleteMany();
+  await prisma.booking.deleteMany();
+
+  await prisma.media.deleteMany();
+  await prisma.review.deleteMany();
+  await prisma.subscription.deleteMany();
+
+  await prisma.experience_availability.deleteMany();
+  await prisma.experience_step.deleteMany();
+  await prisma.experience_category.deleteMany();
+  await prisma.experience_price.deleteMany();
+  await prisma.experience.deleteMany();
+
+  await prisma.guide_document.deleteMany();
+  await prisma.guide_hobby.deleteMany();
+  await prisma.guide_boost.deleteMany();
+  await prisma.boost_offer.deleteMany();
+  await prisma.guide.deleteMany();
+
+  await prisma.address.deleteMany();
+  await prisma.city.deleteMany();
+  await prisma.category.deleteMany();
+  await prisma.user.deleteMany();
+  await prisma.currency.deleteMany();
+}
+
+async function main() {
+  console.log('Seed start: clean and full dataset');
+
+  try {
+    await resetBuckets();
+    await clearDatabase();
+
+    const eur = await prisma.currency.create({
+      data: { code: 'EUR', name: 'Euro', exchange_rate: 1.0 },
+    });
+    const usd = await prisma.currency.create({
+      data: { code: 'USD', name: 'US Dollar', exchange_rate: 1.1 },
+    });
+
+    await prisma.category.createMany({
+      data: CATEGORY_NAMES.map((name) => ({ name })),
+    });
+    const categories = await prisma.category.findMany();
+    const hashedDemoPassword = await bcrypt.hash(DEMO_PASSWORD, 10);
+
+    const adminUser = await prisma.user.create({
+      data: {
+        first_name: 'Admin',
+        last_name: 'Locotrip',
+        email: 'admin@locotrip.com',
+        phone: '+33611111111',
+        birth_date: new Date('1990-01-01'),
+        password: hashedDemoPassword,
+        role: 'admin',
+        is_active: true,
+        is_verified: true,
+        marketing_consent: false,
+      },
+    });
+
+    const travelers: Array<{ id: string; email: string }> = [];
+    for (let i = 1; i <= 80; i++) {
+      const first = pickOne(TRAVELER_FIRST_NAMES);
+      const last = pickOne(TRAVELER_LAST_NAMES);
+      const user = await prisma.user.create({
+        data: {
+          first_name: first,
+          last_name: last,
+          email: generateUniqueEmail(first, last),
+          phone: `+336${String(10000000 + i).padStart(8, '0')}`,
+          birth_date: new Date(randomInt(1970, 2003), randomInt(0, 11), randomInt(1, 28)),
+          password: hashedDemoPassword,
+          role: 'client',
+          is_active: true,
+          is_verified: true,
+          marketing_consent: i % 2 === 0,
+          marketing_consent_date: i % 2 === 0 ? new Date() : null,
+        },
+      });
+      travelers.push({ id: user.id, email: user.email });
+    }
+
+    const cityRaw = JSON.parse(fs.readFileSync(path.join(__dirname, 'assets', 'cities.json'), 'utf-8')) as Array<any>;
+    const cityInputs = cityRaw;
+    const cityCreateData = cityInputs.map((c) => ({
+      name: c.name,
+      country: c.country,
+      slug: c.slug,
+      description: c.description || `Ville ${c.name} idéale pour des expériences authentiques.`,
+      latitude: typeof c.latitude === 'number' ? c.latitude : null,
+      longitude: typeof c.longitude === 'number' ? c.longitude : null,
+      is_active: true,
+      is_suggested: Boolean(c.is_suggested),
+    }));
+
+    await prisma.city.createMany({
+      data: cityCreateData,
+      skipDuplicates: true,
+    });
+
+    const insertedCities = await prisma.city.findMany({
+      where: {
+        slug: {
+          in: cityCreateData.map((c) => c.slug),
+        },
+      },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        country: true,
+        latitude: true,
+        longitude: true,
+        is_suggested: true,
+      },
+    });
+
+    const cities: Array<{ id: string; slug: string; name: string; country: string; latitude: number | null; longitude: number | null; is_suggested: boolean }> = insertedCities;
+
+    const cityImageMap: Record<string, string> = {
+      'paris-france': 'paris.jpg',
+      'lyon-france': 'lyon.jpg',
+      'nice-france': 'nice.jpg',
+      'barcelona-espagne': 'barcelone.jpg',
+      'madrid-espagne': 'madrid.jpg',
+      'berlin-allemagne': 'berlin.jpg',
+      'munich-allemagne': 'munich.jpg',
+      'seville-espagne': 'seville.jpg',
+    };
+
+    for (const city of cities) {
+      const imageName = cityImageMap[city.slug];
+      if (!imageName) continue;
+      const imagePath = path.join(__dirname, 'assets', 'citites', imageName);
+      const cityImageUrl = await uploadAsset(
+        imagePath,
+        `cities/${city.id}/${imageName}`,
+        { entityType: 'city', mediaType: 'city_image', cityId: city.id },
+      );
+      if (!cityImageUrl) continue;
+      await prisma.media.create({
+        data: {
+          entity_type: 'city',
+          entity_id: city.id,
+          url: cityImageUrl,
+          media_type: 'city_image',
+          description: `Image de ${city.name}`,
+          city_id: city.id,
+        },
+      });
+    }
+
+    const suggestedCities = cities.filter((city) => city.is_suggested);
+    const citiesToUse = suggestedCities.length > 0 ? suggestedCities : cities;
+
+    const guideUsers: Array<{ userId: string; guideId: string; firstName: string; lastName: string; assignedCity: typeof citiesToUse[0] }> = [];
+    for (let i = 1; i <= 40; i++) {
+      const assignedCity = citiesToUse[(i - 1) % citiesToUse.length];
+      const imgNum = ((i - 1) % 15) + 1;
+      const isMale = [1, 2, 3, 5, 7, 8, 9, 10, 11, 13].includes(imgNum);
+      const nameList = isMale ? MALE_FIRST_NAMES : FEMALE_FIRST_NAMES;
+
+      const first = nameList[(i - 1) % nameList.length];
+      const last = GUIDE_LAST_NAMES[(i - 1) % GUIDE_LAST_NAMES.length];
+
+      const user = await prisma.user.create({
+        data: {
+          first_name: first,
+          last_name: last,
+          email: generateUniqueEmail(first, last),
+          phone: `+337${String(20000000 + i).padStart(8, '0')}`,
+          birth_date: new Date(randomInt(1972, 1998), randomInt(0, 11), randomInt(1, 28)),
+          password: hashedDemoPassword,
+          role: 'guide',
+          is_active: true,
+          is_verified: true,
+          marketing_consent: true,
+          marketing_consent_date: new Date(),
+        },
+      });
+
+      const guide = await prisma.guide.create({
+        data: {
+          user_id: user.id,
+          bio: `${first} ${last} accompagne des voyageurs avec une approche humaine et locale. Expérience terrain et programme personnalisé selon le groupe.`,
+          languages: pickMany(['Français', 'Anglais', 'Espagnol', 'Italien', 'Allemand'], randomInt(2, 3)).join(', '),
+          years_of_experience: randomInt(2, 18),
+          guide_status: i % 3 === 0 ? 'pro' : 'local',
+          pro_card: i % 3 === 0,
+          country: assignedCity.country,
+          card_request_date: i % 3 === 0 ? addDays(new Date(), -randomInt(100, 600)) : null,
+          card_verification_date: i % 3 === 0 ? addDays(new Date(), -randomInt(30, 200)) : null,
+          response_time_hours: Number((Math.random() * 12 + 1).toFixed(2)),
+          is_active: true,
+        },
+      });
+
+      const imagePath = getGuideImagePath(imgNum);
+      const profileUrl = await uploadAsset(
+        imagePath,
+        `profiles/guides/${guide.id}/profile${path.extname(imagePath)}`,
+        { entityType: 'guide', mediaType: 'profile_picture', guideId: guide.id },
+      );
+
+      if (profileUrl) {
+        await prisma.media.create({
+          data: {
+            entity_type: 'guide',
+            entity_id: guide.id,
+            url: profileUrl,
+            media_type: 'profile_picture',
+            description: `Photo de profil de ${first} ${last}`,
+            guide_id: guide.id,
+          },
+        });
+      }
+
+      const hobbies = pickMany(categories, randomInt(3, 5));
+      for (const hobby of hobbies) {
+        await prisma.guide_hobby.create({
+          data: { guide_id: guide.id, category_id: hobby.id },
+        });
+      }
+
+      await prisma.guide_document.createMany({
+        data: [
+          {
+            guide_id: guide.id,
+            document_type: 'CV',
+            verification_status: 'verified',
+            verification_comment: 'Profil professionnel validé',
+            document_url: `docs/guides/${guide.id}/cv.pdf`,
+            verification_date: addDays(new Date(), -randomInt(5, 150)),
+          },
+          {
+            guide_id: guide.id,
+            document_type: 'proof_of_residence',
+            verification_status: 'verified',
+            verification_comment: 'Justificatif conforme',
+            document_url: `docs/guides/${guide.id}/residence.pdf`,
+            verification_date: addDays(new Date(), -randomInt(5, 150)),
+          },
+          {
+            guide_id: guide.id,
+            document_type: 'diploma',
+            verification_status: i % 6 === 0 ? 'pending' : 'verified',
+            verification_comment: i % 6 === 0 ? null : 'Diplôme validé',
+            document_url: `docs/guides/${guide.id}/diploma.pdf`,
+            verification_date: i % 6 === 0 ? null : addDays(new Date(), -randomInt(5, 150)),
+          },
+        ],
+      });
+
+      guideUsers.push({ userId: user.id, guideId: guide.id, firstName: first, lastName: last, assignedCity });
+    }
+
+    // Cities creation moved up
+
+    const boostOffers = await Promise.all([
+      prisma.boost_offer.create({
+        data: { name: 'Boost Starter', description: 'Mise en avant 7 jours', duration_days: 7, discount_percentage: 0, price: 19.9 },
+      }),
+      prisma.boost_offer.create({
+        data: { name: 'Boost Plus', description: 'Mise en avant 15 jours', duration_days: 15, discount_percentage: 10, price: 34.9 },
+      }),
+      prisma.boost_offer.create({
+        data: { name: 'Boost Pro', description: 'Mise en avant 30 jours', duration_days: 30, discount_percentage: 15, price: 59.9 },
+      }),
+    ]);
+
+    for (let i = 0; i < guideUsers.length; i++) {
+      if (i % 2 !== 0) continue;
+      const offer = boostOffers[i % boostOffers.length];
+      const purchaseDate = addDays(new Date(), -randomInt(1, 45));
+      const expirationDate = addDays(purchaseDate, offer.duration_days);
+      await prisma.guide_boost.create({
+        data: {
+          guide_id: guideUsers[i].guideId,
+          boost_offer_id: offer.id,
+          purchase_date: purchaseDate,
+          expiration_date: expirationDate,
+          status: expirationDate > new Date() ? 'active' : 'expired',
+        },
+      });
+    }
+
+    const experiences: Array<{ id: string; guideId: string; cityId: string; price: number; title: string }> = [];
+    for (let i = 1; i <= 120; i++) {
+      const guide = guideUsers[(i - 1) % guideUsers.length];
+      const city = guide.assignedCity;
+      const title = `${pickOne(EXPERIENCE_TITLES)} - ${city.name}`;
+      const price = Number((randomInt(25, 140) + Math.random()).toFixed(2));
+
+      const durationMinutes = randomInt(90, 360);
+      const exp = await prisma.experience.create({
+        data: {
+          title,
+          description: pickOne(EXPERIENCE_DESCRIPTIONS),
+          additional_info: 'Petit groupe, materiel essentiel indique avant depart, confirmation envoyee 24h avant.',
+          price,
+          duration: durationMinutes,
+          city_id: city.id,
+          guide_id: guide.guideId,
+          max_capacity: randomInt(4, 20),
+          meeting_point: `${city.name} - Point central`,
+          meeting_latitude: city.latitude ? Number((city.latitude + (Math.random() - 0.5) * 0.03).toFixed(6)) : null,
+          meeting_longitude: city.longitude ? Number((city.longitude + (Math.random() - 0.5) * 0.03).toFixed(6)) : null,
+          is_accessible: i % 5 !== 0,
+          is_active: true,
+          is_published: true,
+        },
+      });
+
+      experiences.push({ id: exp.id, guideId: guide.guideId, cityId: city.id, price, title });
+
+      await prisma.experience_price.createMany({
+        data: [
+          { experience_id: exp.id, currency_code: eur.code, price },
+          { experience_id: exp.id, currency_code: usd.code, price: Number((price * 1.1).toFixed(2)) },
+        ],
+      });
+
+      const expCategories = pickMany(categories, randomInt(2, 3));
+      await prisma.experience_category.createMany({
+        data: expCategories.map((cat) => ({
+          experience_id: exp.id,
+          category_id: cat.id,
+        })),
+        skipDuplicates: true,
+      });
+
+      await prisma.experience_step.createMany({
+        data: Array.from({ length: 4 }, (_, s) => ({
+          experience_id: exp.id,
+          step_number: s + 1,
+          title: EXPERIENCE_STEPS[s].title,
+          description: EXPERIENCE_STEPS[s].description,
+        })),
+      });
+
+      const availabilityBase = addDays(new Date(), randomInt(2, 20));
+      await prisma.experience_availability.createMany({
+        data: Array.from({ length: 2 }, (_, a) => {
+          const start = addDays(availabilityBase, a * 7);
+          start.setHours(randomInt(8, 18), pickOne([0, 15, 30, 45]), 0, 0);
+          const end = new Date(start.getTime() + durationMinutes * 60 * 1000);
+          return {
+            experience_id: exp.id,
+            start_date: start,
+            end_date: end,
+            status: a % 5 === 0 ? 'unavailable' : 'available',
+          };
+        }),
+      });
+
+      const mediaRows: Array<{
+        entity_type: string;
+        entity_id: string;
+        url: string;
+        media_type: 'profile_picture' | 'pictures';
+        description: string;
+        experience_id: string;
+      }> = [];
+      for (let m = 0; m < 2; m++) {
+        const imgNum = ((i + m - 1) % 66) + 1;
+        const expPath = path.join(__dirname, 'assets', 'experiences', `exp-${imgNum}.png`);
+        const mediaType = m === 0 ? 'profile_picture' : 'pictures';
+        const expUrl = await uploadAsset(
+          expPath,
+          `experiences/${exp.id}/${mediaType}/exp-${imgNum}.png`,
+          { entityType: 'experience', mediaType, experienceId: exp.id },
+        );
+
+        if (!expUrl) continue;
+        mediaRows.push({
+          entity_type: 'experience',
+          entity_id: exp.id,
+          url: expUrl,
+          media_type: mediaType,
+          description: m === 0 ? `Image principale - ${title}` : `Galerie - ${title}`,
+          experience_id: exp.id,
+        });
+      }
+
+      if (mediaRows.length > 0) {
+        await prisma.media.createMany({
+          data: mediaRows,
+        });
+      }
+    }
+
+    const bookings: Array<{ id: string; userId: string; experienceId: string; status: 'pending' | 'confirmed' | 'cancelled' | 'completed' }> = [];
+    for (let i = 1; i <= 220; i++) {
+      const traveler = pickOne(travelers);
+      const exp = pickOne(experiences);
+      const participants = randomInt(1, 5);
+      const total = Number((exp.price * participants).toFixed(2));
+      const statusOptions: Array<'pending' | 'confirmed' | 'cancelled' | 'completed'> = ['pending', 'confirmed', 'cancelled', 'completed'];
+      const bookingStatus = statusOptions[i % statusOptions.length];
+      const bookingDate = addDays(new Date(), -randomInt(1, 120));
+
+      const booking = await prisma.booking.create({
+        data: {
+          user_id: traveler.id,
+          experience_id: exp.id,
+          booking_date: bookingDate,
+          status: bookingStatus,
+          number_of_participants: participants,
+          total_price: total,
+        },
+      });
+
+      bookings.push({ id: booking.id, userId: traveler.id, experienceId: exp.id, status: bookingStatus });
+
+      await prisma.payment.create({
+        data: {
+          booking_id: booking.id,
+          amount: total,
+          currency: 'EUR',
+          payment_date: addDays(bookingDate, 0),
+          method: pickOne(['card', 'paypal', 'apple_pay']),
+          status:
+            bookingStatus === 'cancelled'
+              ? 'cancelled'
+              : bookingStatus === 'pending'
+                ? 'pending'
+                : 'completed',
+          stripe_payment_intent_id: `pi_seed_${i}_${Math.random().toString(36).slice(2, 9)}`,
+          stripe_customer_id: `cus_seed_${randomInt(1000, 9999)}`,
+          metadata: { source: 'seed', bookingIndex: i },
+        },
+      });
+    }
+
+    const conversationBookings = pickMany(bookings, 170);
+    for (let i = 0; i < conversationBookings.length; i++) {
+      const booking = conversationBookings[i];
+      const exp = experiences.find((e) => e.id === booking.experienceId);
+      if (!exp) continue;
+      const conv = await prisma.conversation.create({ data: { booking_id: booking.id } });
+
+      const msgCount = randomInt(3, 6);
+      const startAt = addDays(new Date(), -randomInt(1, 45));
+      const guideUserId = guideUsers.find((g) => g.guideId === exp.guideId)?.userId || booking.userId;
+      await prisma.message.createMany({
+        data: Array.from({ length: msgCount }, (_, m) => {
+          const fromClient = m % 2 === 0;
+          return {
+            conversation_id: conv.id,
+            author_id: fromClient ? booking.userId : guideUserId,
+            content: fromClient ? pickOne(MESSAGE_TEMPLATES_CLIENT) : pickOne(MESSAGE_TEMPLATES_GUIDE),
+            is_read: m < msgCount - 1,
+            sent_at: addDays(startAt, 0),
+          };
+        }),
+      });
+    }
+
+    const disputeBookings = pickMany(bookings.filter((b) => b.status !== 'pending'), 24);
+    for (let i = 0; i < disputeBookings.length; i++) {
+      const b = disputeBookings[i];
+      const status: 'open' | 'pending' | 'resolved' | 'rejected' =
+        i % 4 === 0 ? 'open' : i % 4 === 1 ? 'pending' : i % 4 === 2 ? 'resolved' : 'rejected';
+      await prisma.dispute.create({
+        data: {
+          booking_id: b.id,
+          user_id: b.userId,
+          reason: pickOne(DISPUTE_REASONS),
+          status,
+          admin_id: status === 'resolved' || status === 'rejected' ? adminUser.id : null,
+          resolution_date: status === 'resolved' || status === 'rejected' ? addDays(new Date(), -randomInt(0, 10)) : null,
+        },
+      });
+    }
+
+    for (let i = 0; i < 260; i++) {
+      const traveler = pickOne(travelers);
+      const exp = pickOne(experiences);
+      const rating = randomInt(3, 5);
+      const review = await prisma.review.create({
+        data: {
+          user_id: traveler.id,
+          experience_id: exp.id,
+          rating,
+          title: pickOne(REVIEW_TITLES),
+          comment: pickOne(REVIEW_COMMENTS),
+          review_date: addDays(new Date(), -randomInt(0, 120)),
+        },
+      });
+
+      if (i % 4 === 0) {
+        const imgNum = (i % 66) + 1;
+        const reviewPath = path.join(__dirname, 'assets', 'experiences', `exp-${imgNum}.png`);
+        const reviewUrl = await uploadAsset(
+          reviewPath,
+          `reviews/${review.id}/review-${imgNum}.png`,
+          { entityType: 'review', mediaType: 'pictures', reviewId: review.id },
+        );
+
+        if (reviewUrl) {
+          await prisma.media.create({
+            data: {
+              entity_type: 'review',
+              entity_id: review.id,
+              url: reviewUrl,
+              media_type: 'pictures',
+              description: 'Photo partagee par le voyageur',
+              review_id: review.id,
+            },
+          });
+        }
+      }
+    }
+
+    for (let i = 0; i < 45; i++) {
+      const t = travelers[i % travelers.length];
+      const start = addDays(new Date(), -randomInt(0, 180));
+      const end = addDays(start, 365);
+      await prisma.subscription.create({
+        data: {
+          user_id: t.id,
+          subscription_type: i % 3 === 0 ? 'loco_plus' : 'standard',
+          start_date: start,
+          end_date: end,
+          status: end > new Date() ? 'active' : 'expired',
+        },
+      });
+    }
+
+    const allUsers = await prisma.user.findMany({ select: { id: true, role: true } });
+    await prisma.notification.createMany({
+      data: Array.from({ length: allUsers.length * 2 }, (_, i) => {
+        const u = allUsers[i % allUsers.length];
+        return {
+          user_id: u.id,
+          type: i % 2 === 0 ? 'booking_reminder' : 'new_message',
+          content:
+            i % 2 === 0
+              ? 'Rappel : votre réservation approche, vérifiez les détails pratiques.'
+              : 'Vous avez reçu un nouveau message sur une conversation de réservation.',
+          read: i % 4 === 0,
+          sent_at: addDays(new Date(), -randomInt(0, 45)),
+        };
+      }),
+    });
+
+    for (let i = 0; i < 55; i++) {
+      const owner = allUsers[i % allUsers.length];
+      const ticket = await prisma.support_ticket.create({
+        data: {
+          user_id: owner.id,
+          subject:
+            i % 3 === 0
+              ? 'Question sur une réservation'
+              : i % 3 === 1
+                ? 'Problème de paiement'
+                : 'Aide sur mon profil',
+          status: i % 3 === 0 ? 'open' : i % 3 === 1 ? 'in_progress' : 'closed',
+          created_at: addDays(new Date(), -randomInt(0, 80)),
+          closed_at: i % 3 === 2 ? addDays(new Date(), -randomInt(0, 20)) : null,
+        },
+      });
+
+      const admin = adminUser.id;
+      await prisma.ticket_message.createMany({
+        data: [
+          {
+            ticket_id: ticket.id,
+            author_id: owner.id,
+            content: 'Bonjour, je vous contacte pour obtenir de l\'aide sur ce sujet.',
+            sent_at: addDays(new Date(), -randomInt(0, 60)),
+          },
+          {
+            ticket_id: ticket.id,
+            author_id: admin,
+            content: 'Merci pour votre message, nous analysons votre demande.',
+            sent_at: addDays(new Date(), -randomInt(0, 30)),
+          },
+        ],
+      });
+    }
+
+    await prisma.data_access_log.createMany({
+      data: Array.from({ length: 360 }, (_, i) => {
+        const targetUser = allUsers[i % allUsers.length];
+        const actorUser = allUsers[(i + 7) % allUsers.length];
+        return {
+          user_id: targetUser.role === 'admin' ? null : targetUser.id,
+          accessed_by: actorUser.id,
+          entity_type: pickOne(['booking', 'payment', 'message', 'review', 'support_ticket']),
+          entity_id: bookings[i % bookings.length]?.id || experiences[i % experiences.length].id,
+          action: pickOne(['read', 'create', 'update']),
+          ip_address: `192.168.${randomInt(0, 255)}.${randomInt(1, 254)}`,
+          reason: 'Consultation opérationnelle et suivi qualité',
+          access_date: addDays(new Date(), -randomInt(0, 90)),
+        };
+      }),
+    });
+
+    const addressUsers = await prisma.user.findMany({ select: { id: true }, take: 130 });
+    await prisma.address.createMany({
+      data: addressUsers.map((user, i) => {
+        const city = cities[i % cities.length];
+        return {
+          user_id: user.id,
+          street: `${randomInt(1, 199)} Rue des Voyageurs`,
+          city: city.name,
+          state: city.country,
+          postal_code: `${randomInt(10000, 95999)}`,
+          country: city.country,
+          longitude: city.longitude ?? Number((2 + Math.random()).toFixed(6)),
+          latitude: city.latitude ?? Number((48 + Math.random()).toFixed(6)),
+        };
+      }),
+    });
+
+    console.log('Seed done');
+    console.log(`Users: ${allUsers.length}`);
+    console.log(`Guides: ${guideUsers.length}`);
+    console.log(`Cities: ${cities.length}`);
+    console.log(`Experiences: ${experiences.length}`);
+    console.log(`Bookings: ${bookings.length}`);
+    console.log(`Demo guide account: guide1@locotrip.com / ${DEMO_PASSWORD}`);
+    console.log(`Demo traveler account: voyageur1@locotrip.com / ${DEMO_PASSWORD}`);
+  } catch (error) {
+    console.error('Seed error:', getErrorMessage(error));
+    throw error;
+  } finally {
     await prisma.$disconnect();
-  });
+  }
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});

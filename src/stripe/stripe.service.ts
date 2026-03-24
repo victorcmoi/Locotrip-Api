@@ -42,8 +42,7 @@ export class StripeService {
     }
 
     this.stripe = new Stripe(apiKey, {
-      // @ts-expect-error Pas d'erreur, bien que le type de Stripe ne le reconnaisse pas encore
-      apiVersion: '2025-09-30.clover',
+      apiVersion: '2025-12-15.clover',
     });
   }
 
@@ -59,12 +58,14 @@ export class StripeService {
     description?: string,
   ) {
     try {
-      return await this.stripe.paymentIntents.create({
+      const paymentIntent = await this.stripe.paymentIntents.create({
         amount,
         currency: currency.toLowerCase(),
         description,
         automatic_payment_methods: { enabled: true },
       });
+
+      return paymentIntent;
     } catch (error) {
       throw new BadRequestException(
         `Erreur lors de la création du paiement: ${getErrorMessage(error)}`,
@@ -78,7 +79,10 @@ export class StripeService {
    */
   async confirmPayment(paymentIntentId: string) {
     try {
-      return await this.stripe.paymentIntents.confirm(paymentIntentId);
+      const paymentIntent =
+        await this.stripe.paymentIntents.confirm(paymentIntentId);
+
+      return paymentIntent;
     } catch (error) {
       throw new BadRequestException(
         `Erreur lors de la confirmation du paiement: ${getErrorMessage(error)}`,
@@ -92,7 +96,10 @@ export class StripeService {
    */
   async retrievePayment(paymentIntentId: string) {
     try {
-      return await this.stripe.paymentIntents.retrieve(paymentIntentId);
+      const paymentIntent =
+        await this.stripe.paymentIntents.retrieve(paymentIntentId);
+
+      return paymentIntent;
     } catch (error) {
       throw new BadRequestException(
         `Erreur lors de la récupération du paiement: ${getErrorMessage(error)}`,

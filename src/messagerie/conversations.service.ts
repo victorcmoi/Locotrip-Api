@@ -21,7 +21,16 @@ export class ConversationsService {
       include: {
         booking: {
           include: {
-            experience: true,
+            experience: {
+              include: {
+                guide: {
+                  include: {
+                    user: true,
+                    medias: true,
+                  },
+                },
+              },
+            },
             user: true,
           },
         },
@@ -41,6 +50,7 @@ export class ConversationsService {
                 guide: {
                   include: {
                     user: true,
+                    medias: true,
                   },
                 },
               },

@@ -13,6 +13,11 @@ import { AuthentificationModule } from './auth/authentification.module';
 import { StripeModule } from './stripe/stripe.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { MailModule } from './mail/mail.module';
+import { MinioModule } from './minio/minio.module';
+import { StatisticsModule } from './statistics/statistics.module';
+import { SearchModule } from './search/search.module';
+import { VideoModule } from './video/video.module';
+import { ContactModule } from './contact/contact.module';
 
 @Module({
   imports: [
@@ -20,6 +25,7 @@ import { MailModule } from './mail/mail.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    MinioModule,
     MailModule,
     UsersModule,
     GuidesModule,
@@ -32,6 +38,10 @@ import { MailModule } from './mail/mail.module';
     CurrenciesModule,
     AuthentificationModule,
     StripeModule,
+    StatisticsModule,
+    SearchModule,
+    VideoModule,
+    ContactModule,
     ThrottlerModule.forRoot([
       {
         name: 'short',
@@ -51,4 +61,4 @@ import { MailModule } from './mail/mail.module';
     ]),
   ],
 })
-export class AppModule {}
+export class AppModule { }

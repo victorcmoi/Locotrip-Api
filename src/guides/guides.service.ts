@@ -1,12 +1,102 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateGuideDto } from './dto/create-guide.dto';
 import { UpdateGuideDto } from './dto/update-guide.dto';
-import { guideUncheckedUpdateInput } from '../generated/prisma/models/guide';
+import { FindAllGuidesDto } from './dto/find-all-guides.dto';
+import {
+  guideUncheckedUpdateInput,
+  guideWhereInput,
+} from '../generated/prisma/models/guide';
+import {
+  PaginatedResponse,
+  PaginationMeta,
+} from '../common/interfaces/paginated-response.interface';
+import { GuideStatus } from './enums/guide.enum';
 
 @Injectable()
 export class GuidesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
+
+  /**
+   * Convertit un délai de réponse en heures en plage lisible
+   */
+  getResponseTimeRange(hours: number | null | undefined): string | null {
+    if (hours === null || hours === undefined) return null;
+
+    if (hours < 1) return '< 1h';
+    if (hours < 3) return '1-3h';
+    if (hours < 6) return '3-6h';
+    if (hours < 12) return '6-12h';
+    if (hours < 24) return '12-24h';
+    return '> 24h';
+  }
+
+  /**
+   * Calcule le délai moyen de réponse d'un guide en heures
+   * Basé sur les messages dans les conversations liées aux bookings de ses expériences
+   */
+  async calculateAverageResponseTime(guideId: string): Promise<number | null> {
+    // Récupérer les expériences du guide
+    const experiences = await this.prisma.experience.findMany({
+      where: { guide_id: guideId },
+      select: { id: true },
+    });
+
+    if (experiences.length === 0) return null;
+
+    const experienceIds = experiences.map((exp) => exp.id);
+
+    // Récupérer les conversations liées aux bookings de ces expériences
+    const conversations = await this.prisma.conversation.findMany({
+      where: {
+        booking: {
+          experience_id: { in: experienceIds },
+        },
+      },
+      include: {
+        messages: {
+          orderBy: { sent_at: 'asc' },
+        },
+        booking: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    const responseTimes: number[] = [];
+
+    // Pour chaque conversation, calculer les délais de réponse du guide
+    for (const conversation of conversations) {
+      const clientUserId = conversation.booking.user_id;
+
+      for (let i = 0; i < conversation.messages.length - 1; i++) {
+        const currentMessage = conversation.messages[i];
+        const nextMessage = conversation.messages[i + 1];
+
+        // Si le message actuel vient du client et le suivant du guide
+        if (
+          currentMessage.author_id === clientUserId &&
+          nextMessage.author_id !== clientUserId
+        ) {
+          const timeDiff =
+            new Date(nextMessage.sent_at).getTime() -
+            new Date(currentMessage.sent_at).getTime();
+          const hoursDelay = timeDiff / (1000 * 60 * 60);
+          responseTimes.push(hoursDelay);
+        }
+      }
+    }
+
+    if (responseTimes.length === 0) return null;
+
+    // Calculer la moyenne
+    const avgResponseTime =
+      responseTimes.reduce((sum, time) => sum + time, 0) / responseTimes.length;
+
+    return avgResponseTime;
+  }
 
   async create(createGuideDto: CreateGuideDto) {
     return this.prisma.guide.create({
@@ -25,19 +115,93 @@ export class GuidesService {
     });
   }
 
-  async findAll() {
-    return this.prisma.guide.findMany({
-      where: {
-        is_active: true,
-      },
-      include: {
-        user: true,
-        documents: true,
-        availabilities: true,
-        boosts: true,
-        experiences: true,
-      },
+  async findAll(query: FindAllGuidesDto): Promise<PaginatedResponse<any>> {
+    const {
+      page = 1,
+      limit = 20,
+      sort = 'created_at',
+      order = 'desc',
+      country,
+      guide_status,
+      is_active = true,
+    } = query;
+
+    const where: guideWhereInput = {
+      is_active,
+    };
+
+    if (country) {
+      where.country = country;
+    }
+
+    if (guide_status) {
+      where.guide_status = guide_status;
+    }
+
+    const skip = (page - 1) * limit;
+
+    const orderBy: Record<string, 'asc' | 'desc'> = {};
+    orderBy[sort] = order as 'asc' | 'desc';
+
+    const [data, total] = await Promise.all([
+      this.prisma.guide.findMany({
+        where,
+        include: {
+          user: true,
+          medias: true,
+          documents: true,
+          boosts: true,
+          hobbies: {
+            include: {
+              category: true,
+            },
+          },
+          experiences: {
+            include: {
+              reviews: true,
+            },
+          },
+        },
+        orderBy,
+        skip,
+        take: limit,
+      }),
+      this.prisma.guide.count({ where }),
+    ]);
+
+    // Ajouter reviewCount et prix des expériences à chaque guide
+    const dataWithReviewCount = data.map((guide) => {
+      const reviewCount = guide.experiences.reduce(
+        (total, exp) => total + exp.reviews.length,
+        0,
+      );
+      const allReviews = guide.experiences.flatMap((exp) => exp.reviews);
+      const avgRating =
+        allReviews.length > 0
+          ? allReviews.reduce((sum, review) => sum + review.rating, 0) / allReviews.length
+          : 0;
+
+      // Calculer le prix minimum et maximum des expériences du guide
+      const experiencePrices = guide.experiences
+        .filter(exp => exp.is_active && exp.is_published)
+        .map(exp => exp.price.toNumber());
+
+      const minPrice = experiencePrices.length > 0 ? Math.min(...experiencePrices) : null;
+      const maxPrice = experiencePrices.length > 0 ? Math.max(...experiencePrices) : null;
+
+      return {
+        ...guide,
+        reviewCount,
+        avgRating,
+        minExperiencePrice: minPrice,
+        maxExperiencePrice: maxPrice,
+      };
     });
+
+    return {
+      data: dataWithReviewCount,
+      meta: new PaginationMeta(page, limit, total),
+    };
   }
 
   async findOne(id: string) {
@@ -47,14 +211,25 @@ export class GuidesService {
       },
       include: {
         user: true,
+        medias: {
+          orderBy: { upload_date: 'desc' },
+        },
         documents: true,
-        availabilities: true,
+        hobbies: {
+          include: {
+            category: true,
+          },
+        },
         boosts: {
           include: {
             boost_offer: true,
           },
         },
-        experiences: true,
+        experiences: {
+          include: {
+            reviews: true,
+          },
+        },
       },
     });
 
@@ -66,21 +241,138 @@ export class GuidesService {
       throw new NotFoundException(`Guide avec l'ID ${id} n'est plus actif`);
     }
 
-    return guide;
+    const reviewCount = guide.experiences.reduce(
+      (total, exp) => total + exp.reviews.length,
+      0,
+    );
+    const allReviews = guide.experiences.flatMap((exp) => exp.reviews);
+    const avgRating =
+      allReviews.length > 0
+        ? allReviews.reduce((sum, review) => sum + review.rating, 0) / allReviews.length
+        : 0;
+
+    const experiencesCount = guide.experiences.length;
+
+    // Si response_time_hours n'est pas défini, le calculer
+    let responseTime = guide.response_time_hours;
+    if (responseTime === null || responseTime === undefined) {
+      responseTime = await this.calculateAverageResponseTime(id);
+      if (responseTime !== null) {
+        await this.prisma.guide.update({
+          where: { id },
+          data: { response_time_hours: responseTime },
+        });
+      }
+    }
+
+    const responseTimeRange = this.getResponseTimeRange(responseTime);
+
+    return {
+      ...guide,
+      reviewCount,
+      avgRating,
+      experiencesCount,
+      response_time_hours: responseTime,
+      response_time_range: responseTimeRange,
+    };
   }
 
-  async findByUser(userId: string) {
-    return this.prisma.guide.findMany({
+  /**
+   * Récupère les top N guides basés sur une note pondérée
+   * Utilise une approche bayésienne : (R * v + C * m) / (v + m)
+   * où R = note moyenne, v = nombre de votes, C = note moyenne globale, m = nombre minimum de votes
+   */
+  async findTopRated(limit = 5, minReviews = 1) {
+    const guides = await this.prisma.guide.findMany({
       where: {
-        user_id: userId,
         is_active: true,
       },
       include: {
+        user: true,
+        medias: true,
+        hobbies: {
+          include: {
+            category: true,
+          },
+        },
+        experiences: {
+          include: {
+            reviews: true,
+          },
+        },
+      },
+    });
+
+    // Calcule la note moyenne globale
+    const allReviews = guides.flatMap((g) =>
+      g.experiences.flatMap((e) => e.reviews),
+    );
+    const globalAverage =
+      allReviews.length > 0
+        ? allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length
+        : 3.5;
+
+    // Calcule le score pondéré pour chaque guide
+    const guidesWithScore = guides
+      .map((guide) => {
+        const reviews = guide.experiences.flatMap((exp) => exp.reviews);
+        const reviewCount = reviews.length;
+        const avgRating =
+          reviewCount > 0
+            ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
+            : 0;
+
+        const weightedScore =
+          (avgRating * reviewCount + globalAverage * minReviews) /
+          (reviewCount + minReviews);
+
+        return {
+          ...guide,
+          reviewCount,
+          avgRating,
+          weightedScore,
+        };
+      })
+      .filter((g) => g.reviewCount >= minReviews)
+      .sort((a, b) => b.weightedScore - a.weightedScore)
+      .slice(0, limit);
+
+    return guidesWithScore;
+  }
+
+  async findByUser(userId: string) {
+    const guide = await this.prisma.guide.findUnique({
+      where: {
+        user_id: userId,
+      },
+      include: {
+        user: true,
+        medias: {
+          orderBy: { upload_date: 'desc' },
+        },
         documents: true,
-        availabilities: true,
+        hobbies: {
+          include: {
+            category: true,
+          },
+        },
         experiences: true,
       },
     });
+
+    if (!guide) {
+      throw new NotFoundException(
+        `Aucun profil guide trouvé pour l'utilisateur ${userId}`,
+      );
+    }
+
+    if (!guide.is_active) {
+      throw new NotFoundException(
+        `Le profil guide de l'utilisateur ${userId} n'est plus actif`,
+      );
+    }
+
+    return guide;
   }
 
   async update(id: string, updateGuideDto: UpdateGuideDto) {
@@ -143,14 +435,126 @@ export class GuidesService {
     return this.prisma.guide.findMany({
       include: {
         user: true,
+        medias: true,
         documents: true,
-        availabilities: true,
         boosts: true,
+        hobbies: {
+          include: {
+            category: true,
+          },
+        },
         experiences: true,
       },
       orderBy: {
         created_at: 'desc',
       },
     });
+  }
+
+  /**
+   * Récupère les guides locaux avec une demande de carte professionnelle
+   */
+  async findLocalWithCardRequests() {
+    const guides = await this.prisma.guide.findMany({
+      where: {
+        guide_status: GuideStatus.LOCAL,
+        is_active: true,
+        card_request_date: {
+          not: null,
+        },
+      },
+      include: {
+        user: true,
+        medias: true,
+        hobbies: {
+          include: {
+            category: true,
+          },
+        },
+        documents: true,
+      },
+      orderBy: {
+        card_request_date: 'asc',
+      },
+    });
+    return guides;
+  }
+
+  /**
+   * Demande de passage en guide pro
+   * Vérifie les conditions puis crée des guide_document avec les URLs des fichiers
+   */
+  async requestProCard(
+    guideId: string,
+    documents?: { document_type: string; document_url: string }[],
+  ) {
+    const guide = await this.prisma.guide.findUnique({
+      where: { id: guideId },
+      include: { documents: true },
+    });
+
+    if (!guide) {
+      throw new NotFoundException(`Guide avec l'ID ${guideId} introuvable`);
+    }
+
+    // Déjà pro
+    if (guide.guide_status === GuideStatus.PRO) {
+      throw new BadRequestException('Vous êtes déjà un guide professionnel');
+    }
+
+    // Vérifier s'il y a une demande en cours (document guide_card avec status pending)
+    const pendingRequest = guide.documents.find(
+      (doc) =>
+        doc.document_type === 'guide_card' &&
+        doc.verification_status === 'pending',
+    );
+
+    if (pendingRequest) {
+      throw new ConflictException(
+        'Une demande de passage en guide pro est déjà en attente de validation',
+      );
+    }
+
+    // Créer les documents et mettre à jour card_request_date dans une transaction
+    const operations: any[] = [];
+
+    // Créer le document principal guide_card
+    operations.push(
+      this.prisma.guide_document.create({
+        data: {
+          guide_id: guideId,
+          document_type: 'guide_card',
+          verification_status: 'pending',
+        },
+      }),
+    );
+
+    // Créer un guide_document pour chaque fichier uploadé
+    if (documents && documents.length > 0) {
+      for (const doc of documents) {
+        operations.push(
+          this.prisma.guide_document.create({
+            data: {
+              guide_id: guideId,
+              document_type: doc.document_type as any,
+              document_url: doc.document_url,
+              verification_status: 'pending',
+            },
+          }),
+        );
+      }
+    }
+
+    // Mettre à jour card_request_date
+    operations.push(
+      this.prisma.guide.update({
+        where: { id: guideId },
+        data: { card_request_date: new Date() },
+      }),
+    );
+
+    const results = await this.prisma.$transaction(operations);
+
+    return results.slice(0, -1); // Retourner les documents créés (sans le guide update)
   }
 }

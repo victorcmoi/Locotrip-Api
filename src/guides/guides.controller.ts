@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   Patch,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -19,17 +20,18 @@ import {
 } from '@nestjs/swagger';
 import { GuidesService } from './guides.service';
 import { GuideDocumentsService } from './guide-documents.service';
-import { GuideAvailabilityService } from './guide-availability.service';
 import { BoostOffersService } from './boost-offers.service';
 import { GuideBoostsService } from './guide-boosts.service';
 import { CreateGuideDto } from './dto/create-guide.dto';
 import { UpdateGuideDto } from './dto/update-guide.dto';
 import { SoftDeleteGuideDto } from './dto/soft-delete-guide.dto';
 import { CreateGuideDocumentDto } from './dto/create-guide-document.dto';
-import { CreateGuideAvailabilityDto } from './dto/create-guide-availability.dto';
+import { UpdateGuideDocumentDto } from './dto/update-guide-document.dto';
 import { CreateGuideBoostDto } from './dto/create-guide-boost.dto';
 import { CreateBoostOfferDto } from './dto/create-boost-offer.dto';
 import { UpdateBoostOfferDto } from './dto/update-boost-offer.dto';
+import { FindAllGuidesDto } from './dto/find-all-guides.dto';
+import { RequestProDto } from './dto/request-pro.dto';
 import { GuideEntity } from './entities/guide.entity';
 import {
   ApiCreateResponse,
@@ -49,10 +51,9 @@ export class GuidesController {
   constructor(
     private readonly guidesService: GuidesService,
     private readonly guideDocumentsService: GuideDocumentsService,
-    private readonly guideAvailabilityService: GuideAvailabilityService,
     private readonly boostOffersService: BoostOffersService,
     private readonly guideBoostsService: GuideBoostsService,
-  ) {}
+  ) { }
 
   // === GUIDES ===
   @Post()
@@ -68,8 +69,37 @@ export class GuidesController {
   @Public()
   @ApiOperation({ summary: 'Récupérer tous les guides' })
   @ApiGetManyResponse(GuideEntity)
-  findAll() {
-    return this.guidesService.findAll();
+  findAll(@Query() query: FindAllGuidesDto) {
+    return this.guidesService.findAll(query);
+  }
+
+  @Get('top-rated')
+  @Public()
+  @ApiOperation({
+    summary: 'Récupérer les guides les mieux notés',
+    description:
+      "Retourne les guides avec les meilleures notes pondérées par le nombre d'avis",
+  })
+  @ApiGetManyResponse(GuideEntity)
+  findTopRated(
+    @Query('limit') limit?: number,
+    @Query('minReviews') minReviews?: number,
+  ) {
+    return this.guidesService.findTopRated(
+      limit ? Number(limit) : 5,
+      minReviews ? Number(minReviews) : 1,
+    );
+  }
+
+
+  @Get('local')
+  @ApiOperation({
+    summary:
+      'Récupérer les guides locaux avec demande de carte - Admin uniquement',
+  })
+  @ApiGetManyResponse(GuideEntity)
+  findLocalWithCardRequests() {
+    return this.guidesService.findLocalWithCardRequests();
   }
 
   @Get(':id')
@@ -81,8 +111,37 @@ export class GuidesController {
     return this.guidesService.findOne(id);
   }
 
+  @Patch(':id/update-response-time')
+  @Roles(UserRole.ADMIN, UserRole.GUIDE)
+  @ApiOperation({ summary: 'Recalculer et mettre à jour le délai de réponse du guide' })
+  @ApiParam({ name: 'id', description: 'ID du guide' })
+  @ApiUpdateResponse(Object)
+  async updateResponseTime(@Param('id') id: string) {
+    const responseTime = await this.guidesService.calculateAverageResponseTime(id);
+
+    if (responseTime !== null) {
+      await this.guidesService.update(id, {
+        response_time_hours: responseTime
+      });
+
+      const responseTimeRange = this.guidesService.getResponseTimeRange(responseTime);
+
+      return {
+        message: 'Délai de réponse mis à jour avec succès',
+        response_time_hours: responseTime,
+        response_time_range: responseTimeRange,
+      };
+    }
+
+    return {
+      message: 'Pas assez de données pour calculer le délai de réponse',
+      response_time_hours: null,
+      response_time_range: null,
+    };
+  }
+
   @Get('user/:userId')
-  @Roles(UserRole.CLIENT, UserRole.GUIDE)
+  @Public()
   @ApiOperation({ summary: 'Récupérer le guide associé à un utilisateur' })
   @ApiParam({ name: 'userId', description: "ID de l'utilisateur" })
   @ApiGetOneResponse(GuideEntity)
@@ -91,7 +150,6 @@ export class GuidesController {
   }
 
   @Put(':id')
-  @Roles(UserRole.GUIDE)
   @ApiOperation({ summary: 'Mettre à jour un guide' })
   @ApiParam({ name: 'id', description: 'ID du guide' })
   @ApiUpdateResponse(GuideEntity)
@@ -143,9 +201,23 @@ export class GuidesController {
     return this.guidesService.findAllIncludingDeleted();
   }
 
+  // === PRO CARD REQUEST ===
+  @Post(':guideId/request-pro')
+  // @Roles(UserRole.GUIDE)
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Soumettre une demande de passage en guide pro' })
+  @ApiParam({ name: 'guideId', description: 'ID du guide' })
+  @ApiCreateResponse(Object)
+  requestProCard(
+    @Param('guideId') guideId: string,
+    @Body() requestProDto: RequestProDto,
+  ) {
+    return this.guidesService.requestProCard(guideId, requestProDto.documents);
+  }
+
   // === DOCUMENTS ===
   @Post(':guideId/documents')
-  @Roles(UserRole.GUIDE)
+  // @Roles(UserRole.GUIDE)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Ajouter un document au guide' })
   @ApiParam({ name: 'guideId', description: 'ID du guide' })
@@ -163,25 +235,18 @@ export class GuidesController {
     return this.guideDocumentsService.findByGuide(guideId);
   }
 
-  // === DISPONIBILITÉS ===
-  @Post(':guideId/availability')
-  @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Ajouter une disponibilité' })
-  @ApiParam({ name: 'guideId', description: 'ID du guide' })
-  @ApiCreateResponse(Object)
-  createAvailability(
-    @Body() createAvailabilityDto: CreateGuideAvailabilityDto,
+  @Patch(':guideId/documents/:documentId')
+  @ApiOperation({ summary: 'Mettre à jour un document de guide' })
+  @ApiParam({ name: 'documentId', description: 'ID du document' })
+  @ApiUpdateResponse(Object)
+  updateDocument(
+    @Param('documentId') documentId: string,
+    @Body() updateDocumentDto: UpdateGuideDocumentDto,
   ) {
-    return this.guideAvailabilityService.create(createAvailabilityDto);
-  }
-
-  @Get(':guideId/availability')
-  @Public()
-  @ApiOperation({ summary: "Récupérer les disponibilités d'un guide" })
-  @ApiParam({ name: 'guideId', description: 'ID du guide' })
-  @ApiGetManyResponse(Object)
-  findAvailabilityByGuide(@Param('guideId') guideId: string) {
-    return this.guideAvailabilityService.findByGuide(guideId);
+    return this.guideDocumentsService.update(documentId, {
+      ...updateDocumentDto,
+      verification_date: updateDocumentDto.verification_status ? new Date() : undefined,
+    });
   }
 
   // === BOOSTS ===
@@ -209,7 +274,7 @@ export class GuidesController {
 @ApiBearerAuth('JWT-auth')
 @Controller('boost-offers')
 export class BoostOffersController {
-  constructor(private readonly boostOffersService: BoostOffersService) {}
+  constructor(private readonly boostOffersService: BoostOffersService) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)

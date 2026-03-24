@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   Patch,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -21,6 +22,7 @@ import { UsersService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { SoftDeleteUserDto } from './dto/soft-delete-user.dto';
+import { FindAllUsersDto } from './dto/find-all-users.dto';
 import { UserEntity } from './entities/user.entity';
 import {
   ApiCreateResponse,
@@ -49,8 +51,8 @@ export class UsersController {
   @Get()
   @ApiOperation({ summary: 'Récupérer tous les utilisateurs' })
   @ApiGetManyResponse(UserEntity)
-  findAll() {
-    return this.usersService.findAll();
+  findAll(@Query() query: FindAllUsersDto) {
+    return this.usersService.findAll(query);
   }
 
   @Get(':id')
@@ -69,8 +71,8 @@ export class UsersController {
     return this.usersService.findByEmail(email);
   }
 
+  // TODO: Ajouter roles pour la mise à jour du compte
   @Put(':id')
-  @Roles(UserRole.CLIENT)
   @ApiOperation({ summary: 'Mettre à jour un utilisateur' })
   @ApiParam({ name: 'id', description: "ID de l'utilisateur (UUID)" })
   @ApiUpdateResponse(UserEntity)
@@ -79,7 +81,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.CLIENT)
+  @Roles(UserRole.CLIENT, UserRole.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Supprimer un utilisateur' })
   @ApiParam({ name: 'id', description: "ID de l'utilisateur (UUID)" })
@@ -88,8 +90,8 @@ export class UsersController {
     return this.usersService.delete(id);
   }
 
+  // TODO: Ajouter role ADMIN pour la suppression du compte
   @Delete(':id/soft')
-  @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Désactiver un utilisateur (soft delete)' })
   @ApiParam({ name: 'id', description: "ID de l'utilisateur (UUID)" })

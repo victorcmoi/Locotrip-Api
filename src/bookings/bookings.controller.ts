@@ -8,6 +8,8 @@ import {
   Param,
   HttpCode,
   HttpStatus,
+  Query,
+  Request as Req,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -24,6 +26,7 @@ import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { CreateDisputeDto } from './dto/create-dispute.dto';
 import { UpdateDisputeDto } from './dto/update-dispute.dto';
+import { FindAllBookingsDto } from './dto/find-all-bookings.dto';
 import { BookingEntity } from './entities/booking.entity';
 import {
   ApiCreateResponse,
@@ -35,6 +38,7 @@ import {
 import { DisputeStatus } from './enums/dispute.enum';
 import { Roles } from '../common/decorators/role.decorator';
 import { UserRole } from '../users/enums/user.enum';
+import { Public } from '../common/decorators/authentification-decorator';
 
 @ApiTags('Réservations')
 @ApiBearerAuth('JWT-auth')
@@ -51,7 +55,7 @@ export class BookingsController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Créer une réservation' })
   @ApiCreateResponse(BookingEntity)
-  create(@Body() createBookingDto: CreateBookingDto) {
+  async create(@Body() createBookingDto: CreateBookingDto) {
     return this.bookingsService.create(createBookingDto);
   }
 
@@ -59,8 +63,25 @@ export class BookingsController {
   @Roles(UserRole.CLIENT)
   @ApiOperation({ summary: 'Récupérer toutes les réservations' })
   @ApiGetManyResponse(BookingEntity)
-  findAll() {
-    return this.bookingsService.findAll();
+  findAll(@Query() query: FindAllBookingsDto) {
+    return this.bookingsService.findAll(query);
+  }
+
+  @Get('guide/:guideId')
+  @ApiOperation({ summary: "Récupérer les réservations d'un guide" })
+  @ApiParam({ name: 'guideId', description: 'ID du guide' })
+  @ApiGetManyResponse(BookingEntity)
+  findByGuide(@Param('guideId') guideId: string) {
+    return this.bookingsService.findByGuide(guideId);
+  }
+
+  @Get('experience/:experienceId/count')
+  @Public()
+  @ApiOperation({ summary: "Compter les réservations d'une expérience" })
+  @ApiParam({ name: 'experienceId', description: "ID de l'expérience" })
+  async countByExperience(@Param('experienceId') experienceId: string) {
+    const count = await this.bookingsService.countByExperience(experienceId);
+    return { count };
   }
 
   @Get(':id')
@@ -81,12 +102,16 @@ export class BookingsController {
   }
 
   @Put(':id')
-  @Roles(UserRole.CLIENT)
+  @Roles(UserRole.GUIDE, UserRole.ADMIN)
   @ApiOperation({ summary: 'Mettre à jour une réservation' })
   @ApiParam({ name: 'id', description: 'ID de la réservation' })
   @ApiUpdateResponse(BookingEntity)
-  update(@Param('id') id: string, @Body() updateBookingDto: UpdateBookingDto) {
-    return this.bookingsService.update(id, updateBookingDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateBookingDto: UpdateBookingDto,
+    @Req() req: { user: { sub: string } },
+  ) {
+    return this.bookingsService.update(id, updateBookingDto, req.user.sub);
   }
 
   @Delete(':id')
@@ -121,7 +146,7 @@ export class BookingsController {
 
   // Disputes
   @Post(':bookingId/disputes')
-  @Roles(UserRole.CLIENT)
+  // @Roles(UserRole.CLIENT)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Créer un litige' })
   @ApiParam({ name: 'bookingId', description: 'ID de la réservation' })
@@ -193,7 +218,6 @@ export class DisputesController {
   }
 
   @Put(':id')
-  @Roles(UserRole.CLIENT)
   @ApiOperation({ summary: 'Mettre à jour un litige' })
   @ApiParam({ name: 'id', description: 'ID du litige' })
   @ApiUpdateResponse(Object)

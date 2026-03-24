@@ -107,8 +107,8 @@ export class SupportTicketsController {
   }
 
   // Messages
+  // TODO - Add permission guide/client
   @Post(':ticketId/messages')
-  @Roles(UserRole.CLIENT, UserRole.GUIDE)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Ajouter un message au ticket' })
   @ApiParam({ name: 'ticketId', description: 'ID du ticket' })

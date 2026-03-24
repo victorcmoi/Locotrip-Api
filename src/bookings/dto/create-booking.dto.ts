@@ -3,7 +3,7 @@ import {
   IsUUID,
   IsNotEmpty,
   IsInt,
-  IsDecimal,
+  IsNumber,
   IsDateString,
   Min,
 } from 'class-validator';
@@ -47,7 +47,8 @@ export class CreateBookingDto {
     description: 'Prix total de la réservation',
     example: 90.0,
   })
-  @IsDecimal()
+  @IsNumber()
+  @Min(0)
   @IsNotEmpty()
   total_price: number;
 }

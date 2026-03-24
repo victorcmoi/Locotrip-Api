@@ -8,6 +8,7 @@ import { CitiesService } from './cities.service';
 import { ExperiencesService } from './experiences.service';
 import { CategoriesService } from './categories.service';
 import { ExperienceCategoriesService } from './experience-categories.service';
+import { ExperienceAvailabilityService } from './experience-availability.service';
 import { PrismaService } from '../prisma.service';
 
 @Module({
@@ -17,6 +18,7 @@ import { PrismaService } from '../prisma.service';
     ExperiencesService,
     CategoriesService,
     ExperienceCategoriesService,
+    ExperienceAvailabilityService,
     PrismaService,
   ],
   exports: [
@@ -24,6 +26,7 @@ import { PrismaService } from '../prisma.service';
     ExperiencesService,
     CategoriesService,
     ExperienceCategoriesService,
+    ExperienceAvailabilityService,
   ],
 })
-export class ExperiencesModule {}
+export class ExperiencesModule { }

@@ -2,20 +2,29 @@ import {
   Injectable,
   NotFoundException,
   UnauthorizedException,
+  BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { UsersService } from '../users/user.service';
+import { GuidesService } from '../guides/guides.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './dto/register.dto';
+import { RegisterGuideDto } from './dto/register-guide.dto';
 import { ConfigService } from '@nestjs/config';
 import { MailService } from '../mail/mail.service';
 import { userModel } from '../generated/prisma/models/user';
+import { UserRole } from '../users/enums/user.enum';
+import { GuideStatus } from '../guides/enums/guide.enum';
 
 @Injectable()
 export class AuthentificationService {
+  private readonly logger = new Logger(AuthentificationService.name);
+
   constructor(
     private usersService: UsersService,
+    private guidesService: GuidesService,
     private jwtService: JwtService,
     private configService: ConfigService,
     private mailService: MailService,
@@ -34,17 +43,69 @@ export class AuthentificationService {
       throw new NotFoundException(`Email ou mot de passe incorrect`);
     }
 
-    const payload = { userId: user.id };
+    if (
+      loginDto.requiredRole &&
+      user.role.toUpperCase() !== loginDto.requiredRole.toUpperCase()
+    ) {
+      throw new UnauthorizedException(
+        `Accès refusé. Ce compte n'a pas les permissions nécessaires pour accéder à cette interface.`,
+      );
+    }
+
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+    };
+
+    // Fetch guide_id if user is a guide
+    let guideId: string | null = null;
+    if (user.role === 'guide') {
+      try {
+        const guide = await this.guidesService.findByUser(user.id);
+        guideId = guide?.id ?? null;
+      } catch {
+        guideId = null;
+      }
+    }
 
     return {
-      token: await this.jwtService.signAsync(payload),
+      token: await this.jwtService.signAsync(payload, {
+        expiresIn: '8h',
+      }),
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        role: user.role,
+        ...(guideId ? { guideId } : {}),
+      },
     };
   }
 
   async register(
     registerDto: RegisterDto,
   ): Promise<{ user: userModel; accessToken: string; refreshToken: string }> {
-    const user = await this.usersService.create(registerDto);
+    const birthDate = new Date(registerDto.birth_date);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+
+    if (age < 18) {
+      throw new BadRequestException("Vous devez avoir au moins 18 ans pour vous inscrire.");
+    }
+
+    const user = await this.usersService.create({
+      ...registerDto,
+      ...(registerDto.birth_date && {
+        birth_date: new Date(registerDto.birth_date).toISOString(),
+      }),
+    });
 
     const tokens = await this.generateTokens(user.id, user.email, user.role);
 
@@ -57,11 +118,77 @@ export class AuthentificationService {
     this.mailService
       .sendWelcomeEmail(user.email, `${user.first_name} ${user.last_name}`)
       .catch((error) =>
-        console.error("Erreur lors de l'envoi de l'email de bienvenue:", error),
+        this.logger.error(
+          `Erreur lors de l'envoi de l'email de bienvenue à ${user.email}:`,
+          error,
+        ),
       );
 
     return {
       user,
+      ...tokens,
+    };
+  }
+
+  async registerGuide(
+    registerGuideDto: RegisterGuideDto,
+  ): Promise<{ user: userModel; guide: any; accessToken: string; refreshToken: string }> {
+    // Validation de l'âge (18+)
+    const birthDate = new Date(registerGuideDto.birth_date);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+
+    if (age < 18) {
+      throw new BadRequestException("Vous devez avoir au moins 18 ans pour vous inscrire.");
+    }
+
+    // 1. Créer le user avec rôle guide
+    const user = await this.usersService.create({
+      first_name: registerGuideDto.first_name,
+      last_name: registerGuideDto.last_name,
+      email: registerGuideDto.email,
+      password: registerGuideDto.password,
+      role: UserRole.GUIDE,
+      birth_date: new Date(registerGuideDto.birth_date).toISOString(),
+      ...(registerGuideDto.phone ? { phone: registerGuideDto.phone } : {}),
+    });
+
+    // 2. Créer le profil guide (statut local par défaut)
+    const guide = await this.guidesService.create({
+      user_id: user.id,
+      bio: registerGuideDto.bio,
+      country: registerGuideDto.country,
+      languages: registerGuideDto.languages,
+      years_of_experience: registerGuideDto.years_of_experience,
+      guide_status: GuideStatus.LOCAL,
+    });
+
+    // 3. Générer les tokens
+    const tokens = await this.generateTokens(user.id, user.email, user.role);
+
+    // 4. Sauvegarder le refresh token
+    await this.usersService.update(user.id, {
+      refresh_token: tokens.refreshToken,
+    });
+
+    // 5. Envoyer l'email de bienvenue
+    this.mailService
+      .sendWelcomeEmail(user.email, `${user.first_name} ${user.last_name}`)
+      .catch((error) =>
+        this.logger.error(
+          `Erreur lors de l'envoi de l'email de bienvenue à ${user.email}:`,
+          error,
+        ),
+      );
+
+    return {
+      user,
+      guide,
       ...tokens,
     };
   }
@@ -120,6 +247,21 @@ export class AuthentificationService {
     return this.usersService.update(user.id, {
       password: changePasswordDto.password,
     });
+  }
+
+  async getProfile(userId: string) {
+    const user = await this.usersService.findOne(userId);
+    if (!user) {
+      throw new NotFoundException(`Utilisateur introuvable`);
+    }
+
+    return {
+      id: user.id,
+      email: user.email,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      role: user.role,
+    };
   }
 
   // ========== MÉTHODES PRIVÉES ==========

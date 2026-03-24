@@ -1,44 +1,40 @@
+version: "3.9"
+
 services:
   # Base de données PostgreSQL
   postgres:
-    image: postgres:16
+    image: postgres:15
     container_name: locotrip-postgres
-    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: locotrip_db
     ports:
       - "5432:5432"
-    environment:
-      POSTGRES_USER: locotrip
-      POSTGRES_PASSWORD: locotrip
-      POSTGRES_DB: locotrip_db
     volumes:
-      - postgres:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U locotrip -d locotrip_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - postgres15:/var/lib/postgresql/data
 
-  # API NestJS
-  api:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.dev
-    container_name: locotrip-api
+  # Stockage objet MinIO
+  minio:
+    image: ghcr.io/coollabsio/minio:RELEASE.2025-04-22T22-12-26Z
+    container_name: locotrip-minio
     restart: unless-stopped
-    env_file:
-      - .env
-    environment:
-      NODE_ENV: development
-      DATABASE_URL: "postgresql://locotrip:locotrip@postgres:5432/locotrip_db?schema=public"
+    command: server /data --console-address ":9001"
     ports:
-      - "${API_PORT:-3333}:3333"
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BROWSER_REDIRECT_URL: ${MINIO_BROWSER_REDIRECT_URL}
     volumes:
-      - .:/app
-      - /app/node_modules
-    command: sh -c "npx prisma generate && npm run start:dev"
-    depends_on:
-      postgres:
-        condition: service_healthy
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 20s
+      retries: 10
 
 volumes:
-  postgres:
+  postgres15:
+  minio-data:

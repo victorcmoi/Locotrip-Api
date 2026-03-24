@@ -8,4 +8,6 @@ export enum DocumentType {
   CV = 'CV',
   DIPLOMA = 'diploma',
   PROOF_OF_RESIDENCE = 'proof_of_residence',
+  GUIDE_CARD = 'guide_card',
+  OTHER = 'other',
 }

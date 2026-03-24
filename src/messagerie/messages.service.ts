@@ -1,13 +1,22 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateMessageDto } from './dto/create-message.dto';
+import { NotificationsService } from '../support/notifications.service';
+import { NotificationType } from '../support/enums/notification.enum';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class MessagesService {
-  constructor(private prisma: PrismaService) {}
+  private readonly logger = new Logger(MessagesService.name);
+
+  constructor(
+    private prisma: PrismaService,
+    private notificationsService: NotificationsService,
+    private mailService: MailService,
+  ) {}
 
   async create(createMessageDto: CreateMessageDto) {
-    return this.prisma.message.create({
+    const message = await this.prisma.message.create({
       data: {
         content: createMessageDto.content,
         conversation: {
@@ -18,6 +27,74 @@ export class MessagesService {
         },
       },
     });
+
+    const conversationDetails = await this.prisma.conversation.findUnique({
+      where: { id: createMessageDto.conversation_id },
+      include: {
+        booking: {
+          include: {
+            user: true,
+            experience: {
+              include: {
+                guide: {
+                  include: {
+                    user: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const authorDoc = await this.prisma.user.findUnique({
+      where: { id: createMessageDto.author_id },
+      select: { first_name: true },
+    });
+
+    if (conversationDetails && authorDoc) {
+      const clientUser = conversationDetails.booking.user;
+      const guideUser = conversationDetails.booking.experience.guide.user;
+
+      const recipient =
+        message.author_id === clientUser.id ? guideUser : clientUser;
+
+      if (recipient) {
+        // App-level notification
+        this.notificationsService
+          .create({
+            user_id: recipient.id,
+            type: NotificationType.NEW_MESSAGE,
+            content: `Vous avez reçu un nouveau message de ${authorDoc.first_name}`,
+          })
+          .catch((e) =>
+            this.logger.error(
+              `Erreur lors de la création de la notification de nouveau message pour l'utilisateur ${recipient.id}`,
+              e,
+            ),
+          );
+
+        // Email notification
+        const now = new Date();
+        const timestamp = `${now.toLocaleDateString('fr-FR')} à ${now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+
+        this.mailService
+          .sendNewMessageEmail(recipient.email, {
+            senderName: authorDoc.first_name,
+            messageContent: message.content,
+            timestamp: timestamp,
+          })
+          .catch((e) =>
+            this.logger.error(
+              `Erreur lors de l'envoi de l'email de nouveau message à ${recipient.email}`,
+              e,
+            ),
+          );
+      }
+    }
+
+    return message;
   }
 
   async findAll() {
@@ -63,5 +140,18 @@ export class MessagesService {
     } catch {
       throw new NotFoundException(`Message avec l'ID ${id} introuvable`);
     }
+  }
+
+  async markAsRead(conversationId: string, userId: string) {
+    return this.prisma.message.updateMany({
+      where: {
+        conversation_id: conversationId,
+        author_id: { not: userId },
+        is_read: false,
+      },
+      data: {
+        is_read: true,
+      },
+    });
   }
 }
