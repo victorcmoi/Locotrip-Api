@@ -42,7 +42,6 @@ import {
 import { Roles } from '../common/decorators/role.decorator';
 import { UserRole } from '../users/enums/user.enum';
 import { Public } from '../common/decorators/authentification-decorator';
-import { find } from 'rxjs';
 
 @ApiTags('Villes')
 @ApiBearerAuth('JWT-auth')
