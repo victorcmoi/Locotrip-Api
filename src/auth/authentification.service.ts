@@ -3,7 +3,6 @@ import {
   NotFoundException,
   UnauthorizedException,
   BadRequestException,
-  Logger,
 } from '@nestjs/common';
 import { UsersService } from '../users/user.service';
 import { GuidesService } from '../guides/guides.service';
@@ -20,8 +19,6 @@ import { GuideStatus } from '../guides/enums/guide.enum';
 
 @Injectable()
 export class AuthentificationService {
-  private readonly logger = new Logger(AuthentificationService.name);
-
   constructor(
     private usersService: UsersService,
     private guidesService: GuidesService,
@@ -118,10 +115,7 @@ export class AuthentificationService {
     this.mailService
       .sendWelcomeEmail(user.email, `${user.first_name} ${user.last_name}`)
       .catch((error) =>
-        this.logger.error(
-          `Erreur lors de l'envoi de l'email de bienvenue à ${user.email}:`,
-          error,
-        ),
+        console.error("Erreur lors de l'envoi de l'email de bienvenue:", error),
       );
 
     return {
@@ -180,10 +174,7 @@ export class AuthentificationService {
     this.mailService
       .sendWelcomeEmail(user.email, `${user.first_name} ${user.last_name}`)
       .catch((error) =>
-        this.logger.error(
-          `Erreur lors de l'envoi de l'email de bienvenue à ${user.email}:`,
-          error,
-        ),
+        console.error("Erreur lors de l'envoi de l'email de bienvenue:", error),
       );
 
     return {

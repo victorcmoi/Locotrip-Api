@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { NotificationsService } from '../support/notifications.service';
@@ -7,8 +7,6 @@ import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class MessagesService {
-  private readonly logger = new Logger(MessagesService.name);
-
   constructor(
     private prisma: PrismaService,
     private notificationsService: NotificationsService,
@@ -68,12 +66,7 @@ export class MessagesService {
             type: NotificationType.NEW_MESSAGE,
             content: `Vous avez reçu un nouveau message de ${authorDoc.first_name}`,
           })
-          .catch((e) =>
-            this.logger.error(
-              `Erreur lors de la création de la notification de nouveau message pour l'utilisateur ${recipient.id}`,
-              e,
-            ),
-          );
+          .catch((e) => console.error('Failed to create notification', e));
 
         // Email notification
         const now = new Date();
@@ -85,12 +78,7 @@ export class MessagesService {
             messageContent: message.content,
             timestamp: timestamp,
           })
-          .catch((e) =>
-            this.logger.error(
-              `Erreur lors de l'envoi de l'email de nouveau message à ${recipient.email}`,
-              e,
-            ),
-          );
+          .catch((e) => console.error('Failed to send new message email', e));
       }
     }
 

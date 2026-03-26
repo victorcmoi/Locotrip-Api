@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
@@ -18,8 +18,6 @@ import {
 
 @Injectable()
 export class BookingsService {
-  private readonly logger = new Logger(BookingsService.name);
-
   constructor(
     private prisma: PrismaService,
     private notificationsService: NotificationsService,
@@ -77,10 +75,7 @@ export class BookingsService {
         bookingId: booking.id,
       })
       .catch((e) =>
-        this.logger.error(
-          `Erreur lors de l'envoi de l'email de nouvelle réservation au guide`,
-          e,
-        ),
+        console.error('Failed to send new booking email to guide', e),
       );
 
     return booking;
@@ -352,10 +347,7 @@ export class BookingsService {
                 bookingId: booking.id,
               })
               .catch((e) =>
-                this.logger.error(
-                  `Erreur lors de l'envoi du mail de confirmation de réservation à ${booking.user.email}`,
-                  e,
-                ),
+                console.error('Failed to send confirmation email', e),
               );
           } else if (updateBookingDto.status === BookingStatus.CANCELLED) {
             const bookingDate = new Date(booking.booking_date);
@@ -368,12 +360,7 @@ export class BookingsService {
                 date: dateFormatted,
                 bookingId: booking.id,
               })
-              .catch((e) =>
-                this.logger.error(
-                  `Erreur lors de l'envoi du mail d'annulation de réservation à ${booking.user.email}`,
-                  e,
-                ),
-              );
+              .catch((e) => console.error('Failed to send cancellation email', e));
           }
         }
       }

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
@@ -9,8 +9,6 @@ import { NotificationType } from '../support/enums/notification.enum';
 
 @Injectable()
 export class ReviewService {
-  private readonly logger = new Logger(ReviewService.name);
-
   constructor(
     private prisma: PrismaService,
     private mailService: MailService,
@@ -91,12 +89,7 @@ export class ReviewService {
           content: `Vous avez reçu un nouvel avis (${review.rating} étoiles) de ${review.user.first_name} pour l'expérience "${review.experience.title}".`,
           user_id: guideUser.id,
         })
-        .catch((e) =>
-          this.logger.error(
-            `Erreur lors de la création de la notification de nouvel avis pour le guide`,
-            e,
-          ),
-        );
+        .catch((e) => console.error('Failed to create in-app notification', e));
 
       // Send email
       if (guideUser.email) {
@@ -107,12 +100,7 @@ export class ReviewService {
             comment: review.comment || '',
             experienceName: review.experience.title,
           })
-          .catch((e) =>
-            this.logger.error(
-              `Erreur lors de l'envoi de l'email de nouvel avis au guide ${guideUser.email}`,
-              e,
-            ),
-          );
+          .catch((e) => console.error('Failed to send review email to guide', e));
       }
     }
 
